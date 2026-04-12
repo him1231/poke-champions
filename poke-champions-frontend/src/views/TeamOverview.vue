@@ -105,9 +105,9 @@ async function downloadOverviewPng() {
       useCORS: true,
       backgroundColor: '#0f1023',
       logging: false,
-      /** 略過操作列；略過頭像（跨域圖無法可靠畫進 canvas，匯出改為不顯示圖片） */
+      /** 略過操作列；略過整段頭像區（不占位） */
       ignoreElements: el =>
-        !!el.closest?.('.overview-export-ignore') || el.classList?.contains('mc-avatar'),
+        !!el.closest?.('.overview-export-ignore') || el.classList?.contains('mc-avatar-wrap'),
     })
     const stamp = new Date().toISOString().replace(/\D/g, '').slice(0, 14)
     const link = document.createElement('a')
@@ -161,7 +161,9 @@ async function downloadOverviewPng() {
         <article v-for="m in filledMembers" :key="m.slotIdx" class="member-card">
           <!-- 頭部 -->
           <div class="mc-header">
-            <img :src="getPokemonImageUrl(m.pokemon)" class="mc-avatar" />
+            <div class="mc-avatar-wrap">
+              <img :src="getPokemonImageUrl(m.pokemon)" class="mc-avatar" />
+            </div>
             <div class="mc-info">
               <h3 class="mc-name">{{ pokemonDisplayName(m.pokemon) }}</h3>
               <div class="mc-types">
@@ -429,7 +431,12 @@ async function downloadOverviewPng() {
   gap: 14px;
 }
 
+.mc-avatar-wrap {
+  flex-shrink: 0;
+}
+
 .mc-avatar {
+  display: block;
   width: 64px;
   height: 64px;
   object-fit: contain;
@@ -437,7 +444,6 @@ async function downloadOverviewPng() {
   background: var(--bg-glass);
   border-radius: var(--radius-sm);
   padding: 4px;
-  flex-shrink: 0;
 }
 
 .mc-info { flex: 1; min-width: 0; }
