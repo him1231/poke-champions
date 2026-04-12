@@ -18,6 +18,8 @@ public interface PokemonRepository extends JpaRepository<Pokemon, Long> {
 
     List<Pokemon> findByStatsSyncedFalse();
 
+    List<Pokemon> findAllByOrderByFormId();
+
     Optional<Pokemon> findByChineseName(String chineseName);
 
     List<Pokemon> findByChineseNameIsNotNull();
