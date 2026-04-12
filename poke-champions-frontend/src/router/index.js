@@ -6,6 +6,7 @@ import MovesPage from '../views/MovesPage.vue'
 import TypesPage from '../views/TypesPage.vue'
 import TeamBuilder from '../views/TeamBuilder.vue'
 import TeamOverview from '../views/TeamOverview.vue'
+import AboutPage from '../views/AboutPage.vue'
 
 export default createRouter({
   history: createWebHistory(),
@@ -17,5 +18,6 @@ export default createRouter({
     { path: '/types', name: 'types', component: TypesPage },
     { path: '/team-builder', name: 'team-builder', component: TeamBuilder },
     { path: '/team-overview', name: 'team-overview', component: TeamOverview },
+    { path: '/about', name: 'about', component: AboutPage },
   ],
 })

@@ -51,6 +51,14 @@ const features = [
     gradient: 'linear-gradient(135deg, rgba(171, 106, 200, 0.15), rgba(250, 113, 121, 0.1))',
     iconColor: '#ab6ac8',
   },
+  {
+    icon: 'groups',
+    title: '隊伍組建',
+    desc: '自由選擇寶可夢與招式，打造你的冠軍賽最強隊伍',
+    link: '/team-builder',
+    gradient: 'linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(129, 199, 132, 0.1))',
+    iconColor: '#4caf50',
+  },
 ]
 </script>
 

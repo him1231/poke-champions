@@ -55,6 +55,7 @@ const navLinks = [
         </div>
         <div class="footer-links">
           <router-link v-for="link in navLinks" :key="link.path" :to="link.path">{{ link.name }}</router-link>
+          <router-link to="/about">關於製作者</router-link>
         </div>
       </div>
     </footer>
