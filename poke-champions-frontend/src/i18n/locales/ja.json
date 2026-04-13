@@ -3,9 +3,12 @@
     "home": "ホーム",
     "pokedex": "図鑑",
     "moves": "技",
-    "types": "タイプ",
+    "types": "タイプ相性",
     "teamBuilder": "チーム編成",
-    "teams": "チーム探索"
+    "teams": "チーム探索",
+    "teamMenu": "チーム",
+    "toolsMenu": "タイプ・ツール",
+    "speedTiers": "素早さの指標"
   },
   "common": {
     "loading": "読み込み中",
@@ -104,6 +107,10 @@
       "types": {
         "title": "タイプ相性",
         "desc": "タイプ間の攻防倍率を確認、複合タイプの防御相性を計算"
+      },
+      "speedTiers": {
+        "title": "速度線",
+        "desc": "Lv.50 の無努力・満速・急速と、天気で速度が2倍になるポケモンの参考表"
       },
       "teamBuilder": {
         "title": "チーム編成",
@@ -305,6 +312,10 @@
       "title": "タイプ相性表 — Poké Champions",
       "description": "18タイプの攻防倍率を確認、複合タイプの防御相性を計算。"
     },
+    "speedTiers": {
+      "title": "速度線 — Poké Champions",
+      "description": "チャンピオンズ Lv.50 の無努力・満速・急速（性格補正）と天気加速ポケモンの目安。"
+    },
     "teamBuilder": {
       "title": "チーム編成 — Poké Champions",
       "description": "ポケモンと技を選んで最強のチャンピオンズチームを編成、エクスポートして共有。"
@@ -330,12 +341,52 @@
       "description": "共有チームのメンバー構成とステータスを確認。"
     }
   },
+  "speedTiers": {
+    "title": "素早さの指標",
+    "subtitle": "本サイトの名簿で素早さ種族値が同期済みのポケモンに基づきます。帯域の分け方は一般的な早見表と同じく「素早さ種族値」の区間です（計算後の急速では分けません）。カードには無努力・満速・急速も併記します。",
+    "formulaTitle": "計算式",
+    "formulaNoEv": "無努力速度 = 種族値 + 20",
+    "formulaMax": "満速 = 種族値 + 52",
+    "formulaExtreme": "急速 = floor(満速 × 1.1)（素早さプラス性格、切り捨て）",
+    "formulaNote": "一般的な対戦用早見表と同様：満速は速度252努力・31個体・バランス性格、急速は素早さ上昇性格とします。",
+    "abilitySectionTitle": "天気・フィールド／かるわざなど速度2倍",
+    "abilitySectionDesc": "「すいすい」「ようりょくそう」「すなかき」「ゆきかき」に加え、ルガルガン（まひるのすがた・すなかき）、ルチャブル・オオニューラ（「かるわざ」＝道具消費後の素早さ2倍、×2欄は天気系との比較用）を含みます。「満速×2」= 2×(種族値+52)、「急速×2」= floor(満速×2×1.1)。2倍がないポケモンは「—」。行は極速順：2倍ありは「急速×2」降順、2倍なしは「急速」で並べます。名簿にいないフォルムは表示しません。",
+    "colPokemon": "ポケモン",
+    "colBase": "種族値",
+    "colNoEv": "無努力",
+    "colMax": "満速",
+    "colExtreme": "急速",
+    "colMaxDouble": "満速×2",
+    "colExtremeDouble": "急速×2",
+    "shortNoEv": "無努力",
+    "shortMax": "満速",
+    "shortExtreme": "急速",
+    "tiers": {
+      "t120": "極めて速い（素早さ種族値 ≥ 120）",
+      "t110_119": "高速（素早さ種族値 110–119）",
+      "t100_109": "高速（素早さ種族値 100–109）",
+      "t90_99": "中速（素早さ種族値 90–99）",
+      "t80_89": "中速（素早さ種族値 80–89）",
+      "t70_79": "中速（素早さ種族値 70–79）",
+      "t60_69": "やや遅い（素早さ種族値 60–69）",
+      "t42_59": "遅い（素早さ種族値 42–59）",
+      "t0_41": "非常に遅い（素早さ種族値 ≤ 41）"
+    }
+  },
   "teamShare": {
+    "battleFormat": {
+      "label": "ルール",
+      "singles": "シングル",
+      "doubles": "ダブル"
+    },
     "listPage": {
       "title": "チーム探索",
       "sortLatest": "新着",
       "sortPopular": "人気",
-      "noTeams": "まだチームがありません。最初に共有しよう！"
+      "noTeams": "まだチームがありません。最初に共有しよう！",
+      "goToTeamBuilder": "チーム構築へ",
+      "tagSingles": "シングル",
+      "tagDoubles": "ダブル"
     },
     "detailPage": {
       "notFound": "チームが見つかりません",
@@ -352,7 +403,8 @@
       "pinExpired": "PINの有効期限が切れました。再度認証してください",
       "deleteConfirmTitle": "チームを削除しますか？",
       "deleteConfirmMsg": "この操作は取り消せません。チームは完全に削除されます。",
-      "deleteBtn": "削除"
+      "deleteBtn": "削除",
+      "battleFormatShort": "ルール"
     },
     "shareModal": {
       "title": "チームを共有",
@@ -364,6 +416,9 @@
       "pinMismatch": "PINが一致しません",
       "pinHint": "PINはチームの編集・削除に使用します",
       "publicLabel": "チーム探索に公開する",
+      "battleFormatSingles": "シングル",
+      "battleFormatDoubles": "ダブル",
+      "battleFormatHint": "主にシングル／ダブルのどちら向けか表示されます。",
       "submit": "共有",
       "duplicateError": "このチームIDは既に使用されています",
       "genericError": "エラーが発生しました。もう一度お試しください",

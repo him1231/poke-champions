@@ -40,13 +40,15 @@ const filtered = computed(() => {
   let list = pokemonList.value
 
   if (search.value) {
-    const q = search.value.toLowerCase()
+    const raw = search.value.trim()
+    const q = raw.toLowerCase()
     list = list.filter(
       (p) =>
         (p.displayName && p.displayName.toLowerCase().includes(q)) ||
         (p.chineseName && p.chineseName.toLowerCase().includes(q)) ||
+        (p.japaneseName && p.japaneseName.toLowerCase().includes(q)) ||
         (p.apiName && p.apiName.toLowerCase().includes(q)) ||
-        String(p.nationalDexNumber).includes(q),
+        String(p.nationalDexNumber).includes(raw),
     )
   }
 

@@ -37,6 +37,8 @@ const pinLoading = ref(false)
 const editTitle = ref('')
 const editDescription = ref('')
 const editIsPublic = ref(true)
+/** singles | doubles */
+const editBattleFormat = ref('singles')
 const saving = ref(false)
 const saveError = ref('')
 
@@ -191,6 +193,7 @@ async function startEditing(pin) {
   editTitle.value = team.value.title
   editDescription.value = team.value.description || ''
   editIsPublic.value = team.value.isPublic
+  editBattleFormat.value = team.value.battleFormat === 'doubles' ? 'doubles' : 'singles'
   isEditing.value = true
 }
 
@@ -204,6 +207,7 @@ async function saveEdit() {
       title: editTitle.value.trim(),
       description: editDescription.value.trim(),
       isPublic: editIsPublic.value,
+      battleFormat: editBattleFormat.value,
     })
     team.value = data
     isEditing.value = false
@@ -323,6 +327,10 @@ onMounted(() => {
             />
           </h1>
           <div class="team-meta">
+            <span
+              v-if="!isEditing"
+              class="meta-badge bf-badge"
+            >{{ team.battleFormat === 'doubles' ? t('teamShare.listPage.tagDoubles') : t('teamShare.listPage.tagSingles') }}</span>
             <span class="meta-badge rental-badge copyable" @click="copyRentalCode" :title="t('teamShare.detailPage.copyId')">
               <span class="material-symbols-rounded">confirmation_number</span>
               {{ team.rentalCode }}
@@ -382,6 +390,19 @@ onMounted(() => {
           <input v-model="editIsPublic" type="checkbox" />
           <span>{{ t('teamShare.shareModal.publicLabel') }}</span>
         </label>
+        <div class="edit-battle-format">
+          <span class="edit-bf-label">{{ t('teamShare.battleFormat.label') }}</span>
+          <div class="edit-bf-options">
+            <label class="edit-bf-option">
+              <input v-model="editBattleFormat" type="radio" value="singles" />
+              <span>{{ t('teamShare.shareModal.battleFormatSingles') }}</span>
+            </label>
+            <label class="edit-bf-option">
+              <input v-model="editBattleFormat" type="radio" value="doubles" />
+              <span>{{ t('teamShare.shareModal.battleFormatDoubles') }}</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <p v-if="saveError" class="save-error">{{ saveError }}</p>
@@ -584,6 +605,16 @@ onMounted(() => {
 .rental-badge .copy-icon { font-size: 14px; opacity: 0.6; }
 .rental-badge.copyable:hover .copy-icon { opacity: 1; }
 
+.bf-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+}
+
 .meta-item {
   display: flex;
   align-items: center;
@@ -739,6 +770,39 @@ onMounted(() => {
 .edit-check input[type="checkbox"] {
   width: 18px;
   height: 18px;
+  accent-color: var(--accent);
+}
+
+.edit-battle-format {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-bf-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.edit-bf-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.edit-bf-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.edit-bf-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
   accent-color: var(--accent);
 }
 

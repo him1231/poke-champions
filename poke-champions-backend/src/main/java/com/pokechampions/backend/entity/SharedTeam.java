@@ -41,6 +41,10 @@ public class SharedTeam {
 
     private boolean expired = false;
 
+    /** singles | doubles */
+    @Column(name = "battle_format", nullable = false, length = 16)
+    private String battleFormat = "singles";
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -91,6 +95,9 @@ public class SharedTeam {
 
     public boolean isExpired() { return expired; }
     public void setExpired(boolean expired) { this.expired = expired; }
+
+    public String getBattleFormat() { return battleFormat; }
+    public void setBattleFormat(String battleFormat) { this.battleFormat = battleFormat; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

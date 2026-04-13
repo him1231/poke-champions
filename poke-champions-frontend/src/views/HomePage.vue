@@ -57,6 +57,14 @@ const features = computed(() => [
     iconColor: '#ab6ac8',
   },
   {
+    icon: 'speed',
+    title: t('home.feature.speedTiers.title'),
+    desc: t('home.feature.speedTiers.desc'),
+    link: localePath('/speed-tiers'),
+    gradient: 'linear-gradient(135deg, rgba(98, 188, 90, 0.15), rgba(74, 144, 217, 0.1))',
+    iconColor: '#62bc5a',
+  },
+  {
     icon: 'groups',
     title: t('home.feature.teamBuilder.title'),
     desc: t('home.feature.teamBuilder.desc'),

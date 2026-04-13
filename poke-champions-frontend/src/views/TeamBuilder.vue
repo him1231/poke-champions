@@ -98,7 +98,8 @@ const filteredPokemon = computed(() => {
   if (!q) return list
   return list.filter(p =>
     (p.displayName || '').toLowerCase().includes(q) ||
-    (p.chineseName || '').includes(q) ||
+    (p.chineseName || '').toLowerCase().includes(q) ||
+    (p.japaneseName || '').toLowerCase().includes(q) ||
     (p.apiName || '').toLowerCase().includes(q)
   )
 })
@@ -253,7 +254,8 @@ const filteredMoves = computed(() => {
   let list = learnableMoves.value
   if (q) {
     list = list.filter(m =>
-      (m.chineseName || '').includes(q) ||
+      (m.chineseName || '').toLowerCase().includes(q) ||
+      (m.japaneseName || '').toLowerCase().includes(q) ||
       (m.displayName || '').toLowerCase().includes(q) ||
       (m.name || '').toLowerCase().includes(q)
     )
@@ -286,7 +288,8 @@ const filteredItems = computed(() => {
   const q = itemSearch.value.toLowerCase().trim()
   if (!q) return allItems.value.slice(0, 40)
   return allItems.value.filter(i =>
-    (i.chineseName || '').includes(q) ||
+    (i.chineseName || '').toLowerCase().includes(q) ||
+    (i.japaneseName || '').toLowerCase().includes(q) ||
     (i.displayName || '').toLowerCase().includes(q) ||
     (i.name || '').toLowerCase().includes(q)
   ).slice(0, 40)

@@ -3,9 +3,12 @@
     "home": "首頁",
     "pokedex": "圖鑑",
     "moves": "招式",
-    "types": "屬性",
+    "types": "屬性相剋",
     "teamBuilder": "組隊",
-    "teams": "隊伍探索"
+    "teams": "隊伍探索",
+    "teamMenu": "隊伍",
+    "toolsMenu": "屬性與工具",
+    "speedTiers": "速度線"
   },
   "common": {
     "loading": "載入中",
@@ -104,6 +107,10 @@
       "types": {
         "title": "屬性相剋",
         "desc": "查詢屬性間的攻防倍率，計算雙屬性組合的防禦相性"
+      },
+      "speedTiers": {
+        "title": "速度線",
+        "desc": "Lv.50 無努力／滿速／急速數值，以及天氣下速度翻倍寶可夢參考表"
       },
       "teamBuilder": {
         "title": "隊伍組建",
@@ -305,6 +312,10 @@
       "title": "屬性相剋表 — Poké Champions",
       "description": "查詢 18 種屬性的攻防倍率，計算雙屬性組合的防禦相性。"
     },
+    "speedTiers": {
+      "title": "速度線 — Poké Champions",
+      "description": "冠軍賽 Lv.50 速度線：無努力、滿速、急速（性格修正）與常見天氣／場地加速寶可夢參考。"
+    },
     "teamBuilder": {
       "title": "隊伍組建 — Poké Champions",
       "description": "選擇寶可夢與招式，打造你的冠軍賽最強隊伍並匯出分享。"
@@ -330,12 +341,52 @@
       "description": "查看分享隊伍的詳細成員配置與能力值。"
     }
   },
+  "speedTiers": {
+    "title": "速度線",
+    "subtitle": "以下依本網站冠軍賽名冊中已同步種族值的寶可夢計算；分組與常見速查表相同，以「種族速度」區間為準（非以計算後的急速分組）。卡片上仍顯示無努力／滿速／急速供對線參考。",
+    "formulaTitle": "計算方式",
+    "formulaNoEv": "無努力速度 = 種族值 + 20",
+    "formulaMax": "滿速 = 種族值 + 52",
+    "formulaExtreme": "急速 = floor(滿速 × 1.1)（性格 +速度，無條件捨去）",
+    "formulaNote": "與常見對戰計算表一致：滿速假設 252 速度努力、31 速度個體、中性性格；急速為 +速度性格。",
+    "abilitySectionTitle": "天氣／場地／輕裝等速度翻倍（×2）",
+    "abilitySectionDesc": "下列為常見「悠遊自如／葉綠素／撥沙／撥雪」等效果之代表寶可夢，並含鬃岩狼人（白晝·撥沙）、摔角鷹人與大狃拉等具「輕裝」者（失去持有道具後速度翻倍；×2 欄數值供與天氣類對照）。「滿速×2」= 2×(種族值+52)；「急速×2」= floor(滿速×2×1.1)。若某列不適用速度×2（僅作單線極速對照），滿速×2／急速×2 以「—」表示。表格列依極速排序：有×2 者以「急速×2」由高到低，無×2 者以「急速」比較。若名冊中無該形態則不顯示。",
+    "colPokemon": "寶可夢",
+    "colBase": "種族速度",
+    "colNoEv": "無努力",
+    "colMax": "滿速",
+    "colExtreme": "急速",
+    "colMaxDouble": "滿速×2",
+    "colExtremeDouble": "急速×2",
+    "shortNoEv": "無努力",
+    "shortMax": "滿速",
+    "shortExtreme": "急速",
+    "tiers": {
+      "t120": "極快（種族速度 ≥ 120）",
+      "t110_119": "高速（種族速度 110–119）",
+      "t100_109": "高速（種族速度 100–109）",
+      "t90_99": "中速（種族速度 90–99）",
+      "t80_89": "中速（種族速度 80–89）",
+      "t70_79": "中速（種族速度 70–79）",
+      "t60_69": "中低速（種族速度 60–69）",
+      "t42_59": "低速（種族速度 42–59）",
+      "t0_41": "極慢（種族速度 ≤ 41）"
+    }
+  },
   "teamShare": {
+    "battleFormat": {
+      "label": "對戰模式",
+      "singles": "單打",
+      "doubles": "雙打"
+    },
     "listPage": {
       "title": "隊伍探索",
       "sortLatest": "最新",
       "sortPopular": "熱門",
-      "noTeams": "目前還沒有隊伍，來分享第一支吧！"
+      "noTeams": "目前還沒有隊伍，來分享第一支吧！",
+      "goToTeamBuilder": "前往組隊",
+      "tagSingles": "單打",
+      "tagDoubles": "雙打"
     },
     "detailPage": {
       "notFound": "找不到此隊伍",
@@ -352,7 +403,8 @@
       "pinExpired": "PIN 碼已失效，請重新驗證",
       "deleteConfirmTitle": "確定要刪除隊伍？",
       "deleteConfirmMsg": "此操作無法復原，隊伍將被永久移除。",
-      "deleteBtn": "確定刪除"
+      "deleteBtn": "確定刪除",
+      "battleFormatShort": "模式"
     },
     "shareModal": {
       "title": "分享隊伍",
@@ -364,6 +416,9 @@
       "pinMismatch": "兩次輸入的 PIN 碼不一致",
       "pinHint": "PIN 碼用於日後編輯或刪除隊伍，請牢記",
       "publicLabel": "公開至隊伍探索列表",
+      "battleFormatSingles": "單打",
+      "battleFormatDoubles": "雙打",
+      "battleFormatHint": "標註此隊伍主要用於單打或雙打對戰，方便其他玩家瀏覽。",
       "submit": "分享",
       "duplicateError": "此隊伍 ID 已被使用",
       "genericError": "發生錯誤，請稍後再試",

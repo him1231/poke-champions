@@ -3,9 +3,12 @@
     "home": "Home",
     "pokedex": "Pokédex",
     "moves": "Moves",
-    "types": "Types",
+    "types": "Type chart",
     "teamBuilder": "Team Builder",
-    "teams": "Teams"
+    "teams": "Team browser",
+    "teamMenu": "Teams",
+    "toolsMenu": "Types & tools",
+    "speedTiers": "Speed tiers"
   },
   "common": {
     "loading": "Loading",
@@ -104,6 +107,10 @@
       "types": {
         "title": "Type Matchups",
         "desc": "Check type effectiveness, calculate dual-type defensive matchups"
+      },
+      "speedTiers": {
+        "title": "Speed Tiers",
+        "desc": "Lv.50 benchmarks: no EVs, max Speed, +Spe nature, plus weather speed-doubling reference"
       },
       "teamBuilder": {
         "title": "Team Builder",
@@ -305,6 +312,10 @@
       "title": "Type Matchups — Poké Champions",
       "description": "Check the 18-type effectiveness chart and calculate dual-type defensive matchups."
     },
+    "speedTiers": {
+      "title": "Speed Tiers — Poké Champions",
+      "description": "Lv.50 speed benchmarks (no EVs, max Speed, +Speed nature) and common doubled-speed Pokémon in weather."
+    },
     "teamBuilder": {
       "title": "Team Builder — Poké Champions",
       "description": "Select Pokémon and moves to build your strongest Champions team and export to share."
@@ -330,12 +341,52 @@
       "description": "View shared team members, stats, and move sets."
     }
   },
+  "speedTiers": {
+    "title": "Speed tiers",
+    "subtitle": "Uses synced base stats from this site’s roster. Tier bands follow common reference charts: grouped by base Speed stat (not by the computed +Spe value). Cards still show No EVs / Max / +Spe for lineups.",
+    "formulaTitle": "Formulas",
+    "formulaNoEv": "No EVs = base Speed + 20",
+    "formulaMax": "Max Speed = base Speed + 52",
+    "formulaExtreme": "+Speed nature = floor(Max Speed × 1.1) (round down)",
+    "formulaNote": "Matches common sheets: max Speed assumes 252 Speed EVs, 31 Speed IV, neutral nature; +Speed uses a boosting nature on Speed.",
+    "abilitySectionTitle": "Weather / field / Unburden-style doubled Speed (×2)",
+    "abilitySectionDesc": "Includes Swift Swim, Chlorophyll, Sand Rush, Slush Rush, plus Midday Lycanroc (Sand Rush in sand), Hawlucha and Sneasler (Unburden after consuming an item—the ×2 columns are for comparison with weather doubling). “Max×2” = 2×(base+52); “+Spe×2” = floor(Max×2×1.1). Rows that do not use a ×2 Speed effect (single-line reference only) show “—” in the ×2 columns. Rows are sorted by effective top speed: +Spe×2 when doubling applies, otherwise +Spe. Rows are hidden if the form is not in the roster.",
+    "colPokemon": "Pokémon",
+    "colBase": "Base Spe",
+    "colNoEv": "No EVs",
+    "colMax": "Max",
+    "colExtreme": "+Spe",
+    "colMaxDouble": "Max×2",
+    "colExtremeDouble": "+Spe×2",
+    "shortNoEv": "No EV",
+    "shortMax": "Max",
+    "shortExtreme": "+Spe",
+    "tiers": {
+      "t120": "Very fast (base Speed ≥ 120)",
+      "t110_119": "Fast (base Speed 110–119)",
+      "t100_109": "Fast (base Speed 100–109)",
+      "t90_99": "Medium-fast (base Speed 90–99)",
+      "t80_89": "Medium (base Speed 80–89)",
+      "t70_79": "Medium (base Speed 70–79)",
+      "t60_69": "Medium-slow (base Speed 60–69)",
+      "t42_59": "Slow (base Speed 42–59)",
+      "t0_41": "Very slow (base Speed ≤ 41)"
+    }
+  },
   "teamShare": {
+    "battleFormat": {
+      "label": "Format",
+      "singles": "Singles",
+      "doubles": "Doubles"
+    },
     "listPage": {
       "title": "Explore Teams",
       "sortLatest": "Latest",
       "sortPopular": "Popular",
-      "noTeams": "No teams yet. Be the first to share!"
+      "noTeams": "No teams yet. Be the first to share!",
+      "goToTeamBuilder": "Team builder",
+      "tagSingles": "Singles",
+      "tagDoubles": "Doubles"
     },
     "detailPage": {
       "notFound": "Team not found",
@@ -352,7 +403,8 @@
       "pinExpired": "PIN expired, please verify again",
       "deleteConfirmTitle": "Delete this team?",
       "deleteConfirmMsg": "This action cannot be undone. The team will be permanently removed.",
-      "deleteBtn": "Delete"
+      "deleteBtn": "Delete",
+      "battleFormatShort": "Format"
     },
     "shareModal": {
       "title": "Share Team",
@@ -364,6 +416,9 @@
       "pinMismatch": "PINs do not match",
       "pinHint": "PIN is used for editing or deleting this team later",
       "publicLabel": "List on public team explorer",
+      "battleFormatSingles": "Singles",
+      "battleFormatDoubles": "Doubles",
+      "battleFormatHint": "Tag whether this team is mainly for singles or doubles.",
       "submit": "Share",
       "duplicateError": "This Team ID is already taken",
       "genericError": "An error occurred, please try again",

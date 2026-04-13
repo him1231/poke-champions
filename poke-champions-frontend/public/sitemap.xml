@@ -118,6 +118,35 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Speed tiers -->
+  <url>
+    <loc>https://victorpoke-champions.com/zh-TW/speed-tiers</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/speed-tiers"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/speed-tiers"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/speed-tiers"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/speed-tiers"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/en/speed-tiers</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/speed-tiers"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/speed-tiers"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/speed-tiers"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/speed-tiers"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/ja/speed-tiers</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/speed-tiers"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/speed-tiers"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/speed-tiers"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/speed-tiers"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
   <!-- Team Builder -->
   <url>
     <loc>https://victorpoke-champions.com/zh-TW/team-builder</loc>

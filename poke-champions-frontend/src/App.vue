@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 import { setLocale, SUPPORTED_LOCALES } from './i18n'
@@ -10,6 +10,10 @@ const router = useRouter()
 const route = useRoute()
 const { localePath } = useLocalePath()
 const mobileMenuOpen = ref(false)
+const teamMenuOpen = ref(false)
+const toolsMenuOpen = ref(false)
+const teamDropdownRef = ref(null)
+const toolsDropdownRef = ref(null)
 
 function switchLocale(newLocale) {
   const currentPath = route.path
@@ -20,21 +24,80 @@ function switchLocale(newLocale) {
 
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 
-const navLinks = computed(() => [
-  { name: t('nav.home'), path: localePath('/'), icon: 'home' },
-  { name: t('nav.pokedex'), path: localePath('/pokemon'), icon: 'menu_book' },
-  { name: t('nav.moves'), path: localePath('/moves'), icon: 'bolt' },
-  { name: t('nav.types'), path: localePath('/types'), icon: 'shield' },
+const pathTail = computed(() => {
+  const m = route.path.match(/^\/(zh-TW|en|ja)(\/.*)?$/)
+  return m && m[2] ? m[2] : '/'
+})
+
+const isTeamNavActive = computed(() => {
+  const p = pathTail.value
+  return p.startsWith('/team-builder') || p.startsWith('/teams')
+})
+
+const isToolsNavActive = computed(() => {
+  const p = pathTail.value
+  return p.startsWith('/types') || p.startsWith('/speed-tiers')
+})
+
+const simpleNav = computed(() => [
+  { name: t('nav.home'), path: localePath('/'), icon: 'home', exact: true },
+  { name: t('nav.pokedex'), path: localePath('/pokemon'), icon: 'menu_book', exact: false },
+  { name: t('nav.moves'), path: localePath('/moves'), icon: 'bolt', exact: false },
+])
+
+const teamNavChildren = computed(() => [
   { name: t('nav.teamBuilder'), path: localePath('/team-builder'), icon: 'groups' },
   { name: t('nav.teams'), path: localePath('/teams'), icon: 'explore' },
 ])
+
+const toolsNavChildren = computed(() => [
+  { name: t('nav.types'), path: localePath('/types'), icon: 'shield' },
+  { name: t('nav.speedTiers'), path: localePath('/speed-tiers'), icon: 'speed' },
+])
+
+const footerLinks = computed(() => [
+  ...simpleNav.value,
+  ...teamNavChildren.value,
+  ...toolsNavChildren.value,
+])
+
+function closeMenus() {
+  teamMenuOpen.value = false
+  toolsMenuOpen.value = false
+}
+
+function toggleTeamMenu() {
+  toolsMenuOpen.value = false
+  teamMenuOpen.value = !teamMenuOpen.value
+}
+
+function toggleToolsMenu() {
+  teamMenuOpen.value = false
+  toolsMenuOpen.value = !toolsMenuOpen.value
+}
+
+function afterNavClick() {
+  mobileMenuOpen.value = false
+  closeMenus()
+}
+
+function onGlobalPointerDown(e) {
+  if (!teamMenuOpen.value && !toolsMenuOpen.value) return
+  const el = e.target
+  if (teamDropdownRef.value?.contains(el)) return
+  if (toolsDropdownRef.value?.contains(el)) return
+  closeMenus()
+}
+
+onMounted(() => document.addEventListener('mousedown', onGlobalPointerDown))
+onUnmounted(() => document.removeEventListener('mousedown', onGlobalPointerDown))
 </script>
 
 <template>
   <div class="app">
     <header v-if="!isAdminRoute" class="navbar">
       <div class="container navbar-inner">
-        <router-link to="/" class="logo" @click="mobileMenuOpen = false">
+        <router-link to="/" class="logo" @click="afterNavClick">
           <div class="logo-pokeball">
             <div class="pokeball-top"></div>
             <div class="pokeball-center"></div>
@@ -44,15 +107,74 @@ const navLinks = computed(() => [
 
         <nav class="nav-links" :class="{ open: mobileMenuOpen }">
           <router-link
-            v-for="link in navLinks"
+            v-for="link in simpleNav"
             :key="link.path"
             :to="link.path"
-            class="nav-link"
-            @click="mobileMenuOpen = false"
+            custom
+            v-slot="{ href, navigate, isExactActive, isActive }"
           >
-            <span class="material-symbols-rounded nav-icon">{{ link.icon }}</span>
-            <span>{{ link.name }}</span>
+            <a
+              :href="href"
+              class="nav-link"
+              :class="link.exact
+                ? { 'router-link-exact-active': isExactActive }
+                : { 'router-link-active': isActive }"
+              @click.prevent="navigate(); afterNavClick()"
+            >
+              <span class="material-symbols-rounded nav-icon">{{ link.icon }}</span>
+              <span>{{ link.name }}</span>
+            </a>
           </router-link>
+
+          <div ref="teamDropdownRef" class="nav-dropdown">
+            <button
+              type="button"
+              class="nav-dropdown-trigger"
+              :class="{ active: isTeamNavActive, open: teamMenuOpen }"
+              @click.stop="toggleTeamMenu"
+            >
+              <span class="material-symbols-rounded nav-icon">groups</span>
+              <span>{{ t('nav.teamMenu') }}</span>
+              <span class="material-symbols-rounded nav-chevron">expand_more</span>
+            </button>
+            <div v-show="teamMenuOpen" class="nav-dropdown-panel">
+              <router-link
+                v-for="c in teamNavChildren"
+                :key="c.path"
+                :to="c.path"
+                class="nav-dropdown-link"
+                @click="afterNavClick"
+              >
+                <span class="material-symbols-rounded nav-icon">{{ c.icon }}</span>
+                <span>{{ c.name }}</span>
+              </router-link>
+            </div>
+          </div>
+
+          <div ref="toolsDropdownRef" class="nav-dropdown">
+            <button
+              type="button"
+              class="nav-dropdown-trigger"
+              :class="{ active: isToolsNavActive, open: toolsMenuOpen }"
+              @click.stop="toggleToolsMenu"
+            >
+              <span class="material-symbols-rounded nav-icon">construction</span>
+              <span>{{ t('nav.toolsMenu') }}</span>
+              <span class="material-symbols-rounded nav-chevron">expand_more</span>
+            </button>
+            <div v-show="toolsMenuOpen" class="nav-dropdown-panel">
+              <router-link
+                v-for="c in toolsNavChildren"
+                :key="c.path"
+                :to="c.path"
+                class="nav-dropdown-link"
+                @click="afterNavClick"
+              >
+                <span class="material-symbols-rounded nav-icon">{{ c.icon }}</span>
+                <span>{{ c.name }}</span>
+              </router-link>
+            </div>
+          </div>
         </nav>
 
         <select :value="locale" @change="switchLocale($event.target.value)" class="lang-select">
@@ -76,7 +198,7 @@ const navLinks = computed(() => [
           <p>{{ t('footer.subtitle') }}</p>
         </div>
         <div class="footer-links">
-          <router-link v-for="link in navLinks" :key="link.path" :to="link.path">{{ link.name }}</router-link>
+          <router-link v-for="link in footerLinks" :key="link.path + link.name" :to="link.path">{{ link.name }}</router-link>
           <router-link :to="localePath('/about')">{{ t('footer.about') }}</router-link>
           <router-link :to="localePath('/privacy')">{{ t('footer.privacy') }}</router-link>
         </div>
@@ -107,6 +229,7 @@ const navLinks = computed(() => [
   align-items: center;
   justify-content: space-between;
   height: 64px;
+  position: relative;
 }
 
 .logo {
@@ -155,6 +278,7 @@ const navLinks = computed(() => [
 .nav-links {
   display: flex;
   gap: 4px;
+  align-items: stretch;
 }
 
 .nav-link {
@@ -167,6 +291,7 @@ const navLinks = computed(() => [
   font-weight: 500;
   color: var(--text-secondary);
   transition: all 0.2s ease;
+  text-decoration: none;
 }
 
 .nav-icon {
@@ -178,7 +303,89 @@ const navLinks = computed(() => [
   color: var(--text-primary);
 }
 
-.nav-link.router-link-exact-active {
+.nav-link.router-link-exact-active,
+.nav-link.router-link-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 8px 16px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-dropdown-trigger:hover {
+  background: var(--bg-glass);
+  color: var(--text-primary);
+}
+
+.nav-dropdown-trigger.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.nav-dropdown-trigger.open {
+  background: var(--bg-glass);
+  color: var(--text-primary);
+}
+
+.nav-chevron {
+  font-size: 18px;
+  margin-left: -2px;
+  transition: transform 0.2s ease;
+}
+
+.nav-dropdown-trigger.open .nav-chevron {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  padding: 6px;
+  background: rgba(22, 24, 48, 0.98);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  z-index: 200;
+}
+
+.nav-dropdown-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-dropdown-link:hover {
+  background: var(--bg-glass);
+  color: var(--text-primary);
+}
+
+.nav-dropdown-link.router-link-active {
   background: var(--accent-soft);
   color: var(--accent);
 }
@@ -270,7 +477,8 @@ const navLinks = computed(() => [
 
 .footer-links {
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 16px 20px;
 }
 
 .footer-links a {
@@ -301,11 +509,26 @@ const navLinks = computed(() => [
     border-bottom: 1px solid var(--border);
     padding: 12px 20px;
     gap: 4px;
+    align-items: stretch;
   }
 
   .nav-links.open {
     display: flex;
     animation: slideUp 0.25s ease;
+  }
+
+  .nav-dropdown-panel {
+    position: static;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    box-shadow: none;
+    border: 1px solid var(--border);
+    background: rgba(15, 16, 35, 0.6);
+  }
+
+  .nav-dropdown-trigger {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .main-content {

@@ -44,12 +44,13 @@ const filtered = computed(() => {
   let list = allMoves.value
 
   if (search.value) {
-    const q = search.value.toLowerCase()
+    const q = search.value.toLowerCase().trim()
     list = list.filter(
       (m) =>
         (m.displayName && m.displayName.toLowerCase().includes(q)) ||
         (m.name && m.name.toLowerCase().includes(q)) ||
-        (m.chineseName && m.chineseName.toLowerCase().includes(q)),
+        (m.chineseName && m.chineseName.toLowerCase().includes(q)) ||
+        (m.japaneseName && m.japaneseName.toLowerCase().includes(q)),
     )
   }
 

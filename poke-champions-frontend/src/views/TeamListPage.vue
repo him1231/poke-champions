@@ -46,6 +46,12 @@ function previewSprites(team) {
   return ids.slice(0, 6)
 }
 
+function battleFormatLabel(team) {
+  return team.battleFormat === 'doubles'
+    ? t('teamShare.listPage.tagDoubles')
+    : t('teamShare.listPage.tagSingles')
+}
+
 watch([sort, page], fetchTeams)
 onMounted(fetchTeams)
 </script>
@@ -58,6 +64,13 @@ onMounted(fetchTeams)
         {{ t('teamShare.listPage.title') }}
       </h1>
       <div class="page-header-actions">
+        <router-link
+          :to="localePath('/team-builder')"
+          class="btn-to-builder"
+        >
+          <span class="material-symbols-rounded">construction</span>
+          {{ t('teamShare.listPage.goToTeamBuilder') }}
+        </router-link>
         <div class="sort-tabs">
           <button
             :class="['sort-tab', { active: sort === 'latest' }]"
@@ -99,7 +112,10 @@ onMounted(fetchTeams)
           class="team-card"
         >
           <div class="team-card-header">
-            <h3 class="team-card-title">{{ team.title }}</h3>
+            <div class="team-card-title-block">
+              <h3 class="team-card-title">{{ team.title }}</h3>
+              <span class="bf-tag">{{ battleFormatLabel(team) }}</span>
+            </div>
             <span class="team-card-code">{{ team.rentalCode }}</span>
           </div>
           <p v-if="team.description" class="team-card-desc">{{ team.description }}</p>
@@ -158,6 +174,38 @@ onMounted(fetchTeams)
 }
 
 .page-header .page-title { margin-bottom: 0; }
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-to-builder {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.btn-to-builder:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btn-to-builder .material-symbols-rounded { font-size: 18px; }
 
 .sort-tabs {
   display: flex;
@@ -248,17 +296,36 @@ onMounted(fetchTeams)
   gap: 8px;
 }
 
+.team-card-title-block {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
 .team-card-title {
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.3;
-  flex: 1;
-  min-width: 0;
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+.bf-tag {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
 }
 
 .team-card-code {

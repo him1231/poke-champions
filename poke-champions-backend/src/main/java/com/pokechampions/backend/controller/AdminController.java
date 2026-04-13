@@ -169,6 +169,7 @@ public class AdminController {
         m.put("viewCount", t.getViewCount());
         m.put("reportCount", t.getReportCount());
         m.put("expired", t.isExpired());
+        m.put("battleFormat", t.getBattleFormat());
         m.put("createdAt", t.getCreatedAt());
         m.put("updatedAt", t.getUpdatedAt());
         return m;

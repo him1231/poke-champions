@@ -6,6 +6,7 @@ import PokemonListPage from '../views/PokemonListPage.vue'
 import PokemonDetailPage from '../views/PokemonDetailPage.vue'
 import MovesPage from '../views/MovesPage.vue'
 import TypesPage from '../views/TypesPage.vue'
+import SpeedTiersPage from '../views/SpeedTiersPage.vue'
 import TeamBuilder from '../views/TeamBuilder.vue'
 import TeamOverview from '../views/TeamOverview.vue'
 import TeamListPage from '../views/TeamListPage.vue'
@@ -58,6 +59,12 @@ const router = createRouter({
           name: 'types',
           component: TypesPage,
           meta: { titleKey: 'routes.types.title', descKey: 'routes.types.description' },
+        },
+        {
+          path: 'speed-tiers',
+          name: 'speed-tiers',
+          component: SpeedTiersPage,
+          meta: { titleKey: 'routes.speedTiers.title', descKey: 'routes.speedTiers.description' },
         },
         {
           path: 'team-builder',

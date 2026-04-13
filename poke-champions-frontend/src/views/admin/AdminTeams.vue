@@ -97,6 +97,11 @@ function statusClass(t) {
   return 'status-ok'
 }
 
+function formatBattle(f) {
+  if (f === 'doubles') return '雙打'
+  return '單打'
+}
+
 onMounted(fetchTeams)
 </script>
 
@@ -162,6 +167,7 @@ onMounted(fetchTeams)
           <tr>
             <th>隊伍 ID</th>
             <th>標題</th>
+            <th>模式</th>
             <th>瀏覽</th>
             <th>回報</th>
             <th>狀態</th>
@@ -173,6 +179,7 @@ onMounted(fetchTeams)
           <tr v-for="t in teams" :key="t.rentalCode" :class="{ 'row-expired': t.expired }">
             <td class="col-code">{{ t.rentalCode }}</td>
             <td class="col-title">{{ t.title }}</td>
+            <td class="col-format">{{ formatBattle(t.battleFormat) }}</td>
             <td class="col-num">{{ t.viewCount }}</td>
             <td class="col-num">
               <span v-if="t.reportCount > 0" class="report-badge">{{ t.reportCount }}</span>

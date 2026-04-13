@@ -35,6 +35,7 @@ public class TeamShareController {
         Object snapshot   = body.get("teamSnapshot");
         Object previewIds = body.get("previewPokemonIds");
         Boolean isPublic  = body.get("isPublic") instanceof Boolean b ? b : true;
+        String battleFmt = normalizeBattleFormat(body.get("battleFormat"));
 
         if (rentalCode == null || rentalCode.isBlank())
             return badRequest("rentalCode is required");
@@ -56,6 +57,7 @@ public class TeamShareController {
         team.setTeamSnapshot(toJson(snapshot));
         team.setPreviewPokemonIds(previewIds != null ? toJson(previewIds) : "[]");
         team.setPublic(isPublic);
+        team.setBattleFormat(battleFmt);
 
         SharedTeam saved = service.create(team, pin);
         return ResponseEntity.status(201).body(toPublicMap(saved));
@@ -129,6 +131,8 @@ public class TeamShareController {
                         team.setPreviewPokemonIds(toJson(body.get("previewPokemonIds")));
                     if (body.get("isPublic") instanceof Boolean b)
                         team.setPublic(b);
+                    if (body.containsKey("battleFormat"))
+                        team.setBattleFormat(normalizeBattleFormat(body.get("battleFormat")));
 
                     SharedTeam updated = service.update(team);
                     return ResponseEntity.ok((Object) toPublicMap(updated));
@@ -208,6 +212,7 @@ public class TeamShareController {
         m.put("viewCount", t.getViewCount());
         m.put("reportCount", t.getReportCount());
         m.put("expired", t.isExpired());
+        m.put("battleFormat", t.getBattleFormat());
         m.put("createdAt", t.getCreatedAt());
         m.put("updatedAt", t.getUpdatedAt());
         return m;
@@ -220,8 +225,17 @@ public class TeamShareController {
         m.put("description", t.getDescription());
         m.put("previewPokemonIds", parseJson(t.getPreviewPokemonIds()));
         m.put("viewCount", t.getViewCount());
+        m.put("battleFormat", t.getBattleFormat());
         m.put("createdAt", t.getCreatedAt());
         return m;
+    }
+
+    private static String normalizeBattleFormat(Object raw) {
+        if (raw instanceof String s) {
+            String t = s.trim().toLowerCase();
+            if ("doubles".equals(t)) return "doubles";
+        }
+        return "singles";
     }
 
     private static String str(Map<String, Object> body, String key) {

@@ -23,6 +23,8 @@ const description = ref('')
 const pin = ref('')
 const pinConfirm = ref('')
 const isPublic = ref(true)
+/** singles | doubles */
+const battleFormat = ref('singles')
 const submitting = ref(false)
 const errorMsg = ref('')
 const successCode = ref('')
@@ -80,6 +82,7 @@ async function onSubmit() {
       description: description.value.trim(),
       pin: pin.value,
       isPublic: isPublic.value,
+      battleFormat: battleFormat.value,
       teamSnapshot: serializeTeam(),
       previewPokemonIds: getPreviewIds(),
     }
@@ -110,6 +113,7 @@ function resetAndClose() {
   pin.value = ''
   pinConfirm.value = ''
   isPublic.value = true
+  battleFormat.value = 'singles'
   errorMsg.value = ''
   successCode.value = ''
   emit('close')
@@ -169,6 +173,21 @@ function resetAndClose() {
                 <span>{{ t('teamShare.shareModal.teamDescription') }}</span>
                 <textarea v-model="description" rows="3" maxlength="500"></textarea>
               </label>
+
+              <div class="form-label battle-format-block">
+                <span>{{ t('teamShare.battleFormat.label') }}</span>
+                <div class="battle-format-options">
+                  <label class="bf-option">
+                    <input v-model="battleFormat" type="radio" value="singles" />
+                    <span>{{ t('teamShare.shareModal.battleFormatSingles') }}</span>
+                  </label>
+                  <label class="bf-option">
+                    <input v-model="battleFormat" type="radio" value="doubles" />
+                    <span>{{ t('teamShare.shareModal.battleFormatDoubles') }}</span>
+                  </label>
+                </div>
+                <p class="bf-hint">{{ t('teamShare.shareModal.battleFormatHint') }}</p>
+              </div>
 
               <div class="form-row">
                 <label class="form-label form-half">
@@ -320,6 +339,35 @@ function resetAndClose() {
   width: 18px;
   height: 18px;
   accent-color: var(--accent);
+}
+
+.battle-format-block .battle-format-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.bf-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.bf-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.bf-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 6px 0 0;
+  line-height: 1.45;
 }
 
 .form-error {
