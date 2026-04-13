@@ -20,6 +20,8 @@ public class Move {
 
     private String chineseName;
 
+    private String japaneseName;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "type_id", nullable = false)
     private PokemonType type;
@@ -44,6 +46,10 @@ public class Move {
     /** 效果描述（繁體中文，由 AI 翻譯） */
     @Column(length = 1000)
     private String chineseDescription;
+
+    /** 效果描述（日文） */
+    @Column(length = 1000)
+    private String japaneseDescription;
 
     /** Game8 招式詳情頁 URL，用於爬取可學習寶可夢列表 */
     private String game8Url;
@@ -79,6 +85,9 @@ public class Move {
     public String getChineseName() { return chineseName; }
     public void setChineseName(String chineseName) { this.chineseName = chineseName; }
 
+    public String getJapaneseName() { return japaneseName; }
+    public void setJapaneseName(String japaneseName) { this.japaneseName = japaneseName; }
+
     public PokemonType getType() { return type; }
     public void setType(PokemonType type) { this.type = type; }
 
@@ -99,6 +108,9 @@ public class Move {
 
     public String getChineseDescription() { return chineseDescription; }
     public void setChineseDescription(String chineseDescription) { this.chineseDescription = chineseDescription; }
+
+    public String getJapaneseDescription() { return japaneseDescription; }
+    public void setJapaneseDescription(String japaneseDescription) { this.japaneseDescription = japaneseDescription; }
 
     public String getGame8Url() { return game8Url; }
     public void setGame8Url(String game8Url) { this.game8Url = game8Url; }

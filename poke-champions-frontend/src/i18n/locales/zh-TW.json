@@ -1,0 +1,329 @@
+{
+  "nav": {
+    "home": "首頁",
+    "pokedex": "圖鑑",
+    "moves": "招式",
+    "types": "屬性",
+    "teamBuilder": "組隊"
+  },
+  "common": {
+    "loading": "載入中",
+    "noResults": "無符合結果",
+    "search": "搜尋",
+    "back": "返回",
+    "close": "關閉",
+    "remove": "移除",
+    "change": "更換",
+    "export": "匯出",
+    "clear": "清除",
+    "resultCount": "{count} 筆",
+    "allTypes": "全部屬性",
+    "allCategories": "全部分類"
+  },
+  "footer": {
+    "subtitle": "寶可夢冠軍賽資料查詢工具",
+    "about": "關於製作者",
+    "privacy": "隱私權政策"
+  },
+  "pokemon": {
+    "types": {
+      "normal": "一般",
+      "fire": "火",
+      "water": "水",
+      "electric": "電",
+      "grass": "草",
+      "ice": "冰",
+      "fighting": "格鬥",
+      "poison": "毒",
+      "ground": "地面",
+      "flying": "飛行",
+      "psychic": "超能力",
+      "bug": "蟲",
+      "rock": "岩石",
+      "ghost": "幽靈",
+      "dragon": "龍",
+      "dark": "惡",
+      "steel": "鋼",
+      "fairy": "妖精"
+    },
+    "stats": {
+      "hp": "HP",
+      "attack": "攻擊",
+      "defense": "防禦",
+      "specialAttack": "特攻",
+      "specialDefense": "特防",
+      "speed": "速度"
+    },
+    "categories": {
+      "PHYSICAL": "物理",
+      "SPECIAL": "特殊",
+      "STATUS": "變化"
+    },
+    "natures": {
+      "serious": "認真",
+      "lonely": "怕寂寞",
+      "adamant": "固執",
+      "naughty": "任性",
+      "brave": "勇敢",
+      "bold": "大膽",
+      "impish": "頑皮",
+      "lax": "悠閒",
+      "relaxed": "懶惰",
+      "modest": "內斂",
+      "mild": "慢吞吞",
+      "rash": "馬虎",
+      "quiet": "害羞",
+      "calm": "溫和",
+      "gentle": "溫順",
+      "careful": "慎重",
+      "sassy": "自大",
+      "timid": "膽小",
+      "hasty": "急躁",
+      "jolly": "爽朗",
+      "naive": "天真"
+    },
+    "natureNeutral": "{name}：五維（非 HP）性格倍率皆為 1.0，無增減",
+    "natureEffect": "{name}：↑ {up}　↓ {down}"
+  },
+  "home": {
+    "badge": "寶可夢冠軍賽",
+    "desc": "快速查詢寶可夢資料、屬性相剋與招式資訊",
+    "descLine2": "為你的冠軍之路做好準備",
+    "cta": "開始探索",
+    "featuresTitle": "功能總覽",
+    "feature": {
+      "pokedex": {
+        "title": "寶可夢圖鑑",
+        "desc": "瀏覽冠軍賽可用寶可夢，查看屬性、可學招式與能力值模擬"
+      },
+      "moves": {
+        "title": "招式查詢",
+        "desc": "搜尋招式資料，依屬性或分類篩選，查看哪些寶可夢可以學習"
+      },
+      "types": {
+        "title": "屬性相剋",
+        "desc": "查詢屬性間的攻防倍率，計算雙屬性組合的防禦相性"
+      },
+      "teamBuilder": {
+        "title": "隊伍組建",
+        "desc": "自由選擇寶可夢與招式，打造你的冠軍賽最強隊伍"
+      }
+    }
+  },
+  "pokemonList": {
+    "title": "寶可夢圖鑑",
+    "searchPlaceholder": "搜尋名稱、圖鑑編號...",
+    "empty": "沒有找到符合條件的寶可夢",
+    "loadError": "無法載入資料，請確認後端服務是否啟動"
+  },
+  "pokemonDetail": {
+    "backToList": "返回圖鑑",
+    "tabs": {
+      "stats": "能力值",
+      "moves": "可學招式",
+      "matchup": "屬性相剋"
+    },
+    "natureSelect": "性格選擇",
+    "remainingPoints": "剩餘點數",
+    "natureUp": "性格：此能力 ×1.1",
+    "natureDown": "性格：此能力 ×0.9",
+    "clearAll": "全部減點",
+    "fillAll": "全部加點",
+    "noMoveData": "尚無可學招式資料",
+    "moveTable": {
+      "name": "招式名稱",
+      "type": "屬性",
+      "category": "分類",
+      "power": "威力",
+      "accuracy": "命中"
+    },
+    "noMatchupData": "無相剋資料或 API 未回傳",
+    "effectDesc": "效果說明",
+    "notFound": "找不到此寶可夢",
+    "loadFailed": "載入失敗",
+    "matchup": {
+      "immune": "0× 無效",
+      "quadResist": "¼× 抵抗",
+      "resist": "½× 抵抗",
+      "neutral": "1× 普通",
+      "weak": "2× 弱點",
+      "quadWeak": "4× 弱點"
+    }
+  },
+  "movesPage": {
+    "title": "招式查詢",
+    "searchPlaceholder": "搜尋招式名稱...",
+    "learners": "可學習的寶可夢",
+    "noData": "尚無資料",
+    "empty": "沒有找到符合條件的招式",
+    "loadError": "無法載入招式資料",
+    "moveTable": {
+      "name": "招式名稱",
+      "type": "屬性",
+      "category": "分類",
+      "power": "威力",
+      "accuracy": "命中"
+    }
+  },
+  "typesPage": {
+    "title": "屬性相剋查詢",
+    "hint": "點選屬性查詢防禦相性（可選擇 1~2 個屬性）",
+    "calculate": "查詢防禦相性",
+    "calculating": "計算中",
+    "defenseOf": "的防禦相性",
+    "loadError": "無法載入屬性資料"
+  },
+  "teamBuilder": {
+    "title": "隊伍建構器",
+    "viewOverview": "查看總覽",
+    "position": "位置 {n}",
+    "selectPokemon": "選擇寶可夢",
+    "searchPokemon": "搜尋寶可夢名稱…",
+    "ability": "特性",
+    "nature": "性格",
+    "remainingPoints": "剩餘點數：",
+    "tabs": {
+      "stats": "能力值",
+      "moves": "招式",
+      "items": "持有物"
+    },
+    "movePower": "· 威力 {power}",
+    "moveSlot": "招式 {n}",
+    "selectMove": "選擇招式（插槽 {n}）",
+    "searchMove": "搜尋招式名稱…",
+    "noLearnableMoves": "此寶可夢無可學招式資料",
+    "noItem": "尚未選擇持有物",
+    "changeItem": "更換道具",
+    "selectItem": "選擇道具",
+    "selectItemTitle": "選擇持有物",
+    "searchItem": "搜尋道具名稱…",
+    "defenseAnalysis": "隊伍防禦分析",
+    "addPokemonFirst": "請先在隊伍中加入寶可夢",
+    "teamWeakness": "隊伍有 {count} 位成員弱點為",
+    "noCommonWeakness": "隊伍無顯著共同弱點",
+    "weak": "弱",
+    "resist": "抗",
+    "immune": "免",
+    "weakCount": "{count} 位弱點",
+    "resistCount": "{count} 位抵抗",
+    "immuneCount": "{count} 位免疫"
+  },
+  "teamOverview": {
+    "title": "隊伍總覽",
+    "export": "匯出",
+    "exporting": "輸出中…",
+    "downloadPng": "下載圖片（PNG）",
+    "exportShowdown": "匯出 showdown.txt",
+    "editTeam": "編輯隊伍",
+    "emptyTeam": "尚未建立隊伍",
+    "goToBuild": "前往組隊",
+    "noItem": "無持有物",
+    "noNatureEffect": "無加減",
+    "analysis": "隊伍分析",
+    "defenseWeakness": "防禦弱點",
+    "weakCount": "{count} 位弱點",
+    "noMajorWeakness": "無重大共同弱點",
+    "noResistCoverage": "無抗性覆蓋",
+    "fullResistCoverage": "每個屬性都有成員可抵抗",
+    "attackCoverage": "攻擊覆蓋",
+    "missingAttack": "缺少 {types} 屬性攻擊",
+    "fullAttackCoverage": "18 種屬性攻擊全覆蓋",
+    "defenseTable": "防禦相性總表",
+    "weak": "弱",
+    "resist": "抗",
+    "immune": "免"
+  },
+  "about": {
+    "title": "關於製作者",
+    "subtitle": "認識 Poké Champions 背後的開發者",
+    "role": "全端開發者",
+    "bio": "熱愛寶可夢與網頁開發，打造 Poké Champions 的初衷是讓每位訓練家都能輕鬆查閱冠軍賽資料、規劃最強隊伍。",
+    "milestones": "開發歷程",
+    "milestone": {
+      "idea": { "title": "靈感來源", "desc": "對寶可夢冠軍賽數據散落各處感到不便，決定自己動手整合。" },
+      "tech": { "title": "技術選型", "desc": "前端採 Vue 3 + Vite，後端 Spring Boot + PostgreSQL，部署於 GCP。" },
+      "data": { "title": "資料整合", "desc": "自動爬取並同步官方冠軍賽名單、招式、屬性等資料。" },
+      "launch": { "title": "正式上線", "desc": "持續優化 UI 與效能，為訓練家提供最佳查詢體驗。" }
+    },
+    "thanks": "特別感謝",
+    "thanksText": "感謝所有寶可夢訓練家的支持與回饋，以及 PokeAPI、官方冠軍賽資料的公開。",
+    "disclaimer": "本站為非官方粉絲作品，與 The Pokémon Company 無關。所有寶可夢相關名稱與圖像為其各自擁有者之商標與著作權。"
+  },
+  "privacy": {
+    "title": "隱私權政策",
+    "lastUpdated": "最後更新：{date}",
+    "overview": "總覽",
+    "overviewText": "Poké Champions 重視您的隱私。本政策說明當您使用本網站時，我們如何收集、使用及保護您的資訊。",
+    "dataCollection": "我們收集的資訊",
+    "dataCollectionText1": "我們不要求使用者註冊或提供個人身分資訊。但當您瀏覽本站時，我們的託管服務與分析工具可能會自動收集以下匿名資料：",
+    "dataCollectionText2": "這些資料僅用於改善網站效能與使用者體驗。",
+    "dataItems": {
+      "browser": "瀏覽器類型與版本",
+      "device": "裝置類型（桌機／手機）",
+      "pages": "造訪頁面與停留時間",
+      "ip": "IP 位址（由託管服務自動記錄）"
+    },
+    "cookies": "Cookie 與本機儲存",
+    "cookiesText1": "本站使用 Google Analytics 收集匿名流量統計資料，該服務會在您的裝置上設定 Cookie。",
+    "cookiesText2": "此外，本站使用瀏覽器本機儲存（localStorage）保存隊伍組建等偏好設定，這些資料僅保留在您的裝置中，不會傳送至伺服器。",
+    "ads": "第三方廣告",
+    "adsText1": "本站可能透過 Google AdSense 顯示廣告。Google 可能會使用 Cookie 根據您造訪本站及其他網站的紀錄投放相關廣告。",
+    "adsText2": "您可透過 Google 廣告設定 管理個人化廣告偏好。",
+    "externalLinks": "外部連結",
+    "externalLinksText": "本站可能包含通往外部網站的連結。我們對這些外部網站的隱私政策及內容概不負責。",
+    "children": "兒童隱私",
+    "childrenText": "本站不針對 13 歲以下兒童，也不會刻意收集兒童的個人資訊。",
+    "changes": "政策變更",
+    "changesText": "我們可能會不定期更新本隱私權政策。修改後的版本將發布於本頁面，並更新「最後更新」日期。",
+    "contact": "聯絡我們",
+    "contactText": "若您對本隱私權政策有任何疑問，歡迎透過關於頁面上的聯繫方式與我們聯繫。"
+  },
+  "natureGrid": {
+    "title": "選擇性格",
+    "headerDec": ["攻擊", "防禦", "特攻", "特防", "速度"],
+    "headerInc": ["攻擊", "防禦", "特攻", "特防", "速度"]
+  },
+  "routes": {
+    "home": {
+      "title": "Poké Champions — 寶可夢冠軍賽資料查詢與組隊工具",
+      "description": "查詢寶可夢冠軍賽可用寶可夢、屬性相剋、招式資訊，並在線上組建你的最強隊伍。"
+    },
+    "pokemonList": {
+      "title": "寶可夢圖鑑 — Poké Champions",
+      "description": "瀏覽冠軍賽規則可用的寶可夢列表，查看屬性、種族值與詳細資料。"
+    },
+    "pokemonDetail": {
+      "title": "寶可夢詳情 — Poké Champions",
+      "description": "查看寶可夢的詳細種族值、屬性、可學招式與進化鏈。"
+    },
+    "moves": {
+      "title": "招式列表 — Poké Champions",
+      "description": "搜尋與篩選寶可夢招式，查看威力、命中率、PP 與效果說明。"
+    },
+    "types": {
+      "title": "屬性相剋表 — Poké Champions",
+      "description": "查詢 18 種屬性的攻防倍率，計算雙屬性組合的防禦相性。"
+    },
+    "teamBuilder": {
+      "title": "隊伍組建 — Poké Champions",
+      "description": "選擇寶可夢與招式，打造你的冠軍賽最強隊伍並匯出分享。"
+    },
+    "teamOverview": {
+      "title": "隊伍總覽 — Poké Champions",
+      "description": "檢視已組建隊伍的屬性覆蓋與弱點分析。"
+    },
+    "about": {
+      "title": "關於製作者 — Poké Champions",
+      "description": "了解 Poké Champions 的開發者與網站製作背景。"
+    },
+    "privacy": {
+      "title": "隱私權政策 — Poké Champions",
+      "description": "Poké Champions 的隱私權政策與 Cookie 使用說明。"
+    }
+  },
+  "langSwitcher": {
+    "zh-TW": "繁體中文",
+    "en": "English",
+    "ja": "日本語"
+  }
+}

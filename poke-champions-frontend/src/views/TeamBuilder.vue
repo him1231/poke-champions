@@ -1,10 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { pokemonRosterApi } from '../api/pokemonRoster'
 import { moveRosterApi } from '../api/moveRoster'
 import { itemRosterApi } from '../api/itemRoster'
 import { getPokemonImageUrl } from '../utils/pokemonImage'
 import { typeBadgeClasses } from '../utils/pokemonTypesDisplay'
+import { localizedName, localizedTypeName, localizedDescription, localizedEffect } from '../utils/localizedName'
 import NatureGridSelector from '../components/NatureGridSelector.vue'
 import { NATURE_DEFS } from '../constants/pokemonNatures'
 import {
@@ -13,6 +15,7 @@ import {
   getDefenseMultipliers, calcStat,
 } from '../composables/useTeamStore'
 
+const { t } = useI18n()
 const { teamMembers, clearSlot, pokemonDisplayName } = useTeamStore()
 
 // ═══════════════════════════════════════════════════
@@ -33,6 +36,35 @@ onMounted(async () => {
     allPokemon.value = pokRes.data || []
     allMoves.value = movRes.data || []
     allItems.value = itmRes.data || []
+
+    await Promise.all(
+      teamMembers.map(async (member) => {
+        if (!member.pokemon) return
+        try {
+          const [abRes, movRes] = await Promise.allSettled([
+            pokemonRosterApi.getPokemonAbilities(member.pokemon.apiName),
+            pokemonRosterApi.getPokemonMoves(member.pokemon.apiName),
+          ])
+          if (abRes.status === 'fulfilled') {
+            const raw = abRes.value.data
+            member._availableAbilities = Array.isArray(raw) ? raw : []
+            const sel = member.ability
+            if (sel?.name && member._availableAbilities.length) {
+              const still = member._availableAbilities.find((x) => x.name === sel.name)
+              member.ability = still || (member._availableAbilities.length === 1 ? member._availableAbilities[0] : null)
+            } else if (member._availableAbilities.length === 1) {
+              member.ability = member._availableAbilities[0]
+            }
+          }
+          if (movRes.status === 'fulfilled') {
+            const md = movRes.value.data
+            member._learnableMoves = Array.isArray(md) ? md : []
+          }
+        } catch (e) {
+          console.error('補齊隊伍成員招式/特性失敗', e)
+        }
+      }),
+    )
   } catch (e) {
     console.error('TeamBuilder 資料載入失敗', e)
   } finally {
@@ -74,19 +106,43 @@ async function selectPokemon(p) {
   member.nature = 'serious'
   member.moves = [null, null, null, null]
   member.heldItem = null
+  member.ability = null
+  member._availableAbilities = []
   pokemonPickerOpen.value = false
   pokemonSearch.value = ''
 
-  try {
-    const typesRes = await pokemonRosterApi.getPokemonTypes(p.apiName)
-    member.types = (typesRes.data || []).map(t => t.type)
+  const [typesRes, movesRes, abilitiesRes] = await Promise.allSettled([
+    pokemonRosterApi.getPokemonTypes(p.apiName),
+    pokemonRosterApi.getPokemonMoves(p.apiName),
+    pokemonRosterApi.getPokemonAbilities(p.apiName),
+  ])
 
-    const movesRes = await pokemonRosterApi.getPokemonMoves(p.apiName)
-    member._learnableMoves = movesRes.data || []
-  } catch (e) {
-    console.error('載入寶可夢資料失敗', e)
+  if (typesRes.status === 'fulfilled') {
+    const td = typesRes.value.data
+    const arr = Array.isArray(td) ? td : []
+    member.types = arr.map((t) => t.type).filter(Boolean)
+  } else {
     member.types = []
+    console.error('載入屬性失敗', typesRes.reason)
+  }
+
+  if (movesRes.status === 'fulfilled') {
+    const md = movesRes.value.data
+    member._learnableMoves = Array.isArray(md) ? md : []
+  } else {
     member._learnableMoves = []
+    console.error('載入招式失敗', movesRes.reason)
+  }
+
+  if (abilitiesRes.status === 'fulfilled') {
+    const ad = abilitiesRes.value.data
+    member._availableAbilities = Array.isArray(ad) ? ad : []
+    if (member._availableAbilities.length === 1) {
+      member.ability = member._availableAbilities[0]
+    }
+  } else {
+    member._availableAbilities = []
+    console.error('載入特性失敗', abilitiesRes.reason)
   }
 }
 
@@ -122,6 +178,15 @@ function clearStatPoint(key) {
   active.value.statPoints[key] = 0
 }
 
+function natureTrendForStat(natureId, statKey) {
+  if (statKey === 'hp') return 'neutral'
+  const mult = NATURE_DEFS[natureId]?.mult?.[statKey]
+  if (mult == null) return 'neutral'
+  if (mult > 1) return 'up'
+  if (mult < 1) return 'down'
+  return 'neutral'
+}
+
 const statRows = computed(() => {
   const p = active.value.pokemon
   if (!p) return []
@@ -133,7 +198,15 @@ const statRows = computed(() => {
     const actual = calcStat(p, key, pts, nature)
     const maxStat = 260
     const barPct = Math.min((actual / maxStat) * 100, 100)
-    return { key, label: STAT_LABELS[key], base, actual, barPct, color: STAT_COLORS[key] }
+    return {
+      key,
+      label: t('pokemon.stats.' + key),
+      base,
+      actual,
+      barPct,
+      color: STAT_COLORS[key],
+      natureTrend: natureTrendForStat(nature, key),
+    }
   })
 })
 
@@ -143,19 +216,24 @@ const statRows = computed(() => {
 const natureExpanded = ref(false)
 
 const currentNatureLabelZh = computed(() => {
-  const def = NATURE_DEFS[active.value.nature]
-  return def?.labelZh ?? active.value.nature
+  return t('pokemon.natures.' + active.value.nature)
 })
 
 const natureEffectSummary = computed(() => {
-  const def = NATURE_DEFS[active.value.nature]
-  if (!def || !def.mult || Object.keys(def.mult).length === 0) return '無特殊加減'
-  const parts = []
-  for (const [k, v] of Object.entries(def.mult)) {
-    if (v > 1) parts.push(`${STAT_LABELS[k]} ↑`)
-    else if (v < 1) parts.push(`${STAT_LABELS[k]} ↓`)
+  const id = active.value.nature
+  const def = NATURE_DEFS[id]
+  if (!def) return ''
+  const mult = def.mult || {}
+  const keys = Object.keys(mult)
+  const name = t('pokemon.natures.' + id)
+  if (!keys.length) {
+    return t('pokemon.natureNeutral', { name })
   }
-  return parts.join('、')
+  const upKeys = keys.filter((k) => mult[k] > 1)
+  const downKeys = keys.filter((k) => mult[k] < 1)
+  const upStr = upKeys.map((k) => t('pokemon.stats.' + k)).join('、')
+  const downStr = downKeys.map((k) => t('pokemon.stats.' + k)).join('、')
+  return t('pokemon.natureEffect', { name, up: upStr, down: downStr })
 })
 
 // ═══════════════════════════════════════════════════
@@ -235,10 +313,10 @@ const teamDefenseAnalysis = computed(() => {
       else if (mult > 1) weakCount++
       else if (mult < 1) resistCount++
     })
-    return { type: atkType, typeZh: TYPE_ZH[atkType], weakCount, resistCount, immuneCount }
+    return { type: atkType, typeZh: t('pokemon.types.' + atkType), weakCount, resistCount, immuneCount }
   })
 
-  const warnings = perType.filter(t => t.weakCount >= 2).sort((a, b) => b.weakCount - a.weakCount)
+  const warnings = perType.filter(tp => tp.weakCount >= 2).sort((a, b) => b.weakCount - a.weakCount)
   return { perType, warnings, memberCount: members.length }
 })
 
@@ -253,11 +331,11 @@ const editTab = ref('stats')
     <div class="page-header">
       <h1 class="page-title">
         <span class="material-symbols-rounded" style="font-size:1.6rem;vertical-align:middle;margin-right:8px">groups</span>
-        隊伍建構器
+        {{ t('teamBuilder.title') }}
       </h1>
       <router-link to="/team-overview" class="btn-overview" v-if="teamMembers.some(m => m.pokemon)">
         <span class="material-symbols-rounded">summarize</span>
-        查看總覽
+        {{ t('teamBuilder.viewOverview') }}
       </router-link>
     </div>
 
@@ -279,19 +357,20 @@ const editTab = ref('stats')
           <span class="slot-name">{{ pokemonDisplayName(member.pokemon) }}</span>
           <div class="slot-types">
             <span
-              v-for="t in member.types"
-              :key="t"
-              :class="typeBadgeClasses(t)"
+              v-for="tp in member.types"
+              :key="tp"
+              :class="typeBadgeClasses(tp)"
               class="slot-type-badge"
-            >{{ TYPE_ZH[t] || t }}</span>
+            >{{ t('pokemon.types.' + tp) }}</span>
           </div>
-          <button class="slot-clear" @click.stop="clearSlot(idx)" title="移除">
+          <span v-if="member.ability" class="slot-ability">{{ localizedName(member.ability) }}</span>
+          <button class="slot-clear" @click.stop="clearSlot(idx)" :title="t('common.remove')">
             <span class="material-symbols-rounded">close</span>
           </button>
         </template>
         <template v-else>
           <span class="material-symbols-rounded slot-plus">add</span>
-          <span class="slot-label">位置 {{ idx + 1 }}</span>
+          <span class="slot-label">{{ t('teamBuilder.position', { n: idx + 1 }) }}</span>
         </template>
       </div>
     </section>
@@ -307,19 +386,36 @@ const editTab = ref('stats')
             <div>
               <h2 class="editor-pokemon-name">{{ pokemonDisplayName(active.pokemon) }}</h2>
               <div class="editor-types">
-                <span v-for="t in active.types" :key="t" :class="typeBadgeClasses(t)">{{ TYPE_ZH[t] || t }}</span>
+                <span v-for="tp in active.types" :key="tp" :class="typeBadgeClasses(tp)">{{ t('pokemon.types.' + tp) }}</span>
               </div>
             </div>
             <button class="btn-change-pokemon" @click="pokemonPickerOpen = true">
               <span class="material-symbols-rounded">swap_horiz</span>
-              更換
+              {{ t('common.change') }}
             </button>
+          </div>
+
+          <!-- 特性選擇 -->
+          <div v-if="active._availableAbilities && active._availableAbilities.length" class="ability-section">
+            <span class="ability-section-label">{{ t('teamBuilder.ability') }}</span>
+            <div class="ability-options">
+              <button
+                v-for="a in active._availableAbilities"
+                :key="`${a.name}-${a.slot ?? ''}`"
+                class="ability-option"
+                :class="{ selected: active.ability && active.ability.name === a.name }"
+                @click="active.ability = a"
+                :title="localizedDescription(a)"
+              >
+                {{ localizedName(a) }}
+              </button>
+            </div>
           </div>
 
           <!-- 編輯分頁 -->
           <nav class="edit-tabs">
             <button
-              v-for="tab in [{id:'stats',label:'能力值',icon:'bar_chart'},{id:'moves',label:'招式',icon:'bolt'},{id:'item',label:'持有物',icon:'inventory_2'}]"
+              v-for="tab in [{id:'stats',label:t('teamBuilder.tabs.stats'),icon:'bar_chart'},{id:'moves',label:t('teamBuilder.tabs.moves'),icon:'bolt'},{id:'item',label:t('teamBuilder.tabs.items'),icon:'inventory_2'}]"
               :key="tab.id"
               class="edit-tab"
               :class="{ active: editTab === tab.id }"
@@ -335,7 +431,7 @@ const editTab = ref('stats')
             <!-- 性格 -->
             <div class="nature-section">
               <button class="nature-toggle" @click="natureExpanded = !natureExpanded">
-                <span class="nature-toggle-label">性格</span>
+                <span class="nature-toggle-label">{{ t('teamBuilder.nature') }}</span>
                 <span class="nature-current-tag">{{ currentNatureLabelZh }}</span>
                 <span class="nature-effect-tag">{{ natureEffectSummary }}</span>
                 <span class="material-symbols-rounded toggle-arrow" :class="{ open: natureExpanded }">expand_more</span>
@@ -347,24 +443,32 @@ const editTab = ref('stats')
 
             <!-- 剩餘點數 -->
             <div class="ev-remaining">
-              剩餘點數：<strong :class="{ zero: remainingPoints === 0 }">{{ remainingPoints }}</strong> / {{ TOTAL_EV }}
+              {{ t('teamBuilder.remainingPoints') }}<strong :class="{ zero: remainingPoints === 0 }">{{ remainingPoints }}</strong> / {{ TOTAL_EV }}
             </div>
 
             <!-- 能力值條 -->
             <div class="stat-rows">
               <div v-for="row in statRows" :key="row.key" class="stat-row">
-                <span class="stat-label">{{ row.label }}</span>
-                <span class="stat-base">{{ row.base }}</span>
+                <span class="stat-label-wrap">
+                  <span class="stat-label" :style="{ color: row.color }">{{ row.label }}</span>
+                  <span v-if="row.natureTrend === 'up'" class="nature-trend nature-trend-up" :title="t('pokemonDetail.natureUp')">
+                    <span class="material-symbols-rounded">trending_up</span>
+                  </span>
+                  <span v-else-if="row.natureTrend === 'down'" class="nature-trend nature-trend-down" :title="t('pokemonDetail.natureDown')">
+                    <span class="material-symbols-rounded">trending_down</span>
+                  </span>
+                </span>
+                <span class="stat-base"></span>
                 <div class="stat-bar-track">
                   <div class="stat-bar-fill" :style="{ width: row.barPct + '%', background: row.color }"></div>
                 </div>
                 <span class="stat-actual">{{ row.actual }}</span>
                 <div class="stat-stepper">
-                  <button class="step-btn" @click="clearStatPoint(row.key)" title="全部清除">--</button>
+                  <button class="step-btn" @click="clearStatPoint(row.key)" :title="t('pokemonDetail.clearAll')">--</button>
                   <button class="step-btn" @click="adjustStatPoint(row.key, -1)">−</button>
                   <span class="step-val">{{ active.statPoints[row.key] }}</span>
                   <button class="step-btn" @click="adjustStatPoint(row.key, 1)">+</button>
-                  <button class="step-btn" @click="maxStatPoint(row.key)" title="加到滿">++</button>
+                  <button class="step-btn" @click="maxStatPoint(row.key)" :title="t('pokemonDetail.fillAll')">++</button>
                 </div>
               </div>
             </div>
@@ -377,10 +481,10 @@ const editTab = ref('stats')
                 <template v-if="move">
                   <span :class="typeBadgeClasses(move.type || move.typeName)" class="move-type-dot"></span>
                   <div class="move-slot-info">
-                    <span class="move-slot-name">{{ move.chineseName || move.displayName }}</span>
+                    <span class="move-slot-name">{{ localizedName(move) }}</span>
                     <span class="move-slot-meta">
-                      {{ CATEGORY_LABELS[move.category] || '' }}
-                      <template v-if="move.power">· 威力 {{ move.power }}</template>
+                      {{ move.category ? t('pokemon.categories.' + move.category) : '' }}
+                      <template v-if="move.power">{{ t('teamBuilder.movePower', { power: move.power }) }}</template>
                     </span>
                   </div>
                   <button class="move-slot-clear" @click.stop="clearMove(mi)">
@@ -389,7 +493,7 @@ const editTab = ref('stats')
                 </template>
                 <template v-else>
                   <span class="material-symbols-rounded move-slot-empty-icon">add</span>
-                  <span class="move-slot-empty-text">招式 {{ mi + 1 }}</span>
+                  <span class="move-slot-empty-text">{{ t('teamBuilder.moveSlot', { n: mi + 1 }) }}</span>
                 </template>
               </div>
             </div>
@@ -397,7 +501,7 @@ const editTab = ref('stats')
             <!-- 招式選擇器 -->
             <div v-if="movePickerSlot >= 0" class="picker-panel">
               <div class="picker-header">
-                <h3>選擇招式（插槽 {{ movePickerSlot + 1 }}）</h3>
+                <h3>{{ t('teamBuilder.selectMove', { n: movePickerSlot + 1 }) }}</h3>
                 <button class="picker-close" @click="movePickerSlot = -1">
                   <span class="material-symbols-rounded">close</span>
                 </button>
@@ -405,7 +509,7 @@ const editTab = ref('stats')
               <input
                 v-model="moveSearch"
                 class="picker-search"
-                placeholder="搜尋招式名稱…"
+                :placeholder="t('teamBuilder.searchMove')"
                 autofocus
               />
               <div class="picker-list">
@@ -415,14 +519,14 @@ const editTab = ref('stats')
                   class="picker-item"
                   @click="selectMove(m)"
                 >
-                  <span :class="typeBadgeClasses(m.type || m.typeName)" class="picker-item-type">{{ TYPE_ZH[m.type || m.typeName] || m.type }}</span>
-                  <span class="picker-item-name">{{ m.chineseName || m.displayName }}</span>
-                  <span class="picker-item-cat">{{ CATEGORY_LABELS[m.category] || '' }}</span>
+                  <span :class="typeBadgeClasses(m.type || m.typeName)" class="picker-item-type">{{ t('pokemon.types.' + (m.type || m.typeName)) }}</span>
+                  <span class="picker-item-name">{{ localizedName(m) }}</span>
+                  <span class="picker-item-cat">{{ m.category ? t('pokemon.categories.' + m.category) : '' }}</span>
                   <span class="picker-item-power">{{ m.power ?? '—' }}</span>
                   <span class="picker-item-pp">PP {{ m.pp ?? '—' }}</span>
                 </div>
                 <div v-if="filteredMoves.length === 0" class="picker-empty">
-                  {{ learnableMoves.length === 0 ? '此寶可夢無可學招式資料' : '無符合結果' }}
+                  {{ learnableMoves.length === 0 ? t('teamBuilder.noLearnableMoves') : t('common.noResults') }}
                 </div>
               </div>
             </div>
@@ -432,24 +536,24 @@ const editTab = ref('stats')
           <div v-if="editTab === 'item'" class="tab-panel">
             <div class="item-current" v-if="active.heldItem">
               <div class="item-current-info">
-                <span class="item-current-name">{{ active.heldItem.chineseName || active.heldItem.displayName }}</span>
+                <span class="item-current-name">{{ localizedName(active.heldItem) }}</span>
                 <span class="item-current-en">{{ active.heldItem.displayName }}</span>
-                <p class="item-current-effect">{{ active.heldItem.chineseEffect || active.heldItem.effect }}</p>
+                <p class="item-current-effect">{{ localizedEffect(active.heldItem) }}</p>
               </div>
               <button class="item-clear-btn" @click="clearItem">
                 <span class="material-symbols-rounded">delete</span>
               </button>
             </div>
-            <div v-else class="item-none">尚未選擇持有物</div>
+            <div v-else class="item-none">{{ t('teamBuilder.noItem') }}</div>
 
             <button class="btn-pick-item" @click="itemPickerOpen = true">
               <span class="material-symbols-rounded">search</span>
-              {{ active.heldItem ? '更換道具' : '選擇道具' }}
+              {{ active.heldItem ? t('teamBuilder.changeItem') : t('teamBuilder.selectItem') }}
             </button>
 
             <div v-if="itemPickerOpen" class="picker-panel">
               <div class="picker-header">
-                <h3>選擇持有物</h3>
+                <h3>{{ t('teamBuilder.selectItemTitle') }}</h3>
                 <button class="picker-close" @click="itemPickerOpen = false">
                   <span class="material-symbols-rounded">close</span>
                 </button>
@@ -457,7 +561,7 @@ const editTab = ref('stats')
               <input
                 v-model="itemSearch"
                 class="picker-search"
-                placeholder="搜尋道具名稱…"
+                :placeholder="t('teamBuilder.searchItem')"
                 autofocus
               />
               <div class="picker-list">
@@ -467,10 +571,10 @@ const editTab = ref('stats')
                   class="picker-item item-picker-row"
                   @click="selectItem(item)"
                 >
-                  <span class="picker-item-name">{{ item.chineseName || item.displayName }}</span>
+                  <span class="picker-item-name">{{ localizedName(item) }}</span>
                   <span class="picker-item-cat item-cat-tag">{{ item.category }}</span>
                 </div>
-                <div v-if="filteredItems.length === 0" class="picker-empty">無符合結果</div>
+                <div v-if="filteredItems.length === 0" class="picker-empty">{{ t('common.noResults') }}</div>
               </div>
             </div>
           </div>
@@ -481,7 +585,7 @@ const editTab = ref('stats')
           <div class="empty-editor">
             <button class="btn-add-pokemon" @click="pokemonPickerOpen = true">
               <span class="material-symbols-rounded">add_circle</span>
-              選擇寶可夢
+              {{ t('teamBuilder.selectPokemon') }}
             </button>
           </div>
         </template>
@@ -491,44 +595,44 @@ const editTab = ref('stats')
       <aside class="synergy-panel">
         <h3 class="synergy-title">
           <span class="material-symbols-rounded">analytics</span>
-          隊伍防禦分析
+          {{ t('teamBuilder.defenseAnalysis') }}
         </h3>
 
         <template v-if="teamDefenseAnalysis.memberCount === 0">
-          <p class="synergy-empty">請先在隊伍中加入寶可夢</p>
+          <p class="synergy-empty">{{ t('teamBuilder.addPokemonFirst') }}</p>
         </template>
         <template v-else>
           <!-- 警告 -->
           <div v-if="teamDefenseAnalysis.warnings.length" class="synergy-warnings">
             <div v-for="w in teamDefenseAnalysis.warnings" :key="w.type" class="synergy-warn-item">
               <span class="material-symbols-rounded warn-icon">warning</span>
-              <span>隊伍有 <strong>{{ w.weakCount }}</strong> 位成員弱點為
+              <span>{{ t('teamBuilder.teamWeakness', { count: w.weakCount }) }}
                 <span :class="typeBadgeClasses(w.type)" class="warn-type-badge">{{ w.typeZh }}</span>
               </span>
             </div>
           </div>
           <div v-else class="synergy-ok">
             <span class="material-symbols-rounded">check_circle</span>
-            隊伍無顯著共同弱點
+            {{ t('teamBuilder.noCommonWeakness') }}
           </div>
 
           <!-- 完整表 -->
           <div class="synergy-grid">
             <div
-              v-for="t in teamDefenseAnalysis.perType"
-              :key="t.type"
+              v-for="entry in teamDefenseAnalysis.perType"
+              :key="entry.type"
               class="synergy-cell"
               :class="{
-                'cell-danger': t.weakCount >= 2,
-                'cell-warn': t.weakCount === 1 && t.resistCount === 0 && t.immuneCount === 0,
-                'cell-good': t.resistCount >= 2 || t.immuneCount >= 1,
+                'cell-danger': entry.weakCount >= 2,
+                'cell-warn': entry.weakCount === 1 && entry.resistCount === 0 && entry.immuneCount === 0,
+                'cell-good': entry.resistCount >= 2 || entry.immuneCount >= 1,
               }"
             >
-              <span :class="typeBadgeClasses(t.type)" class="synergy-type-badge">{{ t.typeZh }}</span>
+              <span :class="typeBadgeClasses(entry.type)" class="synergy-type-badge">{{ entry.typeZh }}</span>
               <div class="synergy-counts">
-                <span v-if="t.weakCount" class="cnt cnt-weak" :title="`${t.weakCount} 位弱點`">{{ t.weakCount }}弱</span>
-                <span v-if="t.resistCount" class="cnt cnt-resist" :title="`${t.resistCount} 位抵抗`">{{ t.resistCount }}抗</span>
-                <span v-if="t.immuneCount" class="cnt cnt-immune" :title="`${t.immuneCount} 位免疫`">{{ t.immuneCount }}免</span>
+                <span v-if="entry.weakCount" class="cnt cnt-weak" :title="t('teamBuilder.weakCount', { count: entry.weakCount })">{{ entry.weakCount }}{{ t('teamBuilder.weak') }}</span>
+                <span v-if="entry.resistCount" class="cnt cnt-resist" :title="t('teamBuilder.resistCount', { count: entry.resistCount })">{{ entry.resistCount }}{{ t('teamBuilder.resist') }}</span>
+                <span v-if="entry.immuneCount" class="cnt cnt-immune" :title="t('teamBuilder.immuneCount', { count: entry.immuneCount })">{{ entry.immuneCount }}{{ t('teamBuilder.immune') }}</span>
               </div>
             </div>
           </div>
@@ -541,7 +645,7 @@ const editTab = ref('stats')
       <div v-if="pokemonPickerOpen" class="modal-backdrop" @click.self="pokemonPickerOpen = false">
         <div class="modal-content pokemon-picker-modal">
           <div class="picker-header">
-            <h3>選擇寶可夢</h3>
+            <h3>{{ t('teamBuilder.selectPokemon') }}</h3>
             <button class="picker-close" @click="pokemonPickerOpen = false">
               <span class="material-symbols-rounded">close</span>
             </button>
@@ -549,7 +653,7 @@ const editTab = ref('stats')
           <input
             v-model="pokemonSearch"
             class="picker-search"
-            placeholder="搜尋寶可夢名稱…"
+            :placeholder="t('teamBuilder.searchPokemon')"
             autofocus
           />
           <div class="picker-list pokemon-picker-list">
@@ -561,18 +665,18 @@ const editTab = ref('stats')
             >
               <img :src="getPokemonImageUrl(p)" class="picker-pokemon-img" />
               <div class="picker-pokemon-info">
-                <span class="picker-pokemon-name">{{ p.chineseName || p.displayName }}</span>
+                <span class="picker-pokemon-name">{{ localizedName(p) }}</span>
                 <span class="picker-pokemon-sub">{{ p.displayName }}</span>
               </div>
             </div>
-            <div v-if="filteredPokemon.length === 0" class="picker-empty">無符合結果</div>
+            <div v-if="filteredPokemon.length === 0" class="picker-empty">{{ t('common.noResults') }}</div>
           </div>
         </div>
       </div>
     </Teleport>
   </div>
 
-  <div v-else class="loading">載入中</div>
+  <div v-else class="loading">{{ t('common.loading') }}</div>
 </template>
 
 <style scoped>
@@ -767,6 +871,63 @@ const editTab = ref('stats')
   color: var(--text-primary);
 }
 
+/* ═══ 特性選擇 ═══ */
+.ability-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.ability-section-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.ability-options {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ability-option {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ability-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.ability-option.selected {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.slot-ability {
+  font-size: 0.64rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.2;
+}
+
 /* ═══ 編輯分頁 ═══ */
 .edit-tabs {
   display: flex;
@@ -855,12 +1016,35 @@ const editTab = ref('stats')
 
 .stat-row {
   display: grid;
-  grid-template-columns: 42px 34px 1fr 38px auto;
+  grid-template-columns: minmax(52px, auto) 34px 1fr 38px auto;
   align-items: center;
   gap: 8px;
 }
 
-.stat-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); }
+.stat-label-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.stat-label { font-size: 0.78rem; font-weight: 600; }
+
+.nature-trend {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nature-trend .material-symbols-rounded {
+  font-size: 16px;
+  font-variation-settings: 'FILL' 1;
+}
+
+.nature-trend-up { color: #4ade80; }
+
+.nature-trend-down { color: #f87171; }
 .stat-base { font-size: 0.72rem; color: var(--text-muted); text-align: right; }
 
 .stat-bar-track {
@@ -1364,7 +1548,7 @@ const editTab = ref('stats')
   }
 
   .stat-row {
-    grid-template-columns: 42px 30px 1fr 34px;
+    grid-template-columns: minmax(48px, auto) 30px 1fr 34px;
     gap: 6px;
   }
 

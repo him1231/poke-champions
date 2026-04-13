@@ -92,6 +92,11 @@ npm run dev
 3. `POST /api/roster/sync-moves` — 同步招式資料
 4. `POST /api/roster/sync-pokemon-moves` — 同步寶可夢可學招式
 5. `POST /api/roster/sync-items` — 同步持有物
+5b. `POST /api/roster/sync-item-chinese-names?forceRefresh=false` — 從 **PokeAPI** 寫入道具繁中官方名稱（建議；`forceRefresh=true` 可全量重抓）。舊路徑 `POST /api/roster/translate-item-names` 行為已與此相同。
+6. `POST /api/roster/sync-abilities` — 為尚未寫入 `pokemon_abilities` 的寶可夢從 PokeAPI 補上特性槽位。若曾出現「只有一般特性、缺少第二／隱藏特性」等不完整資料，請再執行 **`?forceRefresh=true`** 強制全量覆寫。
+7. `POST /api/roster/sync-ability-details` — 從 PokeAPI 補齊特性中文名與描述（可選，`forceRefresh=true` 可全量重抓）
+
+說明：**本機不會自動同步特性**；若只做過較舊的 `full-sync`、或資料庫在加入特性功能前就已有資料，請至少執行一次 `sync-abilities`。新入庫且尚未 `statsSynced` 的寶可夢在種族值同步時會一併寫入特性。
 
 ---
 

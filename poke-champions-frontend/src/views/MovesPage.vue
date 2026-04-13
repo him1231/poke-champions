@@ -1,9 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { moveRosterApi } from '../api/moveRoster'
 import { typeRosterApi } from '../api/typeRoster'
+import { localizedName, localizedTypeName, localizedDescription } from '../utils/localizedName'
 
+const { t } = useI18n()
 const route = useRoute()
 const allMoves = ref([])
 const types = ref([])
@@ -27,7 +30,7 @@ onMounted(async () => {
       loadLearners(route.query.highlight)
     }
   } catch (e) {
-    error.value = '無法載入招式資料'
+    error.value = t('movesPage.loadError')
   } finally {
     loading.value = false
   }
@@ -85,29 +88,23 @@ function getTypeName(move) {
   return move.type?.name || ''
 }
 
-function getTypeChineseName(move) {
-  return move.type?.chineseName || move.type?.name || ''
-}
-
 function categoryBadgeClass(move) {
   const c = (move.category || 'STATUS').toString().toLowerCase()
   return `category-badge ${c}`
 }
-
-const categoryLabels = { PHYSICAL: '物理', SPECIAL: '特殊', STATUS: '變化' }
 </script>
 
 <template>
   <div class="container">
     <div class="page-header">
-      <h1 class="page-title">招式查詢</h1>
-      <span class="result-badge" v-if="!loading && !error">{{ filtered.length }} 筆</span>
+      <h1 class="page-title">{{ t('movesPage.title') }}</h1>
+      <span class="result-badge" v-if="!loading && !error">{{ t('common.resultCount', { count: filtered.length }) }}</span>
     </div>
 
     <div class="filters-bar">
       <div class="search-box">
         <span class="material-symbols-rounded search-icon">search</span>
-        <input v-model="search" type="text" placeholder="搜尋招式名稱..." class="search-input" />
+        <input v-model="search" type="text" :placeholder="t('movesPage.searchPlaceholder')" class="search-input" />
         <button v-if="search" class="search-clear" @click="search = ''">
           <span class="material-symbols-rounded">close</span>
         </button>
@@ -115,18 +112,18 @@ const categoryLabels = { PHYSICAL: '物理', SPECIAL: '特殊', STATUS: '變化'
 
       <div class="filter-group">
         <select v-model="selectedType" class="filter-select">
-          <option value="">全部屬性</option>
-          <option v-for="t in types" :key="t.name" :value="t.name">{{ t.chineseName }} ({{ t.name }})</option>
+          <option value="">{{ t('common.allTypes') }}</option>
+          <option v-for="tp in types" :key="tp.name" :value="tp.name">{{ localizedTypeName(tp) }} ({{ tp.name }})</option>
         </select>
 
         <select v-model="selectedCategory" class="filter-select">
-          <option value="">全部分類</option>
-          <option v-for="c in categories" :key="c" :value="c">{{ categoryLabels[c] }} ({{ c }})</option>
+          <option value="">{{ t('common.allCategories') }}</option>
+          <option v-for="c in categories" :key="c" :value="c">{{ t('pokemon.categories.' + c) }} ({{ c }})</option>
         </select>
       </div>
     </div>
 
-    <div v-if="loading" class="loading">載入中</div>
+    <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
     <div v-else-if="error" class="error-msg">{{ error }}</div>
 
     <div v-else class="moves-list">
@@ -134,12 +131,12 @@ const categoryLabels = { PHYSICAL: '物理', SPECIAL: '特殊', STATUS: '變化'
         <table class="moves-table">
           <thead>
             <tr>
-              <th>招式名稱</th>
-              <th>屬性</th>
-              <th>分類</th>
-              <th>威力</th>
-              <th>命中</th>
-              <th>PP</th>
+              <th>{{ t('movesPage.moveTable.name') }}</th>
+              <th>{{ t('movesPage.moveTable.type') }}</th>
+              <th>{{ t('movesPage.moveTable.category') }}</th>
+              <th>{{ t('movesPage.moveTable.power') }}</th>
+              <th>{{ t('movesPage.moveTable.accuracy') }}</th>
+              <th>{{ t('movesPage.moveTable.pp') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -149,15 +146,15 @@ const categoryLabels = { PHYSICAL: '物理', SPECIAL: '特殊', STATUS: '變化'
                 class="move-row"
                 @click="toggleMove(m.name)"
               >
-                <td class="move-name-cell">{{ m.chineseName || m.displayName || m.name }}</td>
+                <td class="move-name-cell">{{ localizedName(m) || m.name }}</td>
                 <td>
                   <span v-if="getTypeName(m)" :class="`type-badge ${getTypeName(m)}`">
-                    {{ getTypeChineseName(m) }}
+                    {{ localizedTypeName(m.type) }}
                   </span>
                 </td>
                 <td>
                   <span :class="categoryBadgeClass(m)">
-                    {{ categoryLabels[m.category] || m.category }}
+                    {{ t('pokemon.categories.' + m.category) }}
                   </span>
                 </td>
                 <td class="num-cell">{{ m.power ?? '—' }}</td>
@@ -167,15 +164,14 @@ const categoryLabels = { PHYSICAL: '物理', SPECIAL: '特殊', STATUS: '變化'
               <tr v-if="expandedMove === m.name" class="detail-row">
                 <td colspan="6">
                   <div class="move-detail">
-                    <p v-if="m.chineseDescription" class="move-desc">{{ m.chineseDescription }}</p>
-                    <p v-else-if="m.description" class="move-desc">{{ m.description }}</p>
+                    <p v-if="localizedDescription(m)" class="move-desc">{{ localizedDescription(m) }}</p>
 
                     <div class="learners-section">
                       <h4>
                         <span class="material-symbols-rounded" style="font-size: 16px">group</span>
-                        可學習的寶可夢
+                        {{ t('movesPage.learners') }}
                       </h4>
-                      <div v-if="learnersLoading" class="loading" style="padding: 20px">載入中</div>
+                      <div v-if="learnersLoading" class="loading" style="padding: 20px">{{ t('common.loading') }}</div>
                       <div v-else-if="moveLearners.length" class="learners-grid">
                         <router-link
                           v-for="p in moveLearners"
@@ -183,11 +179,11 @@ const categoryLabels = { PHYSICAL: '物理', SPECIAL: '特殊', STATUS: '變化'
                           :to="`/pokemon/${p.apiName}`"
                           class="learner-chip"
                         >
-                          {{ p.chineseName || p.displayName }}
+                          {{ localizedName(p) }}
                           <span v-if="p.mega || p.isMega" class="mini-mega">M</span>
                         </router-link>
                       </div>
-                      <p v-else class="no-data">尚無資料</p>
+                      <p v-else class="no-data">{{ t('movesPage.noData') }}</p>
                     </div>
                   </div>
                 </td>
@@ -200,7 +196,7 @@ const categoryLabels = { PHYSICAL: '物理', SPECIAL: '特殊', STATUS: '變化'
 
     <div v-if="!loading && !error && filtered.length === 0" class="empty-state">
       <span class="material-symbols-rounded empty-icon">search_off</span>
-      <p>沒有找到符合條件的招式</p>
+      <p>{{ t('movesPage.empty') }}</p>
     </div>
   </div>
 </template>

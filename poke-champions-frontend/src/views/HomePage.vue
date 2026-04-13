@@ -1,8 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { pokemonRosterApi } from '../api/pokemonRoster'
 import { typeRosterApi } from '../api/typeRoster'
 import { moveRosterApi } from '../api/moveRoster'
+
+const { t } = useI18n()
 
 const stats = ref({ pokemon: 0, types: 0, moves: 0 })
 const loading = ref(true)
@@ -26,40 +29,40 @@ onMounted(async () => {
   }
 })
 
-const features = [
+const features = computed(() => [
   {
     icon: 'auto_awesome',
-    title: '寶可夢圖鑑',
-    desc: '瀏覽冠軍賽可用寶可夢，查看屬性、可學招式與能力值模擬',
+    title: t('home.feature.pokedex.title'),
+    desc: t('home.feature.pokedex.desc'),
     link: '/pokemon',
     gradient: 'linear-gradient(135deg, rgba(230, 83, 79, 0.15), rgba(255, 150, 65, 0.1))',
     iconColor: '#ff9741',
   },
   {
     icon: 'bolt',
-    title: '招式查詢',
-    desc: '搜尋招式資料，依屬性或分類篩選，查看哪些寶可夢可以學習',
+    title: t('home.feature.moves.title'),
+    desc: t('home.feature.moves.desc'),
     link: '/moves',
     gradient: 'linear-gradient(135deg, rgba(74, 144, 217, 0.15), rgba(116, 206, 192, 0.1))',
     iconColor: '#4a90d9',
   },
   {
     icon: 'shield',
-    title: '屬性相剋',
-    desc: '查詢屬性間的攻防倍率，計算雙屬性組合的防禦相性',
+    title: t('home.feature.types.title'),
+    desc: t('home.feature.types.desc'),
     link: '/types',
     gradient: 'linear-gradient(135deg, rgba(171, 106, 200, 0.15), rgba(250, 113, 121, 0.1))',
     iconColor: '#ab6ac8',
   },
   {
     icon: 'groups',
-    title: '隊伍組建',
-    desc: '自由選擇寶可夢與招式，打造你的冠軍賽最強隊伍',
+    title: t('home.feature.teamBuilder.title'),
+    desc: t('home.feature.teamBuilder.desc'),
     link: '/team-builder',
     gradient: 'linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(129, 199, 132, 0.1))',
     iconColor: '#4caf50',
   },
-]
+])
 </script>
 
 <template>
@@ -71,9 +74,9 @@ const features = [
         <div class="hero-orb hero-orb-3"></div>
       </div>
       <div class="container hero-content">
-        <div class="hero-badge">寶可夢冠軍賽</div>
+        <div class="hero-badge">{{ t('home.badge') }}</div>
         <h1 class="hero-title">Poké Champions</h1>
-        <p class="hero-desc">快速查詢寶可夢資料、屬性相剋與招式資訊<br/>為你的冠軍之路做好準備</p>
+        <p class="hero-desc">{{ t('home.desc') }}<br/>{{ t('home.descLine2') }}</p>
 
         <!-- <div v-if="!loading" class="stat-row">
           <div class="stat-card">
@@ -94,14 +97,14 @@ const features = [
         </div> -->
 
         <router-link to="/pokemon" class="hero-cta">
-          <span>開始探索</span>
+          <span>{{ t('home.cta') }}</span>
           <span class="material-symbols-rounded">arrow_forward</span>
         </router-link>
       </div>
     </section>
 
     <section class="features container">
-      <h2 class="section-title">功能總覽</h2>
+      <h2 class="section-title">{{ t('home.featuresTitle') }}</h2>
       <div class="feature-grid">
         <router-link
           v-for="f in features"
@@ -129,6 +132,7 @@ const features = [
   position: relative;
   text-align: center;
   padding: 80px 0 60px;
+  margin-top: -40px;
   overflow: hidden;
 }
 
@@ -374,6 +378,7 @@ const features = [
 @media (max-width: 768px) {
   .hero {
     padding: 48px 0 40px;
+    margin-top: -24px;
   }
 
   .hero-title {

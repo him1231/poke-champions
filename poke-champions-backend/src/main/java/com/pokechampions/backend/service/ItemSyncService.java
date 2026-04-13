@@ -2,7 +2,9 @@ package com.pokechampions.backend.service;
 
 import com.pokechampions.backend.entity.HeldItem;
 import com.pokechampions.backend.entity.HeldItem.ItemCategory;
+import com.pokechampions.backend.entity.Pokemon;
 import com.pokechampions.backend.repository.HeldItemRepository;
+import com.pokechampions.backend.repository.PokemonRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.io.IOException;
 import java.util.*;
@@ -28,17 +31,9 @@ public class ItemSyncService {
 
     private static final String DEFAULT_GAME8_URL =
             "https://game8.co/games/Pokemon-Champions/archives/588871";
+    private static final String POKEAPI_ITEM_URL = "https://pokeapi.co/api/v2/item/";
     private static final String GEMINI_API_BASE =
             "https://generativelanguage.googleapis.com/v1beta/models/";
-
-    private static final String NAME_TRANSLATION_PROMPT = """
-            你是寶可夢遊戲翻譯專家。請將以下 JSON 中的寶可夢持有物品英文名稱翻譯成繁體中文。
-            規則：
-            1. 使用台灣官方寶可夢譯名，例如 Focus Sash = 氣勢披帶、Leftovers = 吃剩的東西、Choice Band = 講究頭帶
-            2. 如果是 Berry 系列，使用官方中文樹果名（如 Sitrus Berry = 文柚果）
-            3. 如果是 Mega Stone，使用「XX石」的格式（如 Charizardite X = 噴火龍進化石X）
-            4. 回傳格式必須是相同 key 的 JSON 物件，value 為翻譯後的繁體中文
-            5. 只回傳 JSON，不要有其他文字""";
 
     private static final String EFFECT_TRANSLATION_PROMPT = """
             你是寶可夢遊戲翻譯專家。請將以下 JSON 中的寶可夢持有物品效果描述從英文翻譯成繁體中文。
@@ -48,6 +43,45 @@ public class ItemSyncService {
             3. 回傳格式必須是相同 key 的 JSON 物件，value 為翻譯後的繁體中文
             4. 只回傳 JSON，不要有其他文字""";
 
+    /**
+     * Game8 slug 與 PokeAPI／慣用 mega api 不一致時的手動對照（其餘由 {@link #resolveMegaApiForStoneSlug} 以資料庫 Mega 形態反推）。
+     */
+    private static final Map<String, String> CHAMPIONS_MEGA_STONE_SLUG_TO_MEGA_API = Map.ofEntries(
+            Map.entry("clefablite", "clefable-mega"),
+            Map.entry("drampanite", "drampa-mega"),
+            Map.entry("excadrite", "excadrill-mega"),
+            Map.entry("chandelurite", "chandelure-mega"),
+            Map.entry("meganiumite", "meganium-mega"),
+            Map.entry("feraligite", "feraligatr-mega"),
+            Map.entry("emboarite", "emboar-mega"),
+            Map.entry("victreebelite", "victreebel-mega"),
+            Map.entry("hawluchanite", "hawlucha-mega"),
+            Map.entry("dragoninite", "dragonite-mega"),
+            Map.entry("froslassite", "froslass-mega"),
+            Map.entry("starminite", "starmie-mega"),
+            Map.entry("skarmorite", "skarmory-mega"),
+            Map.entry("chimechite", "chimecho-mega"),
+            Map.entry("crabominite", "crabominable-mega"),
+            Map.entry("glimmoranite", "glimmora-mega"),
+            Map.entry("golurkite", "golurk-mega"),
+            Map.entry("meowsticite", "meowstic-mega"),
+            Map.entry("chesnaughtite", "chesnaught-mega"),
+            Map.entry("delphoxite", "delphox-mega"),
+            Map.entry("scovillainite", "scovillain-mega"),
+            Map.entry("floettite", "floette-mega"),
+            Map.entry("greninjite", "greninja-mega")
+    );
+
+    /** 僅在「資料庫無法反推 Mega 形態」時使用 Gemini。 */
+    private static final String MEGA_STONE_NAME_FALLBACK_PROMPT = """
+            你是寶可夢繁體中文（台灣）官方用語專家。下列 JSON 的 key 為資料庫物品 slug，value 為遊戲內 Mega 進化石的英文顯示名稱。
+            請依英文名稱判斷對應寶可夢，輸出與主系列道具命名一致的繁中名稱。
+            規則：
+            1. 格式為「官方寶可夢中文名＋進化石」，例如 Charizardite X → 噴火龍進化石X（X/Y 接在進化石後）。
+            2. value 僅為簡潔道具名，不要說明文字。
+            3. 回傳與輸入相同 key 的 JSON 物件。
+            4. 只回傳 JSON。""";
+
     private static final int MAX_RETRIES = 3;
     private static final long DEFAULT_RETRY_DELAY_MS = 60_000;
     private static final Pattern RETRY_DELAY_PATTERN =
@@ -55,6 +89,9 @@ public class ItemSyncService {
 
     @Value("${scraper.timeout-ms:15000}")
     private int timeoutMs;
+
+    @Value("${scraper.pokeapi-delay-ms:600}")
+    private int pokeApiDelayMs;
 
     @Value("${gemini.api-key:}")
     private String geminiApiKey;
@@ -69,9 +106,11 @@ public class ItemSyncService {
     private int geminiDelayMs;
 
     private final HeldItemRepository heldItemRepository;
+    private final PokemonRepository pokemonRepository;
 
-    public ItemSyncService(HeldItemRepository heldItemRepository) {
+    public ItemSyncService(HeldItemRepository heldItemRepository, PokemonRepository pokemonRepository) {
         this.heldItemRepository = heldItemRepository;
+        this.pokemonRepository = pokemonRepository;
     }
 
     /**
@@ -139,20 +178,264 @@ public class ItemSyncService {
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  翻譯物品名稱（Gemini）
+    //  道具繁中名稱：從 PokeAPI 官方本地化（與主系列譯名一致）
     // ═══════════════════════════════════════════════════════════
 
-    public TranslationReport translateNames(boolean forceRefresh) {
-        return translateWithGemini(
-                forceRefresh
-                        ? heldItemRepository.findAll()
-                        : heldItemRepository.findByChineseNameIsNull(),
-                NAME_TRANSLATION_PROMPT,
-                HeldItem::getDisplayName,
-                HeldItem::getChineseName,
-                HeldItem::setChineseName,
-                "物品名稱"
-        );
+    /**
+     * 透過 PokeAPI /item/{slug} 取得繁體中文道具名稱，寫入 HeldItem.chineseName。
+     * slug 須與 PokeAPI 物品識別碼一致（本專案由 Game8 英文名經 {@link ItemSyncService#toSlug(String)} 產生）。
+     *
+     * @param forceRefresh true 時重抓所有道具；false 時只處理 chineseName 為 null 者
+     */
+    @Transactional
+    public ItemChineseNameSyncReport syncChineseNamesFromPokeApi(boolean forceRefresh) {
+        List<HeldItem> items = forceRefresh
+                ? heldItemRepository.findAll()
+                : heldItemRepository.findByChineseNameIsNull();
+        log.info("========== 從 PokeAPI 同步道具繁中名稱: {} 筆待處理 ==========", items.size());
+
+        RestClient restClient = RestClient.builder().baseUrl(POKEAPI_ITEM_URL).build();
+        List<Pokemon> megaForms = pokemonRepository.findByIsMegaTrue();
+
+        int updated = 0, skipped = 0, notFound = 0;
+        List<String> failedItems = new ArrayList<>();
+        List<HeldItem> megaStonesNeedGemini = new ArrayList<>();
+
+        for (int i = 0; i < items.size(); i++) {
+            HeldItem item = items.get(i);
+            try {
+                if (i > 0) {
+                    Thread.sleep(pokeApiDelayMs);
+                }
+                log.debug("  [{}/{}] PokeAPI item: {}", i + 1, items.size(), item.getName());
+
+                @SuppressWarnings("unchecked")
+                Map<String, Object> body = restClient.get()
+                        .uri(item.getName())
+                        .retrieve()
+                        .body(Map.class);
+
+                if (body == null) {
+                    log.warn("    ⚠ {} 回傳 null", item.getName());
+                    failedItems.add(item.getName());
+                    notFound++;
+                    continue;
+                }
+
+                boolean changed = false;
+
+                String zhHant = extractLocalizedName(body, "zh-hant");
+                String chosen = zhHant;
+                if (chosen == null || chosen.isBlank()) {
+                    chosen = extractLocalizedName(body, "zh-hans");
+                }
+                if (chosen != null && !chosen.isBlank() && !chosen.equals(item.getChineseName())) {
+                    item.setChineseName(chosen);
+                    changed = true;
+                }
+
+                String ja = extractLocalizedName(body, "ja");
+                if (ja != null && !ja.isBlank() && !ja.equals(item.getJapaneseName())) {
+                    item.setJapaneseName(ja);
+                    changed = true;
+                }
+
+                if (!changed) {
+                    skipped++;
+                    continue;
+                }
+                heldItemRepository.save(item);
+                updated++;
+                log.info("    ✓ {} → zh:{} / ja:{}", item.getName(), item.getChineseName(), item.getJapaneseName());
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("  ⚠ 同步中斷");
+                break;
+            } catch (Exception e) {
+                if (isHttp404(e) && item.getCategory() == ItemCategory.MEGA_STONE) {
+                    Optional<String> fromMega = inferMegaStoneChineseFromMegaPokemon(item.getName(), megaForms);
+                    if (fromMega.isPresent()) {
+                        String zh = fromMega.get();
+                        if (!zh.equals(item.getChineseName())) {
+                            item.setChineseName(zh);
+                            heldItemRepository.save(item);
+                            updated++;
+                            log.info("    ✓ {} → {}（由 Mega 形態反推）", item.getName(), zh);
+                        } else {
+                            skipped++;
+                        }
+                    } else {
+                        log.info("    Mega 石 {} PokeAPI 無條目且無法對應 Mega 形態，將以 Gemini 備援", item.getName());
+                        megaStonesNeedGemini.add(item);
+                    }
+                } else {
+                    String msg = e.getMessage();
+                    if (isHttp404(e)) {
+                        log.warn("    ⚠ {} 在 PokeAPI 找不到 (404)", item.getName());
+                    } else {
+                        log.warn("    ✗ {} 查詢失敗: {}", item.getName(), msg);
+                    }
+                    failedItems.add(item.getName());
+                    notFound++;
+                }
+            }
+        }
+
+        if (!megaStonesNeedGemini.isEmpty()) {
+            if (geminiApiKey != null && !geminiApiKey.isBlank()) {
+                log.info("========== Mega 石 {} 筆改以 Gemini 備援翻譯中文名 ==========", megaStonesNeedGemini.size());
+                TranslationReport tr = translateWithGemini(
+                        megaStonesNeedGemini,
+                        MEGA_STONE_NAME_FALLBACK_PROMPT,
+                        HeldItem::getDisplayName,
+                        HeldItem::getChineseName,
+                        HeldItem::setChineseName,
+                        "Mega石中文(備援)"
+                );
+                updated += tr.translated();
+                skipped += tr.skipped();
+                notFound += tr.failed();
+                failedItems.addAll(tr.failedItems());
+                for (HeldItem m : megaStonesNeedGemini) {
+                    if ((m.getChineseName() == null || m.getChineseName().isBlank())
+                            && !failedItems.contains(m.getName())) {
+                        failedItems.add(m.getName());
+                        notFound++;
+                    }
+                }
+            } else {
+                log.warn("未設定 gemini.api-key，{} 顆 Mega 石無法備援翻譯，仍缺中文名", megaStonesNeedGemini.size());
+                for (HeldItem m : megaStonesNeedGemini) {
+                    failedItems.add(m.getName());
+                    notFound++;
+                }
+            }
+        }
+
+        log.info("========== 道具繁中名稱同步完成: 更新 {}, 跳過 {}, 找不到/失敗 {}, 共 {} ==========",
+                updated, skipped, notFound, items.size());
+        return new ItemChineseNameSyncReport(items.size(), updated, skipped, notFound, failedItems);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String extractLocalizedName(Map<String, Object> body, String langCode) {
+        List<Map<String, Object>> names = (List<Map<String, Object>>) body.get("names");
+        if (names == null) {
+            return null;
+        }
+        for (Map<String, Object> entry : names) {
+            Map<String, Object> lang = (Map<String, Object>) entry.get("language");
+            if (lang != null && langCode.equalsIgnoreCase(String.valueOf(lang.get("name")))) {
+                return (String) entry.get("name");
+            }
+        }
+        return null;
+    }
+
+    private static boolean isHttp404(Throwable e) {
+        Throwable cur = e;
+        while (cur != null) {
+            if (cur instanceof RestClientResponseException rce) {
+                return rce.getStatusCode().value() == 404;
+            }
+            cur = cur.getCause();
+        }
+        String msg = e.getMessage();
+        return msg != null && (msg.contains("404") || msg.contains("Not Found"));
+    }
+
+    /**
+     * 依進化石 slug 對應資料庫中 Mega 形態（apiName），將 Mega 繁中名轉成「○○進化石」/「○○進化石X」。
+     */
+    private Optional<String> inferMegaStoneChineseFromMegaPokemon(String itemSlug, List<Pokemon> megaForms) {
+        return resolveMegaApiForStoneSlug(itemSlug, megaForms)
+                .flatMap(api -> megaForms.stream()
+                        .filter(p -> api.equals(p.getApiName()))
+                        .findFirst()
+                        .map(p -> formatMegaStoneChineseName(p, api)));
+    }
+
+    private static Optional<String> resolveMegaApiForStoneSlug(String slug, List<Pokemon> megaForms) {
+        if (slug == null || slug.length() < 4 || !slug.endsWith("ite")) {
+            return Optional.empty();
+        }
+        String mapped = CHAMPIONS_MEGA_STONE_SLUG_TO_MEGA_API.get(slug);
+        if (mapped != null) {
+            boolean ok = megaForms.stream().anyMatch(p -> mapped.equals(p.getApiName()));
+            return ok ? Optional.of(mapped) : Optional.empty();
+        }
+        String prefix = slug.substring(0, slug.length() - 3);
+        List<ScoredApi> matches = new ArrayList<>();
+        for (Pokemon p : megaForms) {
+            String api = p.getApiName();
+            if (api == null || !api.contains("-mega")) {
+                continue;
+            }
+            int megaIdx = api.indexOf("-mega");
+            String base = api.substring(0, megaIdx);
+            int score = scoreStonePrefixToBase(prefix, base);
+            if (score >= 0) {
+                matches.add(new ScoredApi(api, score));
+            }
+        }
+        return matches.stream()
+                .max(Comparator.comparingInt(ScoredApi::score).thenComparing(s -> s.api.length()))
+                .map(ScoredApi::api);
+    }
+
+    /**
+     * 將 Game8／慣用進化石 slug 前綴與 Mega 形態的種族名（api 中 -mega 前綴）對齊。
+     * 含「Lucarionite」這類尾端多一字母的常見拼法（與種族名僅最末字不同）。
+     */
+    private static int scoreStonePrefixToBase(String prefix, String base) {
+        if (prefix.equals(base)) {
+            return 10_000 + base.length();
+        }
+        if (base.startsWith(prefix)) {
+            return 5_000 + prefix.length() * 100 + (base.length() - prefix.length());
+        }
+        if (prefix.startsWith(base)) {
+            return 2_000 + base.length();
+        }
+        if (prefix.length() == base.length()
+                && prefix.length() >= 4
+                && prefix.regionMatches(0, base, 0, prefix.length() - 1)) {
+            return 1_500 + base.length();
+        }
+        return -1;
+    }
+
+    private record ScoredApi(String api, int score) {}
+
+    private static String formatMegaStoneChineseName(Pokemon mega, String megaApiName) {
+        String zh = mega.getChineseName();
+        if (zh == null || zh.isBlank()) {
+            return null;
+        }
+        zh = zh.strip();
+        if (zh.startsWith("超級")) {
+            zh = zh.substring(2).strip();
+        }
+        String xy = "";
+        if (megaApiName.endsWith("-mega-x")) {
+            zh = stripTrailingCharVariant(zh, 'Ｘ', 'X');
+            xy = "X";
+        } else if (megaApiName.endsWith("-mega-y")) {
+            zh = stripTrailingCharVariant(zh, 'Ｙ', 'Y');
+            xy = "Y";
+        }
+        return zh + "進化石" + xy;
+    }
+
+    private static String stripTrailingCharVariant(String s, char wide, char ascii) {
+        if (s.endsWith(String.valueOf(wide))) {
+            return s.substring(0, s.length() - 1).strip();
+        }
+        if (s.length() > 1 && s.charAt(s.length() - 1) == ascii) {
+            return s.substring(0, s.length() - 1).strip();
+        }
+        return s;
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -334,6 +617,15 @@ public class ItemSyncService {
 
     public record TranslationReport(
             int total, int translated, int skipped, int failed,
+            List<String> failedItems
+    ) {}
+
+    /** 與 {@link com.pokechampions.backend.service.MoveSyncService.LocalizedNameSyncReport} 欄位語意對齊 */
+    public record ItemChineseNameSyncReport(
+            int total,
+            int updated,
+            int skipped,
+            int notFound,
             List<String> failedItems
     ) {}
 

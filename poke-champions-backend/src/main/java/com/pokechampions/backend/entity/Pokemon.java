@@ -31,6 +31,9 @@ public class Pokemon {
     /** 中文顯示名稱，如 "妙蛙花"、"雷丘 (阿羅拉的樣子)" */
     private String chineseName;
 
+    /** 日文顯示名稱，如 "フシギバナ"、"ライチュウ (アローラのすがた)" */
+    private String japaneseName;
+
     private boolean isMega;
 
     // 種族值
@@ -85,6 +88,9 @@ public class Pokemon {
 
     public String getChineseName() { return chineseName; }
     public void setChineseName(String chineseName) { this.chineseName = chineseName; }
+
+    public String getJapaneseName() { return japaneseName; }
+    public void setJapaneseName(String japaneseName) { this.japaneseName = japaneseName; }
 
     public boolean isMega() { return isMega; }
     public void setMega(boolean mega) { isMega = mega; }

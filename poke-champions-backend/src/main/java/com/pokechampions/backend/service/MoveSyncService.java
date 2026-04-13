@@ -221,17 +221,21 @@ public class MoveSyncService {
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  Phase 3: 從 PokeAPI 同步招式繁體中文名稱
+    //  Phase 3: 從 PokeAPI 同步招式多語名稱（中文 + 日文）
     // ═══════════════════════════════════════════════════════════
 
     /**
-     * 透過 PokeAPI /move/{slug} 取得繁體中文招式名稱，寫入 Move.chineseName。
+     * 透過 PokeAPI /move/{slug} 取得繁體中文與日文招式名稱。
      *
-     * @param forceRefresh 若 true，重新查詢所有招式；若 false，只查 chineseName 為 null 的招式
+     * @param forceRefresh 若 true，重新查詢所有招式；若 false，只查 chineseName 或 japaneseName 為 null 的招式
      */
-    public ChineseNameSyncReport syncChineseNames(boolean forceRefresh) {
-        List<Move> moves = forceRefresh ? moveRepository.findAll() : moveRepository.findByChineseNameIsNull();
-        log.info("========== 開始同步招式中文名: {} 筆待處理 ==========", moves.size());
+    public LocalizedNameSyncReport syncLocalizedNames(boolean forceRefresh) {
+        List<Move> moves = forceRefresh
+                ? moveRepository.findAll()
+                : moveRepository.findAll().stream()
+                    .filter(m -> m.getChineseName() == null || m.getJapaneseName() == null)
+                    .toList();
+        log.info("========== 開始同步招式多語名稱: {} 筆待處理 ==========", moves.size());
 
         RestClient restClient = RestClient.builder().baseUrl(POKEAPI_MOVE_URL).build();
 
@@ -261,23 +265,29 @@ public class MoveSyncService {
                     continue;
                 }
 
-                String zhHant = extractName(body, "zh-hant");
-                if (zhHant != null && !zhHant.equals(move.getChineseName())) {
-                    move.setChineseName(zhHant);
+                boolean changed = false;
+
+                if (move.getChineseName() == null || forceRefresh) {
+                    String zhHant = extractName(body, "zh-hant");
+                    if (zhHant == null) zhHant = extractName(body, "zh-hans");
+                    if (zhHant != null && !zhHant.equals(move.getChineseName())) {
+                        move.setChineseName(zhHant);
+                        changed = true;
+                    }
+                }
+
+                if (move.getJapaneseName() == null || forceRefresh) {
+                    String ja = extractName(body, "ja");
+                    if (ja != null && !ja.equals(move.getJapaneseName())) {
+                        move.setJapaneseName(ja);
+                        changed = true;
+                    }
+                }
+
+                if (changed) {
                     moveRepository.save(move);
                     updated++;
-                    log.info("    ✓ {} → {}", move.getName(), zhHant);
-                } else if (zhHant == null) {
-                    String zhHans = extractName(body, "zh-hans");
-                    if (zhHans != null && !zhHans.equals(move.getChineseName())) {
-                        move.setChineseName(zhHans);
-                        moveRepository.save(move);
-                        updated++;
-                        log.info("    ✓ {} → {} (簡體)", move.getName(), zhHans);
-                    } else {
-                        skipped++;
-                        log.debug("    ⏭ {} 無中文名", move.getName());
-                    }
+                    log.info("    ✓ {} → zh:{} / ja:{}", move.getName(), move.getChineseName(), move.getJapaneseName());
                 } else {
                     skipped++;
                 }
@@ -290,19 +300,23 @@ public class MoveSyncService {
                 String msg = e.getMessage();
                 if (msg != null && msg.contains("404")) {
                     log.warn("    ⚠ {} 在 PokeAPI 找不到 (404)", move.getName());
-                    failedMoves.add(move.getName());
-                    notFound++;
                 } else {
                     log.warn("    ✗ {} 查詢失敗: {}", move.getName(), msg);
-                    failedMoves.add(move.getName());
-                    notFound++;
                 }
+                failedMoves.add(move.getName());
+                notFound++;
             }
         }
 
-        log.info("========== 中文名同步完成: 更新 {}, 跳過 {}, 找不到 {}, 共 {} ==========",
+        log.info("========== 多語名稱同步完成: 更新 {}, 跳過 {}, 找不到 {}, 共 {} ==========",
                 updated, skipped, notFound, moves.size());
-        return new ChineseNameSyncReport(moves.size(), updated, skipped, notFound, failedMoves);
+        return new LocalizedNameSyncReport(moves.size(), updated, skipped, notFound, failedMoves);
+    }
+
+    /** @deprecated Use {@link #syncLocalizedNames(boolean)} instead */
+    @Deprecated
+    public LocalizedNameSyncReport syncChineseNames(boolean forceRefresh) {
+        return syncLocalizedNames(forceRefresh);
     }
 
     @SuppressWarnings("unchecked")
@@ -777,7 +791,7 @@ public class MoveSyncService {
 
     public record MoveSyncReport(int totalParsed, int created, int updated, int failed) {}
 
-    public record ChineseNameSyncReport(
+    public record LocalizedNameSyncReport(
             int total,
             int updated,
             int skipped,

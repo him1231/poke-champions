@@ -6,5 +6,6 @@ export const pokemonRosterApi = {
   getPokemonTypes: (apiName) => rosterClient.get(`/pokemon/${apiName}/types`),
   getPokemonMatchup: (apiName) => rosterClient.get(`/pokemon/${apiName}/matchup`),
   getPokemonMoves: (apiName) => rosterClient.get(`/pokemon/${apiName}/moves`),
+  getPokemonAbilities: (apiName) => rosterClient.get(`/pokemon/${apiName}/abilities`),
   getNameMapping: () => rosterClient.get('/name-mapping'),
 }

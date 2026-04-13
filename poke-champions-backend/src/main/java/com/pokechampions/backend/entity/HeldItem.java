@@ -21,6 +21,8 @@ public class HeldItem {
     /** 繁體中文名稱（後續翻譯用） */
     private String chineseName;
 
+    private String japaneseName;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ItemCategory category;
@@ -36,6 +38,9 @@ public class HeldItem {
     /** 效果說明（繁體中文，由 AI 翻譯） */
     @Column(length = 1000)
     private String chineseEffect;
+
+    @Column(length = 1000)
+    private String japaneseEffect;
 
     /** Game8 物品詳情頁 URL */
     private String game8Url;
@@ -64,6 +69,9 @@ public class HeldItem {
     public String getChineseName() { return chineseName; }
     public void setChineseName(String chineseName) { this.chineseName = chineseName; }
 
+    public String getJapaneseName() { return japaneseName; }
+    public void setJapaneseName(String japaneseName) { this.japaneseName = japaneseName; }
+
     public ItemCategory getCategory() { return category; }
     public void setCategory(ItemCategory category) { this.category = category; }
 
@@ -75,6 +83,9 @@ public class HeldItem {
 
     public String getChineseEffect() { return chineseEffect; }
     public void setChineseEffect(String chineseEffect) { this.chineseEffect = chineseEffect; }
+
+    public String getJapaneseEffect() { return japaneseEffect; }
+    public void setJapaneseEffect(String japaneseEffect) { this.japaneseEffect = japaneseEffect; }
 
     public String getGame8Url() { return game8Url; }
     public void setGame8Url(String game8Url) { this.game8Url = game8Url; }

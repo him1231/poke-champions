@@ -1,6 +1,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { typeRosterApi } from '../api/typeRoster'
+import { localizedTypeName } from '../utils/localizedName'
+
+const { t } = useI18n()
 
 const types = ref([])
 const loading = ref(true)
@@ -15,7 +19,7 @@ onMounted(async () => {
     const res = await typeRosterApi.getTypes()
     types.value = Array.isArray(res.data) ? res.data : []
   } catch (e) {
-    error.value = '無法載入屬性資料'
+    error.value = t('typesPage.loadError')
   } finally {
     loading.value = false
   }
@@ -56,8 +60,7 @@ function clearSelection() {
 }
 
 function getChineseName(typeName) {
-  const t = types.value.find((x) => x.name === typeName)
-  return t ? t.chineseName : typeName
+  return t('pokemon.types.' + typeName)
 }
 
 const matchupSections = computed(() => {
@@ -65,14 +68,14 @@ const matchupSections = computed(() => {
   const sections = []
   const m = matchup.value
 
-  if (m.immunities?.length) sections.push({ title: '0× 無效', items: m.immunities, cls: 'immune' })
+  if (m.immunities?.length) sections.push({ title: t('pokemonDetail.matchup.immune'), items: m.immunities, cls: 'immune' })
   if (m.quadResistances?.length)
-    sections.push({ title: '¼× 抵抗', items: m.quadResistances, cls: 'great' })
-  if (m.resistances?.length) sections.push({ title: '½× 抵抗', items: m.resistances, cls: 'good' })
-  if (m.neutral?.length) sections.push({ title: '1× 普通', items: m.neutral, cls: 'neutral-cls' })
-  if (m.weaknesses?.length) sections.push({ title: '2× 弱點', items: m.weaknesses, cls: 'warn' })
+    sections.push({ title: t('pokemonDetail.matchup.quadResist'), items: m.quadResistances, cls: 'great' })
+  if (m.resistances?.length) sections.push({ title: t('pokemonDetail.matchup.resist'), items: m.resistances, cls: 'good' })
+  if (m.neutral?.length) sections.push({ title: t('pokemonDetail.matchup.neutral'), items: m.neutral, cls: 'neutral-cls' })
+  if (m.weaknesses?.length) sections.push({ title: t('pokemonDetail.matchup.weak'), items: m.weaknesses, cls: 'warn' })
   if (m.quadWeaknesses?.length)
-    sections.push({ title: '4× 弱點', items: m.quadWeaknesses, cls: 'danger' })
+    sections.push({ title: t('pokemonDetail.matchup.quadWeak'), items: m.quadWeaknesses, cls: 'danger' })
 
   return sections
 })
@@ -80,33 +83,33 @@ const matchupSections = computed(() => {
 
 <template>
   <div class="container">
-    <h1 class="page-title">屬性相剋查詢</h1>
+    <h1 class="page-title">{{ t('typesPage.title') }}</h1>
 
-    <div v-if="loading" class="loading">載入中</div>
+    <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
     <div v-else-if="error" class="error-msg">{{ error }}</div>
 
     <template v-else>
       <p class="hint">
         <span class="material-symbols-rounded" style="font-size: 18px">touch_app</span>
-        點選屬性查詢防禦相性（可選擇 1~2 個屬性）
+        {{ t('typesPage.hint') }}
       </p>
 
       <div class="type-grid">
         <button
-          v-for="t in types"
-          :key="t.name"
+          v-for="tp in types"
+          :key="tp.name"
           type="button"
           :class="[
             'type-btn',
-            t.name,
+            tp.name,
             {
-              selected: selectedType1 === t.name || selectedType2 === t.name,
+              selected: selectedType1 === tp.name || selectedType2 === tp.name,
             },
           ]"
-          @click="selectType(t.name)"
+          @click="selectType(tp.name)"
         >
-          <span class="type-btn-name">{{ t.chineseName }}</span>
-          <span class="type-btn-en">{{ t.name }}</span>
+          <span class="type-btn-name">{{ localizedTypeName(tp) }}</span>
+          <span class="type-btn-en">{{ tp.name }}</span>
         </button>
       </div>
 
@@ -123,23 +126,23 @@ const matchupSections = computed(() => {
         <div class="selection-actions">
           <button type="button" class="btn-calc" @click="calculateMatchup">
             <span class="material-symbols-rounded" style="font-size: 18px">calculate</span>
-            查詢防禦相性
+            {{ t('typesPage.calculate') }}
           </button>
           <button type="button" class="btn-clear" @click="clearSelection">
             <span class="material-symbols-rounded" style="font-size: 18px">close</span>
-            清除
+            {{ t('common.clear') }}
           </button>
         </div>
       </div>
 
-      <div v-if="matchupLoading" class="loading">計算中</div>
+      <div v-if="matchupLoading" class="loading">{{ t('typesPage.calculating') }}</div>
 
       <div v-if="matchup && !matchupLoading" class="matchup-result">
         <h2 class="result-title">
           <span class="material-symbols-rounded result-icon">shield</span>
           {{ getChineseName(selectedType1) }}
           <span v-if="selectedType2"> / {{ getChineseName(selectedType2) }}</span>
-          的防禦相性
+          {{ t('typesPage.defenseOf') }}
         </h2>
 
         <div v-if="matchupSections.length" class="matchup-sections">
@@ -150,7 +153,7 @@ const matchupSections = computed(() => {
             </h3>
             <div class="matchup-badges">
               <span v-for="item in sec.items" :key="item.type" :class="`type-badge ${item.type}`">
-                {{ item.chineseName || item.type }}
+                {{ t('pokemon.types.' + item.type) }}
               </span>
             </div>
           </div>

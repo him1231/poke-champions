@@ -25,6 +25,7 @@ public class RosterSyncController {
     private final TypeMatchupService typeMatchupService;
     private final MoveSyncService moveSyncService;
     private final ItemSyncService itemSyncService;
+    private final AbilitySyncService abilitySyncService;
     private final PokemonRepository pokemonRepository;
     private final PokemonTypeRepository typeRepository;
     private final TypeEffectivenessRepository effectivenessRepository;
@@ -33,6 +34,8 @@ public class RosterSyncController {
     private final MoveRepository moveRepository;
     private final PokemonMoveRepository pokemonMoveRepository;
     private final HeldItemRepository heldItemRepository;
+    private final AbilityRepository abilityRepository;
+    private final PokemonAbilityRepository pokemonAbilityRepository;
 
     public RosterSyncController(OfficialRosterScraperService scraperService,
                                 PokemonSyncService pokemonSyncService,
@@ -40,6 +43,7 @@ public class RosterSyncController {
                                 TypeMatchupService typeMatchupService,
                                 MoveSyncService moveSyncService,
                                 ItemSyncService itemSyncService,
+                                AbilitySyncService abilitySyncService,
                                 PokemonRepository pokemonRepository,
                                 PokemonTypeRepository typeRepository,
                                 TypeEffectivenessRepository effectivenessRepository,
@@ -47,13 +51,16 @@ public class RosterSyncController {
                                 SeasonPokemonRepository seasonPokemonRepository,
                                 MoveRepository moveRepository,
                                 PokemonMoveRepository pokemonMoveRepository,
-                                HeldItemRepository heldItemRepository) {
+                                HeldItemRepository heldItemRepository,
+                                AbilityRepository abilityRepository,
+                                PokemonAbilityRepository pokemonAbilityRepository) {
         this.scraperService = scraperService;
         this.pokemonSyncService = pokemonSyncService;
         this.typeSyncService = typeSyncService;
         this.typeMatchupService = typeMatchupService;
         this.moveSyncService = moveSyncService;
         this.itemSyncService = itemSyncService;
+        this.abilitySyncService = abilitySyncService;
         this.pokemonRepository = pokemonRepository;
         this.typeRepository = typeRepository;
         this.effectivenessRepository = effectivenessRepository;
@@ -62,6 +69,8 @@ public class RosterSyncController {
         this.moveRepository = moveRepository;
         this.pokemonMoveRepository = pokemonMoveRepository;
         this.heldItemRepository = heldItemRepository;
+        this.abilityRepository = abilityRepository;
+        this.pokemonAbilityRepository = pokemonAbilityRepository;
     }
 
     @Operation(summary = "健康檢查", description = "確認後端服務是否正常回應。")
@@ -295,14 +304,14 @@ public class RosterSyncController {
         return ResponseEntity.ok(moveSyncService.translateDescriptions(forceRefresh));
     }
 
-    /** 從 PokeAPI 同步招式繁體中文名稱 */
-    @Operation(summary = "同步招式中文名稱", description = "從 PokeAPI 取得招式繁體中文名並寫入資料庫。")
+    /** 從 PokeAPI 同步招式多語名稱（中文 + 日文） */
+    @Operation(summary = "同步招式多語名稱", description = "從 PokeAPI 取得招式繁體中文名與日文名並寫入資料庫。")
     @PostMapping("/sync-move-names")
-    public ResponseEntity<MoveSyncService.ChineseNameSyncReport> syncMoveChineseNames(
-            @Parameter(description = "為 true 時連已有中文名的招式也重新抓取")
+    public ResponseEntity<MoveSyncService.LocalizedNameSyncReport> syncMoveLocalizedNames(
+            @Parameter(description = "為 true 時連已有名稱的招式也重新抓取")
             @RequestParam(defaultValue = "false") boolean forceRefresh
     ) {
-        return ResponseEntity.ok(moveSyncService.syncChineseNames(forceRefresh));
+        return ResponseEntity.ok(moveSyncService.syncLocalizedNames(forceRefresh));
     }
 
     @Operation(summary = "列出全部招式", description = "回傳資料庫中所有招式實體。")
@@ -359,14 +368,17 @@ public class RosterSyncController {
                                 m.put("name", move.getName());
                                 m.put("displayName", move.getDisplayName());
                                 m.put("chineseName", move.getChineseName());
+                                m.put("japaneseName", move.getJapaneseName());
                                 m.put("type", move.getType().getName());
                                 m.put("typeChinese", move.getType().getChineseName());
+                                m.put("typeJapanese", move.getType().getJapaneseName());
                                 m.put("category", move.getCategory().name());
                                 m.put("power", move.getPower());
                                 m.put("accuracy", move.getAccuracy());
                                 m.put("pp", move.getPp());
                                 m.put("description", move.getDescription());
                                 m.put("chineseDescription", move.getChineseDescription());
+                                m.put("japaneseDescription", move.getJapaneseDescription());
                                 m.put("source", pm.getSource().name());
                                 m.put("verified", pm.isVerified());
                                 return m;
@@ -392,6 +404,7 @@ public class RosterSyncController {
                                 m.put("apiName", p.getApiName());
                                 m.put("displayName", p.getDisplayName());
                                 m.put("chineseName", p.getChineseName());
+                                m.put("japaneseName", p.getJapaneseName());
                                 m.put("isMega", p.isMega());
                                 return m;
                             })
@@ -415,6 +428,7 @@ public class RosterSyncController {
                             m.put("apiName", p.getApiName());
                             m.put("englishName", p.getDisplayName());
                             m.put("chineseName", p.getChineseName());
+                            m.put("japaneseName", p.getJapaneseName());
                             m.put("mega", String.valueOf(p.isMega()));
                             return m;
                         })
@@ -432,13 +446,22 @@ public class RosterSyncController {
         return ResponseEntity.ok(itemSyncService.syncFromGame8());
     }
 
-    @Operation(summary = "翻譯物品名稱（繁中）", description = "使用 Gemini 將物品英文名稱翻成繁體中文官方譯名。")
-    @PostMapping("/translate-item-names")
-    public ResponseEntity<ItemSyncService.TranslationReport> translateItemNames(
-            @Parameter(description = "為 true 時連已有中文名的物品也重新翻譯")
+    @Operation(summary = "同步道具繁中名稱（PokeAPI）", description = "從 PokeAPI /item 讀取 zh-hant（無則 zh-hans）官方本地化名稱，寫入 chineseName。與主系列官方譯名一致。")
+    @PostMapping("/sync-item-chinese-names")
+    public ResponseEntity<ItemSyncService.ItemChineseNameSyncReport> syncItemChineseNames(
+            @Parameter(description = "為 true 時連已有中文名的道具也重新從 PokeAPI 抓取")
             @RequestParam(defaultValue = "false") boolean forceRefresh
     ) {
-        return ResponseEntity.ok(itemSyncService.translateNames(forceRefresh));
+        return ResponseEntity.ok(itemSyncService.syncChineseNamesFromPokeApi(forceRefresh));
+    }
+
+    @Operation(summary = "翻譯物品名稱（繁中，已改為 PokeAPI）", description = "與 POST /sync-item-chinese-names 相同；保留路徑供舊文件／腳本相容。")
+    @PostMapping("/translate-item-names")
+    public ResponseEntity<ItemSyncService.ItemChineseNameSyncReport> translateItemNames(
+            @Parameter(description = "為 true 時連已有中文名的道具也重新從 PokeAPI 抓取")
+            @RequestParam(defaultValue = "false") boolean forceRefresh
+    ) {
+        return ResponseEntity.ok(itemSyncService.syncChineseNamesFromPokeApi(forceRefresh));
     }
 
     @Operation(summary = "翻譯物品效果（繁中）", description = "使用 Gemini 將物品英文效果描述翻成繁體中文。")
@@ -477,5 +500,81 @@ public class RosterSyncController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  特性
+    // ═══════════════════════════════════════════════════
+
+    @Operation(summary = "同步寶可夢日文名稱", description = "從 PokeAPI /pokemon-species 取得日文名寫入 japaneseName。")
+    @PostMapping("/sync-pokemon-japanese-names")
+    public ResponseEntity<PokemonSyncService.SyncReport> syncPokemonJapaneseNames(
+            @Parameter(description = "為 true 時連已有日文名的寶可夢也重新抓取")
+            @RequestParam(defaultValue = "false") boolean forceRefresh
+    ) {
+        return ResponseEntity.ok(pokemonSyncService.syncJapaneseNames(forceRefresh));
+    }
+
+    @Operation(summary = "同步寶可夢特性", description = "從 PokeAPI 為所有寶可夢同步特性槽位。forceRefresh=true 時會覆寫既有列，用於補齊先前不完整同步。")
+    @PostMapping("/sync-abilities")
+    public ResponseEntity<PokemonSyncService.SyncReport> syncAbilities(
+            @Parameter(description = "為 true 時連已有特性列的寶可夢也從 PokeAPI 重寫")
+            @RequestParam(defaultValue = "false") boolean forceRefresh
+    ) {
+        return ResponseEntity.ok(pokemonSyncService.syncAbilities(forceRefresh));
+    }
+
+    @Operation(summary = "同步特性詳情", description = "從 PokeAPI 取得所有已登錄特性的中文名稱與描述。")
+    @PostMapping("/sync-ability-details")
+    public ResponseEntity<AbilitySyncService.SyncReport> syncAbilityDetails(
+            @Parameter(description = "為 true 時連已同步過的特性也重新抓取")
+            @RequestParam(defaultValue = "false") boolean forceRefresh
+    ) {
+        return ResponseEntity.ok(abilitySyncService.syncAbilityDetails(forceRefresh));
+    }
+
+    @Operation(summary = "列出全部特性", description = "回傳資料庫中所有已登錄的特性。")
+    @GetMapping("/abilities")
+    public ResponseEntity<List<Ability>> listAbilities() {
+        return ResponseEntity.ok(abilityRepository.findAll());
+    }
+
+    @Operation(summary = "單一特性詳情", description = "依特性 slug（小寫英文名）查詢單一特性。")
+    @GetMapping("/abilities/{name}")
+    public ResponseEntity<Ability> getAbility(
+            @Parameter(description = "特性 slug，如 overgrow", example = "overgrow")
+            @PathVariable String name) {
+        return abilityRepository.findByName(name.toLowerCase())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "寶可夢特性", description = "回傳該寶可夢的特性列表（含隱藏特性標記）。")
+    @GetMapping("/pokemon/{apiName}/abilities")
+    public ResponseEntity<List<Map<String, Object>>> pokemonAbilities(
+            @Parameter(description = "寶可夢 apiName", example = "charizard")
+            @PathVariable String apiName) {
+        return pokemonRepository.findByApiName(apiName)
+                .map(pokemon -> {
+                    List<Map<String, Object>> abilities = pokemonAbilityRepository
+                            .findByPokemonOrderBySlot(pokemon).stream()
+                            .map(pa -> {
+                                Map<String, Object> m = new LinkedHashMap<>();
+                                Ability a = pa.getAbility();
+                                m.put("name", a.getName());
+                                m.put("displayName", a.getDisplayName());
+                                m.put("chineseName", a.getChineseName());
+                                m.put("japaneseName", a.getJapaneseName());
+                                m.put("description", a.getDescription());
+                                m.put("chineseDescription", a.getChineseDescription());
+                                m.put("japaneseDescription", a.getJapaneseDescription());
+                                m.put("slot", pa.getSlot());
+                                m.put("hidden", pa.isHidden());
+                                return m;
+                            })
+                            .collect(Collectors.toList());
+                    return ResponseEntity.ok(abilities);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }

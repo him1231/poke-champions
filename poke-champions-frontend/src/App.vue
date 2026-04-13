@@ -1,15 +1,18 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { setLocale, SUPPORTED_LOCALES } from './i18n'
 
+const { t, locale } = useI18n()
 const mobileMenuOpen = ref(false)
 
-const navLinks = [
-  { name: '首頁', path: '/', icon: 'home' },
-  { name: '圖鑑', path: '/pokemon', icon: 'menu_book' },
-  { name: '招式', path: '/moves', icon: 'bolt' },
-  { name: '屬性', path: '/types', icon: 'shield' },
-  { name: '組隊', path: '/team-builder', icon: 'groups' },
-]
+const navLinks = computed(() => [
+  { name: t('nav.home'), path: '/', icon: 'home' },
+  { name: t('nav.pokedex'), path: '/pokemon', icon: 'menu_book' },
+  { name: t('nav.moves'), path: '/moves', icon: 'bolt' },
+  { name: t('nav.types'), path: '/types', icon: 'shield' },
+  { name: t('nav.teamBuilder'), path: '/team-builder', icon: 'groups' },
+])
 </script>
 
 <template>
@@ -37,7 +40,11 @@ const navLinks = [
           </router-link>
         </nav>
 
-        <button type="button" class="menu-toggle" aria-label="選單" @click="mobileMenuOpen = !mobileMenuOpen">
+        <select :value="locale" @change="setLocale($event.target.value)" class="lang-select">
+          <option v-for="loc in SUPPORTED_LOCALES" :key="loc" :value="loc">{{ t(`langSwitcher.${loc}`) }}</option>
+        </select>
+
+        <button type="button" class="menu-toggle" :aria-label="t('common.close')" @click="mobileMenuOpen = !mobileMenuOpen">
           <span class="hamburger" :class="{ open: mobileMenuOpen }"></span>
         </button>
       </div>
@@ -51,11 +58,12 @@ const navLinks = [
       <div class="container footer-inner">
         <div class="footer-brand">
           <span class="footer-logo">Poké Champions</span>
-          <p>寶可夢冠軍賽資料查詢工具</p>
+          <p>{{ t('footer.subtitle') }}</p>
         </div>
         <div class="footer-links">
           <router-link v-for="link in navLinks" :key="link.path" :to="link.path">{{ link.name }}</router-link>
-          <router-link to="/about">關於製作者</router-link>
+          <router-link to="/about">{{ t('footer.about') }}</router-link>
+          <router-link to="/privacy">{{ t('footer.privacy') }}</router-link>
         </div>
       </div>
     </footer>
@@ -158,6 +166,20 @@ const navLinks = [
 .nav-link.router-link-exact-active {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.lang-select {
+  padding: 6px 10px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  outline: none;
+  cursor: pointer;
+}
+.lang-select option {
+  background: var(--bg-secondary);
 }
 
 .menu-toggle {

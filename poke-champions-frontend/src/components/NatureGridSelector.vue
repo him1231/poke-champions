@@ -1,10 +1,28 @@
 <script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   NATURE_GRID,
-  NATURE_GRID_HEADERS_DEC,
-  NATURE_GRID_HEADERS_INC,
   NATURE_DEFS,
 } from '../constants/pokemonNatures'
+
+const { t } = useI18n()
+
+const headerDec = computed(() => [
+  t('pokemon.stats.attack'),
+  t('pokemon.stats.defense'),
+  t('pokemon.stats.specialAttack'),
+  t('pokemon.stats.specialDefense'),
+  t('pokemon.stats.speed'),
+])
+
+const headerInc = computed(() => [
+  t('pokemon.stats.attack'),
+  t('pokemon.stats.defense'),
+  t('pokemon.stats.specialAttack'),
+  t('pokemon.stats.specialDefense'),
+  t('pokemon.stats.speed'),
+])
 
 const props = defineProps({
   modelValue: {
@@ -22,7 +40,7 @@ function selectNature(id) {
 
 function labelFor(id) {
   if (!id) return ''
-  return NATURE_DEFS[id]?.labelZh ?? id
+  return t('pokemon.natures.' + id)
 }
 </script>
 
@@ -30,12 +48,12 @@ function labelFor(id) {
   <div class="nature-panel">
     <div class="nature-panel-header">
       <span class="material-symbols-rounded" style="font-size: 20px; color: var(--accent)">psychology</span>
-      <span class="nature-panel-title">選擇性格</span>
+      <span class="nature-panel-title">{{ t('natureGrid.title') }}</span>
     </div>
-    <div class="nature-grid" role="grid" aria-label="性格網格">
+    <div class="nature-grid" role="grid" :aria-label="t('natureGrid.title')">
       <div class="nature-corner" aria-hidden="true" />
       <div
-        v-for="(h, ci) in NATURE_GRID_HEADERS_DEC"
+        v-for="(h, ci) in headerDec"
         :key="'dec-' + ci"
         class="nature-col-head"
       >
@@ -49,7 +67,7 @@ function labelFor(id) {
         <div class="nature-row-head">
           <span class="nature-head-inner inc">
             <span class="material-symbols-rounded head-arrow" style="font-size: 14px">north</span>
-            {{ NATURE_GRID_HEADERS_INC[ri] }}
+            {{ headerInc[ri] }}
           </span>
         </div>
         <button

@@ -1,14 +1,18 @@
 <script setup>
 import { computed, ref, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getPokemonImageUrl } from '../utils/pokemonImage'
 import { typeBadgeClasses } from '../utils/pokemonTypesDisplay'
+import { localizedName, localizedTypeName, localizedEffect } from '../utils/localizedName'
 import { NATURE_DEFS } from '../constants/pokemonNatures'
+import { teamToShowdownPaste } from '../utils/showdownTeamExport'
 import {
   useTeamStore, ALL_TYPES, TYPE_ZH,
   STAT_KEYS, STAT_LABELS, STAT_COLORS, CATEGORY_LABELS,
   getDefenseMultipliers, calcStat,
 } from '../composables/useTeamStore'
 
+const { t } = useI18n()
 const { teamMembers, pokemonDisplayName } = useTeamStore()
 
 const filledMembers = computed(() =>
@@ -20,18 +24,27 @@ const filledMembers = computed(() =>
 const teamCount = computed(() => filledMembers.value.length)
 
 function natureLabelZh(id) {
-  return NATURE_DEFS[id]?.labelZh ?? id
+  return t('pokemon.natures.' + id)
 }
 
 function natureEffect(id) {
   const def = NATURE_DEFS[id]
-  if (!def?.mult || Object.keys(def.mult).length === 0) return '無加減'
+  if (!def?.mult || Object.keys(def.mult).length === 0) return t('teamOverview.noNatureEffect')
   const parts = []
   for (const [k, v] of Object.entries(def.mult)) {
-    if (v > 1) parts.push(`${STAT_LABELS[k]}↑`)
-    else if (v < 1) parts.push(`${STAT_LABELS[k]}↓`)
+    if (v > 1) parts.push(`${t('pokemon.stats.' + k)}↑`)
+    else if (v < 1) parts.push(`${t('pokemon.stats.' + k)}↓`)
   }
   return parts.join(' ')
+}
+
+function natureTrendForStat(natureId, statKey) {
+  if (statKey === 'hp') return 'neutral'
+  const mult = NATURE_DEFS[natureId]?.mult?.[statKey]
+  if (mult == null) return 'neutral'
+  if (mult > 1) return 'up'
+  if (mult < 1) return 'down'
+  return 'neutral'
 }
 
 function memberStats(m) {
@@ -41,10 +54,11 @@ function memberStats(m) {
     const actual = calcStat(m.pokemon, key, m.statPoints, m.nature)
     const maxStat = 260
     return {
-      key, label: STAT_LABELS[key], base, actual,
+      key, label: t('pokemon.stats.' + key), base, actual,
       barPct: Math.min((actual / maxStat) * 100, 100),
       color: STAT_COLORS[key],
       evPts: m.statPoints[key] || 0,
+      natureTrend: natureTrendForStat(m.nature, key),
     }
   })
 }
@@ -64,7 +78,7 @@ const teamDefenseAnalysis = computed(() => {
       else if (mult > 1) weakCount++
       else if (mult < 1) resistCount++
     })
-    return { type: atkType, typeZh: TYPE_ZH[atkType], weakCount, resistCount, immuneCount }
+    return { type: atkType, typeZh: t('pokemon.types.' + atkType), weakCount, resistCount, immuneCount }
   })
 
   const warnings = perType.filter(t => t.weakCount >= 2).sort((a, b) => b.weakCount - a.weakCount)
@@ -80,10 +94,10 @@ const teamTypesCoverage = computed(() => {
       if (mv?.type) attackTypes.add(mv.type)
     })
   })
-  return ALL_TYPES.map(t => ({
-    type: t,
-    typeZh: TYPE_ZH[t],
-    covered: attackTypes.has(t),
+  return ALL_TYPES.map(tp => ({
+    type: tp,
+    typeZh: t('pokemon.types.' + tp),
+    covered: attackTypes.has(tp),
   }))
 })
 
@@ -93,6 +107,16 @@ const uncoveredAttackTypes = computed(() =>
 
 const overviewRoot = ref(null)
 const downloading = ref(false)
+const exportMenu = ref(null)
+
+function closeExportMenu() {
+  const el = exportMenu.value
+  if (el) el.open = false
+}
+
+function onExportSummaryClick(e) {
+  if (teamCount.value === 0) e.preventDefault()
+}
 
 async function downloadOverviewPng() {
   if (teamCount.value === 0 || !overviewRoot.value) return
@@ -118,7 +142,22 @@ async function downloadOverviewPng() {
     console.error('overview export failed', err)
   } finally {
     downloading.value = false
+    closeExportMenu()
   }
+}
+
+function downloadShowdownTxt() {
+  if (teamCount.value === 0) return
+  const text = teamToShowdownPaste(filledMembers.value)
+  if (!text.trim()) return
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'showdown.txt'
+  link.click()
+  URL.revokeObjectURL(url)
+  closeExportMenu()
 }
 </script>
 
@@ -128,21 +167,39 @@ async function downloadOverviewPng() {
     <div class="page-header">
       <h1 class="page-title">
         <span class="material-symbols-rounded" style="font-size:1.6rem;vertical-align:middle;margin-right:8px">summarize</span>
-        隊伍總覽
+        {{ t('teamOverview.title') }}
       </h1>
       <div class="page-header-actions overview-export-ignore">
-        <button
-          type="button"
-          class="btn-download-overview"
-          :disabled="teamCount === 0 || downloading"
-          @click="downloadOverviewPng"
-        >
-          <span class="material-symbols-rounded">download</span>
-          {{ downloading ? '輸出中…' : '下載圖片' }}
-        </button>
+        <details ref="exportMenu" class="export-dropdown" :class="{ 'is-disabled': teamCount === 0 }">
+          <summary class="btn-export-summary" @click="onExportSummaryClick">
+            <span class="material-symbols-rounded">download</span>
+            {{ t('teamOverview.export') }}
+            <span class="material-symbols-rounded export-dropdown-chevron">expand_more</span>
+          </summary>
+          <div class="export-dropdown-panel">
+            <button
+              type="button"
+              class="export-dropdown-item"
+              :disabled="teamCount === 0 || downloading"
+              @click="downloadOverviewPng"
+            >
+              <span class="material-symbols-rounded">image</span>
+              {{ downloading ? t('teamOverview.exporting') : t('teamOverview.downloadPng') }}
+            </button>
+            <button
+              type="button"
+              class="export-dropdown-item"
+              :disabled="teamCount === 0"
+              @click="downloadShowdownTxt"
+            >
+              <span class="material-symbols-rounded">description</span>
+              {{ t('teamOverview.exportShowdown') }}
+            </button>
+          </div>
+        </details>
         <router-link to="/team-builder" class="btn-back-edit">
           <span class="material-symbols-rounded">edit</span>
-          編輯隊伍
+          {{ t('teamOverview.editTeam') }}
         </router-link>
       </div>
     </div>
@@ -150,8 +207,8 @@ async function downloadOverviewPng() {
     <template v-if="teamCount === 0">
       <div class="empty-state">
         <span class="material-symbols-rounded empty-icon">group_off</span>
-        <p>尚未建立隊伍</p>
-        <router-link to="/team-builder" class="btn-go-build">前往組隊</router-link>
+        <p>{{ t('teamOverview.emptyTeam') }}</p>
+        <router-link to="/team-builder" class="btn-go-build">{{ t('teamOverview.goToBuild') }}</router-link>
       </div>
     </template>
 
@@ -167,27 +224,39 @@ async function downloadOverviewPng() {
             <div class="mc-info">
               <h3 class="mc-name">{{ pokemonDisplayName(m.pokemon) }}</h3>
               <div class="mc-types">
-                <span v-for="t in m.types" :key="t" :class="typeBadgeClasses(t)">{{ TYPE_ZH[t] || t }}</span>
+                <span v-for="tp in m.types" :key="tp" :class="typeBadgeClasses(tp)">{{ t('pokemon.types.' + tp) }}</span>
               </div>
               <div class="mc-nature">
                 <span class="mc-nature-name">{{ natureLabelZh(m.nature) }}</span>
                 <span class="mc-nature-fx">{{ natureEffect(m.nature) }}</span>
               </div>
+              <div v-if="m.ability" class="mc-ability">
+                <span class="material-symbols-rounded mc-ability-icon">auto_awesome</span>
+                <span class="mc-ability-name">{{ localizedName(m.ability) }}</span>
+              </div>
             </div>
             <div v-if="m.heldItem" class="mc-held-slot">
               <span class="material-symbols-rounded mc-held-icon">inventory_2</span>
-              <span class="mc-held-name">{{ m.heldItem.chineseName || m.heldItem.displayName }}</span>
+              <span class="mc-held-name">{{ localizedName(m.heldItem) }}</span>
             </div>
             <div v-else class="mc-held-slot mc-held-empty">
               <span class="material-symbols-rounded mc-held-icon">block</span>
-              <span class="mc-held-empty-text">無持有物</span>
+              <span class="mc-held-empty-text">{{ t('teamOverview.noItem') }}</span>
             </div>
           </div>
 
           <!-- 能力值迷你條 -->
           <div class="mc-stats">
             <div v-for="s in memberStats(m)" :key="s.key" class="mc-stat-row">
-              <span class="mc-stat-label">{{ s.label }}</span>
+              <span class="mc-stat-label-wrap">
+                <span class="mc-stat-label" :style="{ color: s.color }">{{ s.label }}</span>
+                <span v-if="s.natureTrend === 'up'" class="nature-trend nature-trend-up" :title="t('pokemonDetail.natureUp')">
+                  <span class="material-symbols-rounded">trending_up</span>
+                </span>
+                <span v-else-if="s.natureTrend === 'down'" class="nature-trend nature-trend-down" :title="t('pokemonDetail.natureDown')">
+                  <span class="material-symbols-rounded">trending_down</span>
+                </span>
+              </span>
               <div class="mc-stat-bar-track">
                 <div class="mc-stat-bar-fill" :style="{ width: s.barPct + '%', background: s.color }"></div>
               </div>
@@ -201,8 +270,8 @@ async function downloadOverviewPng() {
             <div v-for="(mv, mi) in m.moves" :key="mi" class="mc-move-chip" :class="{ empty: !mv }">
               <template v-if="mv">
                 <span :class="typeBadgeClasses(mv.type || mv.typeName)" class="mc-move-dot"></span>
-                <span class="mc-move-name">{{ mv.chineseName || mv.displayName }}</span>
-                <span class="mc-move-cat">{{ CATEGORY_LABELS[mv.category] || '' }}</span>
+                <span class="mc-move-name">{{ localizedName(mv) }}</span>
+                <span class="mc-move-cat">{{ mv.category ? t('pokemon.categories.' + mv.category) : '' }}</span>
               </template>
               <template v-else>
                 <span class="mc-move-empty">—</span>
@@ -216,7 +285,7 @@ async function downloadOverviewPng() {
       <section class="analysis-section">
         <h2 class="section-title">
           <span class="material-symbols-rounded">analytics</span>
-          隊伍分析
+          {{ t('teamOverview.analysis') }}
         </h2>
 
         <div class="analysis-grid">
@@ -224,17 +293,17 @@ async function downloadOverviewPng() {
           <div class="analysis-card">
             <h3 class="analysis-card-title">
               <span class="material-symbols-rounded">shield</span>
-              防禦弱點
+              {{ t('teamOverview.defenseWeakness') }}
             </h3>
             <div v-if="teamDefenseAnalysis.warnings.length" class="warn-list">
               <div v-for="w in teamDefenseAnalysis.warnings" :key="w.type" class="warn-row">
                 <span :class="typeBadgeClasses(w.type)" class="ov-type-badge">{{ w.typeZh }}</span>
-                <span class="warn-count">{{ w.weakCount }} 位弱點</span>
+                <span class="warn-count">{{ t('teamOverview.weakCount', { count: w.weakCount }) }}</span>
               </div>
             </div>
             <div v-else class="analysis-ok">
               <span class="material-symbols-rounded">check_circle</span>
-              無重大共同弱點
+              {{ t('teamOverview.noMajorWeakness') }}
             </div>
           </div>
 
@@ -242,19 +311,19 @@ async function downloadOverviewPng() {
           <div class="analysis-card">
             <h3 class="analysis-card-title">
               <span class="material-symbols-rounded">remove_moderator</span>
-              無抗性覆蓋
+              {{ t('teamOverview.noResistCoverage') }}
             </h3>
             <div v-if="teamDefenseAnalysis.uncovered.length" class="uncovered-list">
               <span
-                v-for="t in teamDefenseAnalysis.uncovered"
-                :key="t.type"
-                :class="typeBadgeClasses(t.type)"
+                v-for="entry in teamDefenseAnalysis.uncovered"
+                :key="entry.type"
+                :class="typeBadgeClasses(entry.type)"
                 class="ov-type-badge"
-              >{{ t.typeZh }}</span>
+              >{{ entry.typeZh }}</span>
             </div>
             <div v-else class="analysis-ok">
               <span class="material-symbols-rounded">check_circle</span>
-              每個屬性都有成員可抵抗
+              {{ t('teamOverview.fullResistCoverage') }}
             </div>
           </div>
 
@@ -262,22 +331,22 @@ async function downloadOverviewPng() {
           <div class="analysis-card">
             <h3 class="analysis-card-title">
               <span class="material-symbols-rounded">swords</span>
-              攻擊覆蓋
+              {{ t('teamOverview.attackCoverage') }}
             </h3>
             <div class="coverage-grid">
               <span
-                v-for="t in teamTypesCoverage"
-                :key="t.type"
-                :class="[...typeBadgeClasses(t.type), { 'badge-dim': !t.covered }]"
+                v-for="entry in teamTypesCoverage"
+                :key="entry.type"
+                :class="[...typeBadgeClasses(entry.type), { 'badge-dim': !entry.covered }]"
                 class="ov-type-badge"
-              >{{ t.typeZh }}</span>
+              >{{ entry.typeZh }}</span>
             </div>
             <p v-if="uncoveredAttackTypes.length" class="coverage-note">
-              缺少 {{ uncoveredAttackTypes.map(t => t.typeZh).join('、') }} 屬性攻擊
+              {{ t('teamOverview.missingAttack', { types: uncoveredAttackTypes.map(tp => tp.typeZh).join('、') }) }}
             </p>
             <div v-else class="analysis-ok" style="margin-top:8px">
               <span class="material-symbols-rounded">check_circle</span>
-              18 種屬性攻擊全覆蓋
+              {{ t('teamOverview.fullAttackCoverage') }}
             </div>
           </div>
 
@@ -285,23 +354,23 @@ async function downloadOverviewPng() {
           <div class="analysis-card analysis-card-wide">
             <h3 class="analysis-card-title">
               <span class="material-symbols-rounded">grid_on</span>
-              防禦相性總表
+              {{ t('teamOverview.defenseTable') }}
             </h3>
             <div class="defense-full-grid">
               <div
-                v-for="t in teamDefenseAnalysis.perType"
-                :key="t.type"
+                v-for="entry in teamDefenseAnalysis.perType"
+                :key="entry.type"
                 class="dfg-cell"
                 :class="{
-                  'dfg-danger': t.weakCount >= 2,
-                  'dfg-good': t.resistCount >= 2 || t.immuneCount >= 1,
+                  'dfg-danger': entry.weakCount >= 2,
+                  'dfg-good': entry.resistCount >= 2 || entry.immuneCount >= 1,
                 }"
               >
-                <span :class="typeBadgeClasses(t.type)" class="dfg-badge">{{ t.typeZh }}</span>
+                <span :class="typeBadgeClasses(entry.type)" class="dfg-badge">{{ entry.typeZh }}</span>
                 <div class="dfg-counts">
-                  <span v-if="t.weakCount" class="dfg-c dfg-w">{{ t.weakCount }}弱</span>
-                  <span v-if="t.resistCount" class="dfg-c dfg-r">{{ t.resistCount }}抗</span>
-                  <span v-if="t.immuneCount" class="dfg-c dfg-i">{{ t.immuneCount }}免</span>
+                  <span v-if="entry.weakCount" class="dfg-c dfg-w">{{ entry.weakCount }}{{ t('teamOverview.weak') }}</span>
+                  <span v-if="entry.resistCount" class="dfg-c dfg-r">{{ entry.resistCount }}{{ t('teamOverview.resist') }}</span>
+                  <span v-if="entry.immuneCount" class="dfg-c dfg-i">{{ entry.immuneCount }}{{ t('teamOverview.immune') }}</span>
                 </div>
               </div>
             </div>
@@ -330,7 +399,26 @@ async function downloadOverviewPng() {
   flex-shrink: 0;
 }
 
-.btn-download-overview {
+/* ═══ 匯出下拉（Showdown / PNG）═══ */
+.export-dropdown {
+  position: relative;
+}
+
+.export-dropdown.is-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.export-dropdown > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.export-dropdown > summary::-webkit-details-marker {
+  display: none;
+}
+
+.btn-export-summary {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -341,23 +429,75 @@ async function downloadOverviewPng() {
   color: var(--accent);
   font-size: 0.88rem;
   font-weight: 600;
-  cursor: pointer;
   font-family: inherit;
   transition: all 0.2s;
+  user-select: none;
 }
 
-.btn-download-overview:hover:not(:disabled) {
+.btn-export-summary:hover {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
 }
 
-.btn-download-overview:disabled {
+.btn-export-summary .material-symbols-rounded:first-of-type {
+  font-size: 18px;
+}
+
+.export-dropdown-chevron {
+  font-size: 20px;
+  margin-left: 2px;
+  transition: transform 0.2s;
+}
+
+.export-dropdown[open] .export-dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.export-dropdown-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 220px;
+  padding: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 50;
+}
+
+.export-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.export-dropdown-item:hover:not(:disabled) {
+  background: var(--bg-glass);
+}
+
+.export-dropdown-item:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.btn-download-overview .material-symbols-rounded { font-size: 18px; }
+.export-dropdown-item .material-symbols-rounded {
+  font-size: 20px;
+  color: var(--accent);
+}
 
 .btn-back-edit {
   display: flex;
@@ -404,7 +544,7 @@ async function downloadOverviewPng() {
 /* ═══ 成員卡片 ═══ */
 .members-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 40px;
 }
@@ -473,6 +613,24 @@ async function downloadOverviewPng() {
 
 .mc-nature-fx { color: var(--text-muted); }
 
+.mc-ability {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.mc-ability-icon {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.mc-ability-name {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
 /* 頭部右側：持有物（原總計位置） */
 .mc-held-slot {
   display: flex;
@@ -515,12 +673,35 @@ async function downloadOverviewPng() {
 
 .mc-stat-row {
   display: grid;
-  grid-template-columns: 30px 1fr 32px 28px;
+  grid-template-columns: minmax(48px, auto) 1fr 32px 28px;
   align-items: center;
   gap: 6px;
 }
 
-.mc-stat-label { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); }
+.mc-stat-label-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mc-stat-label { font-size: 0.68rem; font-weight: 600; }
+
+.nature-trend {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nature-trend .material-symbols-rounded {
+  font-size: 14px;
+  font-variation-settings: 'FILL' 1;
+}
+
+.nature-trend-up { color: #4ade80; }
+
+.nature-trend-down { color: #f87171; }
 
 .mc-stat-bar-track {
   height: 6px;
@@ -733,6 +914,10 @@ async function downloadOverviewPng() {
 
   .analysis-card-wide {
     grid-column: auto;
+  }
+
+  .members-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

@@ -99,6 +99,14 @@ public final class PokeApiSlugResolver {
             return parenContent.toLowerCase().contains("female") ? "basculegion-female" : "basculegion-male";
         }
 
+        // Aegislash：Game8 等來源常寫「Aegislash (Shield Forme)」，不可走通用 fallback（會變成 aegislash-shield-shield）
+        if (baseName.equalsIgnoreCase("Aegislash")) {
+            String lower = parenContent.toLowerCase();
+            if (lower.contains("blade") || lower.contains("attack")) return "aegislash-blade";
+            if (lower.contains("shield") || lower.contains("defense")) return "aegislash-shield";
+            return "aegislash-shield";
+        }
+
         // Lycanroc 形態
         if (baseName.equalsIgnoreCase("Lycanroc")) {
             String form = parenContent.replace("Form", "").trim().toLowerCase();

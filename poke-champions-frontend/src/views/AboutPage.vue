@@ -1,21 +1,26 @@
 <script setup>
-const creator = {
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+const creator = computed(() => ({
   name: 'Victor',
-  role: '全端開發者',
-  bio: '熱愛寶可夢與網頁開發，打造 Poké Champions 的初衷是讓每位訓練家都能輕鬆查閱冠軍賽資料、規劃最強隊伍。',
+  role: t('about.role'),
+  bio: t('about.bio'),
   skills: ['Vue.js', 'Spring Boot', 'PostgreSQL', 'GCP'],
   links: [
-    { label: 'GitHub', url: 'https://github.com/', icon: 'code' },
+    { label: 'GitHub', url: 'https://github.com/VictorChen199811/poke-champions', icon: 'code' },
     { label: 'Email', url: 'mailto:lujiang.scout@gmail.com', icon: 'mail' },
   ],
-}
+}))
 
-const milestones = [
-  { icon: 'lightbulb', title: '靈感來源', desc: '對寶可夢冠軍賽數據散落各處感到不便，決定自己動手整合。' },
-  { icon: 'architecture', title: '技術選型', desc: '前端採 Vue 3 + Vite，後端 Spring Boot + PostgreSQL，部署於 GCP。' },
-  { icon: 'database', title: '資料整合', desc: '自動爬取並同步官方冠軍賽名單、招式、屬性等資料。' },
-  { icon: 'rocket_launch', title: '正式上線', desc: '持續優化 UI 與效能，為訓練家提供最佳查詢體驗。' },
-]
+const milestones = computed(() => [
+  { icon: 'lightbulb', title: t('about.milestone.idea.title'), desc: t('about.milestone.idea.desc') },
+  { icon: 'architecture', title: t('about.milestone.tech.title'), desc: t('about.milestone.tech.desc') },
+  { icon: 'database', title: t('about.milestone.data.title'), desc: t('about.milestone.data.desc') },
+  { icon: 'rocket_launch', title: t('about.milestone.launch.title'), desc: t('about.milestone.launch.desc') },
+])
 </script>
 
 <template>
@@ -24,8 +29,8 @@ const milestones = [
       <div class="hero-badge">
         <span class="material-symbols-rounded">person</span>
       </div>
-      <h1>關於製作者</h1>
-      <p class="hero-subtitle">認識 Poké Champions 背後的開發者</p>
+      <h1>{{ t('about.title') }}</h1>
+      <p class="hero-subtitle">{{ t('about.subtitle') }}</p>
     </section>
 
     <section class="creator-card">
@@ -58,7 +63,7 @@ const milestones = [
     <section class="milestones-section">
       <h2 class="section-title">
         <span class="material-symbols-rounded">timeline</span>
-        開發歷程
+        {{ t('about.milestones') }}
       </h2>
       <div class="milestones-grid">
         <div v-for="(m, i) in milestones" :key="i" class="milestone-card">
@@ -74,9 +79,9 @@ const milestones = [
     <section class="thanks-section">
       <div class="thanks-card">
         <span class="material-symbols-rounded thanks-icon">favorite</span>
-        <h2>特別感謝</h2>
-        <p>感謝所有寶可夢訓練家的支持與回饋，以及 PokeAPI、官方冠軍賽資料的公開。</p>
-        <p class="disclaimer">本站為非官方粉絲作品，與 The Pokémon Company 無關。所有寶可夢相關名稱與圖像為其各自擁有者之商標與著作權。</p>
+        <h2>{{ t('about.thanks') }}</h2>
+        <p>{{ t('about.thanksText') }}</p>
+        <p class="disclaimer">{{ t('about.disclaimer') }}</p>
       </div>
     </section>
   </div>

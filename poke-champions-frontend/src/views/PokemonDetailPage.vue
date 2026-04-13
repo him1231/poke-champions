@@ -1,13 +1,16 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { pokemonRosterApi } from '../api/pokemonRoster'
 import { getPokemonImageUrl } from '../utils/pokemonImage'
 import { getMoveCatalog, mergeMoveChineseFromCatalog } from '../utils/moveCatalog'
 import { pokemonTypesForDisplay, typeBadgeClasses } from '../utils/pokemonTypesDisplay'
+import { localizedName, localizedTypeName, localizedDescription } from '../utils/localizedName'
 import NatureGridSelector from '../components/NatureGridSelector.vue'
 import { getNatureMultiplier, NATURE_DEFS } from '../constants/pokemonNatures'
 
+const { t } = useI18n()
 const route = useRoute()
 
 const loading = ref(true)
@@ -15,12 +18,12 @@ const error = ref('')
 const pokemon = ref(null)
 const matchup = ref(null)
 const learnedMoves = ref([])
+const abilities = ref([])
 
 const tab = ref('stats')
 const natureExpanded = ref(false)
 const selectedMove = ref(null)
 
-const CATEGORY_LABELS = { PHYSICAL: '物理', SPECIAL: '特殊', STATUS: '變化' }
 
 function moveRowKey(m) {
   return m?.id ?? m?.name ?? ''
@@ -37,9 +40,9 @@ function closeMoveDetail() {
   selectedMove.value = null
 }
 
-function categoryLabelZh(cat) {
+function categoryLabel(cat) {
   if (!cat) return '—'
-  return CATEGORY_LABELS[cat] || String(cat)
+  return t('pokemon.categories.' + cat) || String(cat)
 }
 
 function learnSourceLabel(m) {
@@ -54,14 +57,6 @@ onMounted(() => window.addEventListener('keydown', onMoveDetailKeydown))
 onUnmounted(() => window.removeEventListener('keydown', onMoveDetailKeydown))
 
 const STAT_KEYS = ['hp', 'attack', 'defense', 'specialAttack', 'specialDefense', 'speed']
-const STAT_LABELS = {
-  hp: 'HP',
-  attack: '攻擊',
-  defense: '防禦',
-  specialAttack: '特攻',
-  specialDefense: '特防',
-  speed: '速度',
-}
 const STAT_COLORS = {
   hp: '#ff5555',
   attack: '#ff9741',
@@ -146,12 +141,11 @@ const actualStats = computed(() => {
   return out
 })
 
-/** 加點段條形顏色（與種族色區隔） */
 const STAT_BAR_POINTS_COLOR = '#38bdf8'
 
-const currentNatureLabelZh = computed(() => {
+const currentNatureLabel = computed(() => {
   const id = currentNature.value
-  return NATURE_DEFS[id]?.labelZh ?? id
+  return t('pokemon.natures.' + id)
 })
 
 function natureTrendForStat(natureId, statKey) {
@@ -170,13 +164,13 @@ const natureEffectSummary = computed(() => {
   const mult = def.mult || {}
   const keys = Object.keys(mult)
   if (!keys.length) {
-    return `${def.labelZh}：五維（非 HP）性格倍率皆為 1.0，無增減`
+    return t('pokemon.natureNeutral', { name: t('pokemon.natures.' + id) })
   }
   const upKeys = keys.filter((k) => mult[k] > 1)
   const downKeys = keys.filter((k) => mult[k] < 1)
-  const upStr = upKeys.map((k) => STAT_LABELS[k] || k).join('、')
-  const downStr = downKeys.map((k) => STAT_LABELS[k] || k).join('、')
-  return `${def.labelZh}：↑ ${upStr}　↓ ${downStr}`
+  const upStr = upKeys.map((k) => t('pokemon.stats.' + k)).join('、')
+  const downStr = downKeys.map((k) => t('pokemon.stats.' + k)).join('、')
+  return t('pokemon.natureEffect', { name: t('pokemon.natures.' + id), up: upStr, down: downStr })
 })
 
 const statRows = computed(() => {
@@ -207,7 +201,7 @@ const statRows = computed(() => {
     const flexPoints = Math.max(barPctPoints, 0)
     return {
       key,
-      label: STAT_LABELS[key],
+      label: t('pokemon.stats.' + key),
       color: STAT_COLORS[key],
       pointsBarColor: STAT_BAR_POINTS_COLOR,
       natureTrend: natureTrend(key),
@@ -239,31 +233,28 @@ function typeNameOfMove(m) {
   return m.type || m.typeName || ''
 }
 
-function typeChineseOfMove(m) {
-  if (typeof m.type === 'object') return m.type?.chineseName || typeNameOfMove(m)
-  return m.typeChinese || typeNameOfMove(m)
-}
-
 async function load() {
   loading.value = true
   error.value = ''
   pokemon.value = null
   matchup.value = null
   learnedMoves.value = []
+  abilities.value = []
   const apiName = route.params.apiName
   try {
     const { data: all } = await pokemonRosterApi.getPokemonList()
     const arr = Array.isArray(all) ? all : []
     const found = arr.find((x) => x.apiName === apiName)
     if (!found) {
-      error.value = '找不到此寶可夢'
+      error.value = t('pokemonDetail.notFound')
       return
     }
 
-    const [typesRes, matchupRes, movesRes] = await Promise.allSettled([
+    const [typesRes, matchupRes, movesRes, abilitiesRes] = await Promise.allSettled([
       pokemonRosterApi.getPokemonTypes(apiName),
       pokemonRosterApi.getPokemonMatchup(apiName),
       pokemonRosterApi.getPokemonMoves(apiName),
+      pokemonRosterApi.getPokemonAbilities(apiName),
     ])
 
     let merged = { ...found }
@@ -280,6 +271,11 @@ async function load() {
       matchup.value = matchupRes.value.data
     }
 
+    if (abilitiesRes.status === 'fulfilled') {
+      const ad = abilitiesRes.value.data
+      abilities.value = Array.isArray(ad) ? ad : []
+    }
+
     let moves = []
     if (movesRes.status === 'fulfilled') {
       moves = normalizeMovesPayload(movesRes.value.data)
@@ -292,7 +288,7 @@ async function load() {
     }
     learnedMoves.value = moves
   } catch (e) {
-    error.value = e?.response?.data?.message || e.message || '載入失敗'
+    error.value = e?.response?.data?.message || e.message || t('pokemonDetail.loadFailed')
   } finally {
     loading.value = false
   }
@@ -305,6 +301,7 @@ watch(
     statPoints.value = emptyPoints()
     tab.value = 'stats'
     selectedMove.value = null
+    abilities.value = []
     load()
   },
   { immediate: true },
@@ -314,22 +311,22 @@ watch(tab, (v) => {
   if (v !== 'moves') selectedMove.value = null
 })
 
-const tabs = [
-  { id: 'stats', label: '能力值', icon: 'bar_chart' },
-  { id: 'moves', label: '可學招式', icon: 'bolt' },
-  { id: 'matchup', label: '屬性相剋', icon: 'shield' },
-]
+const tabs = computed(() => [
+  { id: 'stats', label: t('pokemonDetail.tabs.stats'), icon: 'bar_chart' },
+  { id: 'moves', label: t('pokemonDetail.tabs.moves'), icon: 'bolt' },
+  { id: 'matchup', label: t('pokemonDetail.tabs.matchup'), icon: 'shield' },
+])
 
 const matchupSections = computed(() => {
   if (!matchup.value) return []
   const m = matchup.value
   const sections = []
-  if (m.immunities?.length) sections.push({ title: '0× 無效', items: m.immunities, cls: 'immune' })
-  if (m.quadResistances?.length) sections.push({ title: '¼× 抵抗', items: m.quadResistances, cls: 'great' })
-  if (m.resistances?.length) sections.push({ title: '½× 抵抗', items: m.resistances, cls: 'good' })
-  if (m.neutral?.length) sections.push({ title: '1× 普通', items: m.neutral, cls: 'neutral-cls' })
-  if (m.weaknesses?.length) sections.push({ title: '2× 弱點', items: m.weaknesses, cls: 'warn' })
-  if (m.quadWeaknesses?.length) sections.push({ title: '4× 弱點', items: m.quadWeaknesses, cls: 'danger' })
+  if (m.immunities?.length) sections.push({ title: t('pokemonDetail.matchup.immune'), items: m.immunities, cls: 'immune' })
+  if (m.quadResistances?.length) sections.push({ title: t('pokemonDetail.matchup.quadResist'), items: m.quadResistances, cls: 'great' })
+  if (m.resistances?.length) sections.push({ title: t('pokemonDetail.matchup.resist'), items: m.resistances, cls: 'good' })
+  if (m.neutral?.length) sections.push({ title: t('pokemonDetail.matchup.neutral'), items: m.neutral, cls: 'neutral-cls' })
+  if (m.weaknesses?.length) sections.push({ title: t('pokemonDetail.matchup.weak'), items: m.weaknesses, cls: 'warn' })
+  if (m.quadWeaknesses?.length) sections.push({ title: t('pokemonDetail.matchup.quadWeak'), items: m.quadWeaknesses, cls: 'danger' })
   return sections
 })
 </script>
@@ -338,21 +335,21 @@ const matchupSections = computed(() => {
   <div class="container page">
     <RouterLink to="/pokemon" class="back-link">
       <span class="material-symbols-rounded">arrow_back</span>
-      <span>返回圖鑑</span>
+      <span>{{ t('pokemonDetail.backToList') }}</span>
     </RouterLink>
 
-    <p v-if="loading" class="loading">載入中</p>
+    <p v-if="loading" class="loading">{{ t('common.loading') }}</p>
     <p v-else-if="error" class="error-msg">{{ error }}</p>
 
     <template v-else-if="pokemon">
       <header class="detail-hero">
         <div class="hero-art-wrap">
           <div class="hero-art-glow"></div>
-          <img class="hero-art" :src="getPokemonImageUrl(pokemon)" :alt="pokemon.chineseName || pokemon.displayName" />
+          <img class="hero-art" :src="getPokemonImageUrl(pokemon)" :alt="localizedName(pokemon)" />
         </div>
         <div class="hero-info">
           <span class="hero-dex">#{{ String(pokemon.nationalDexNumber).padStart(4, '0') }}</span>
-          <h1 class="hero-name">{{ pokemon.chineseName || pokemon.displayName }}</h1>
+          <h1 class="hero-name">{{ localizedName(pokemon) }}</h1>
           <p class="hero-en">{{ pokemon.displayName }}</p>
           <div class="hero-types">
             <span
@@ -360,13 +357,21 @@ const matchupSections = computed(() => {
               :key="t.name"
               :class="typeBadgeClasses(t.name)"
             >
-              {{ t.chineseName || t.name }}
+              {{ localizedTypeName(t) }}
             </span>
+          </div>
+          <div v-if="abilities.length" class="hero-abilities">
+            <div v-for="a in abilities" :key="`${a.name}-${a.slot ?? ''}`" class="ability-chip">
+              <span class="ability-name">{{ localizedName(a) }}</span>
+              <span v-if="localizedDescription(a)" class="ability-tooltip">
+                {{ localizedDescription(a) }}
+              </span>
+            </div>
           </div>
         </div>
       </header>
 
-      <nav class="tab-bar" aria-label="詳情分頁">
+      <nav class="tab-bar" :aria-label="t('pokemonDetail.tabs.stats')">
         <button
           v-for="t in tabs"
           :key="t.id"
@@ -385,9 +390,9 @@ const matchupSections = computed(() => {
         <div class="nature-collapse">
           <button type="button" class="nature-toggle" @click="natureExpanded = !natureExpanded">
             <span class="material-symbols-rounded" style="font-size: 18px">psychology</span>
-            <span>性格選擇</span>
+            <span>{{ t('pokemonDetail.natureSelect') }}</span>
             <span class="nature-current-wrap">
-              <span class="nature-current">{{ currentNatureLabelZh }}</span>
+              <span class="nature-current">{{ currentNatureLabel }}</span>
               <span v-if="!natureExpanded" class="nature-current-id">（{{ currentNature }}）</span>
             </span>
             <span class="material-symbols-rounded toggle-arrow" :class="{ expanded: natureExpanded }">expand_more</span>
@@ -401,7 +406,7 @@ const matchupSections = computed(() => {
 
         <div class="ev-bar">
           <div class="ev-bar-info">
-            <span>剩餘點數</span>
+            <span>{{ t('pokemonDetail.remainingPoints') }}</span>
             <strong :class="{ 'ev-zero': remainingPoints === 0 }">{{ remainingPoints }}</strong>
             <span class="ev-total">/ {{ TOTAL_EV }}</span>
           </div>
@@ -415,10 +420,10 @@ const matchupSections = computed(() => {
             <div class="stat-head">
               <span class="stat-label-wrap">
                 <span class="stat-label" :style="{ color: row.color }">{{ row.label }}</span>
-                <span v-if="row.natureTrend === 'up'" class="nature-trend nature-trend-up" title="性格：此能力 ×1.1">
+                <span v-if="row.natureTrend === 'up'" class="nature-trend nature-trend-up" :title="t('pokemonDetail.natureUp')">
                   <span class="material-symbols-rounded">trending_up</span>
                 </span>
-                <span v-else-if="row.natureTrend === 'down'" class="nature-trend nature-trend-down" title="性格：此能力 ×0.9">
+                <span v-else-if="row.natureTrend === 'down'" class="nature-trend nature-trend-down" :title="t('pokemonDetail.natureDown')">
                   <span class="material-symbols-rounded">trending_down</span>
                 </span>
               </span>
@@ -429,7 +434,7 @@ const matchupSections = computed(() => {
                   class="step-btn step-bulk"
                   :disabled="(statPoints[row.key] || 0) <= 0"
                   @click="clearStatPoint(row.key)"
-                  title="全部減點"
+                  :title="t('pokemonDetail.clearAll')"
                 >
                   <span class="bulk-label">−−</span>
                 </button>
@@ -455,7 +460,7 @@ const matchupSections = computed(() => {
                   class="step-btn step-bulk"
                   :disabled="remainingPoints <= 0 || (statPoints[row.key] || 0) >= MAX_PER"
                   @click="maxStatPoint(row.key)"
-                  title="全部加點"
+                  :title="t('pokemonDetail.fillAll')"
                 >
                   <span class="bulk-label">++</span>
                 </button>
@@ -488,17 +493,17 @@ const matchupSections = computed(() => {
       <section v-show="tab === 'moves'" class="panel">
         <p v-if="!learnedMoves.length" class="empty-hint">
           <span class="material-symbols-rounded">info</span>
-          尚無可學招式資料
+          {{ t('pokemonDetail.noMoveData') }}
         </p>
         <div v-else class="moves-table-wrap">
           <table class="detail-moves-table">
             <thead>
               <tr>
-                <th>招式名稱</th>
-                <th>屬性</th>
-                <th>分類</th>
-                <th>威力</th>
-                <th>命中</th>
+                <th>{{ t('pokemonDetail.moveTable.name') }}</th>
+                <th>{{ t('pokemonDetail.moveTable.type') }}</th>
+                <th>{{ t('pokemonDetail.moveTable.category') }}</th>
+                <th>{{ t('pokemonDetail.moveTable.power') }}</th>
+                <th>{{ t('pokemonDetail.moveTable.accuracy') }}</th>
                 <th>PP</th>
               </tr>
             </thead>
@@ -510,15 +515,15 @@ const matchupSections = computed(() => {
                 :class="{ 'move-row-selected': selectedMove && moveRowKey(selectedMove) === moveRowKey(m) }"
                 @click="toggleMoveDetail(m)"
               >
-                <td class="move-name-cell">{{ m.chineseName || m.displayName || m.name }}</td>
+                <td class="move-name-cell">{{ localizedName(m) || m.name }}</td>
                 <td>
                   <span v-if="typeNameOfMove(m)" :class="typeBadgeClasses(typeNameOfMove(m))">
-                    {{ typeChineseOfMove(m) }}
+                    {{ typeof m.type === 'object' ? localizedTypeName(m.type) : t('pokemon.types.' + typeNameOfMove(m)) }}
                   </span>
                 </td>
                 <td>
                   <span v-if="m.category" :class="'category-badge ' + (m.category || '').toLowerCase()">
-                    {{ categoryLabelZh(m.category) }}
+                    {{ categoryLabel(m.category) }}
                   </span>
                 </td>
                 <td class="num-cell">{{ m.power ?? '—' }}</td>
@@ -538,7 +543,7 @@ const matchupSections = computed(() => {
               <h3 :class="['matchup-title', sec.cls]">{{ sec.title }}</h3>
               <div class="matchup-badges">
                 <span v-for="item in sec.items" :key="item.type" :class="`type-badge ${item.type}`">
-                  {{ item.chineseName || item.type }}
+                  {{ localizedTypeName(item) || t('pokemon.types.' + item.type) }}
                 </span>
               </div>
             </div>
@@ -549,7 +554,7 @@ const matchupSections = computed(() => {
         </template>
         <p v-else class="empty-hint">
           <span class="material-symbols-rounded">info</span>
-          無相剋資料或 API 未回傳
+          {{ t('pokemonDetail.noMatchupData') }}
         </p>
       </section>
     </template>
@@ -564,37 +569,37 @@ const matchupSections = computed(() => {
         @click.self="closeMoveDetail"
       >
         <div class="move-detail-modal" @click.stop>
-          <button type="button" class="move-detail-close" aria-label="關閉" @click="closeMoveDetail">
+          <button type="button" class="move-detail-close" :aria-label="t('common.close')" @click="closeMoveDetail">
             <span class="material-symbols-rounded">close</span>
           </button>
 
           <h2 id="move-detail-title" class="move-detail-title">
-            {{ selectedMove.chineseName || selectedMove.displayName || selectedMove.name }}
+            {{ localizedName(selectedMove) || selectedMove.name }}
           </h2>
-          <p v-if="selectedMove.chineseName && selectedMove.displayName" class="move-detail-sub">
+          <p v-if="selectedMove.displayName" class="move-detail-sub">
             {{ selectedMove.displayName }}
           </p>
           <p class="move-detail-slug mono">{{ selectedMove.name }}</p>
 
           <div class="move-detail-stats">
             <div v-if="typeNameOfMove(selectedMove)" class="move-detail-stat">
-              <span class="move-detail-stat-label">屬性</span>
+              <span class="move-detail-stat-label">{{ t('pokemonDetail.moveTable.type') }}</span>
               <span :class="typeBadgeClasses(typeNameOfMove(selectedMove))">
-                {{ typeChineseOfMove(selectedMove) }}
+                {{ typeof selectedMove.type === 'object' ? localizedTypeName(selectedMove.type) : t('pokemon.types.' + typeNameOfMove(selectedMove)) }}
               </span>
             </div>
             <div v-if="selectedMove.category" class="move-detail-stat">
-              <span class="move-detail-stat-label">分類</span>
+              <span class="move-detail-stat-label">{{ t('pokemonDetail.moveTable.category') }}</span>
               <span :class="'category-badge ' + (selectedMove.category || '').toLowerCase()">
-                {{ categoryLabelZh(selectedMove.category) }}
+                {{ categoryLabel(selectedMove.category) }}
               </span>
             </div>
             <div class="move-detail-stat">
-              <span class="move-detail-stat-label">威力</span>
+              <span class="move-detail-stat-label">{{ t('pokemonDetail.moveTable.power') }}</span>
               <span class="move-detail-stat-val">{{ selectedMove.power ?? '—' }}</span>
             </div>
             <div class="move-detail-stat">
-              <span class="move-detail-stat-label">命中</span>
+              <span class="move-detail-stat-label">{{ t('pokemonDetail.moveTable.accuracy') }}</span>
               <span class="move-detail-stat-val">{{
                 selectedMove.accuracy != null ? selectedMove.accuracy + '%' : '—'
               }}</span>
@@ -605,9 +610,9 @@ const matchupSections = computed(() => {
             </div>
           </div>
 
-          <div v-if="selectedMove.chineseDescription || selectedMove.description" class="move-detail-desc-block">
-            <h3 class="move-detail-desc-heading">效果說明</h3>
-            <p class="move-detail-desc">{{ selectedMove.chineseDescription || selectedMove.description }}</p>
+          <div v-if="localizedDescription(selectedMove)" class="move-detail-desc-block">
+            <h3 class="move-detail-desc-heading">{{ t('pokemonDetail.effectDesc') }}</h3>
+            <p class="move-detail-desc">{{ localizedDescription(selectedMove) }}</p>
           </div>
           
         </div>
@@ -706,6 +711,60 @@ const matchupSections = computed(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.hero-abilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ability-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  cursor: default;
+  transition: background 0.15s;
+}
+
+.ability-chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ability-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 280px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  white-space: normal;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.ability-chip:hover .ability-tooltip {
+  display: block;
+  animation: fadeIn 0.15s ease;
 }
 
 .tab-bar {

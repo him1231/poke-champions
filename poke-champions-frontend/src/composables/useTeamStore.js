@@ -1,5 +1,6 @@
 import { reactive, watch } from 'vue'
 import { getNatureMultiplier, NATURE_DEFS } from '../constants/pokemonNatures'
+import { localizedName } from '../utils/localizedName'
 
 // ═══════════════════════════════════════════════════
 //  常數
@@ -88,6 +89,8 @@ function emptyMember() {
   return {
     pokemon: null,
     types: [],
+    ability: null,
+    _availableAbilities: [],
     statPoints: { hp:0, attack:0, defense:0, specialAttack:0, specialDefense:0, speed:0 },
     nature: 'serious',
     moves: [null, null, null, null],
@@ -107,6 +110,7 @@ function loadFromStorage() {
       ...m,
       moves: Array.isArray(m.moves) ? m.moves.slice(0, 4) : [null, null, null, null],
       _learnableMoves: [],
+      _availableAbilities: [],
     }))
   } catch {
     return null
@@ -117,6 +121,7 @@ function serializeForStorage(members) {
   return members.map(m => ({
     pokemon: m.pokemon,
     types: m.types,
+    ability: m.ability,
     statPoints: { ...m.statPoints },
     nature: m.nature,
     moves: [...m.moves],
@@ -142,7 +147,7 @@ export function useTeamStore() {
 
   function pokemonDisplayName(p) {
     if (!p) return ''
-    return p.chineseName || p.displayName || p.apiName
+    return localizedName(p) || p.apiName
   }
 
   return {

@@ -1,0 +1,329 @@
+{
+  "nav": {
+    "home": "Home",
+    "pokedex": "Pokédex",
+    "moves": "Moves",
+    "types": "Types",
+    "teamBuilder": "Team Builder"
+  },
+  "common": {
+    "loading": "Loading",
+    "noResults": "No results found",
+    "search": "Search",
+    "back": "Back",
+    "close": "Close",
+    "remove": "Remove",
+    "change": "Change",
+    "export": "Export",
+    "clear": "Clear",
+    "resultCount": "{count} results",
+    "allTypes": "All Types",
+    "allCategories": "All Categories"
+  },
+  "footer": {
+    "subtitle": "Pokémon Champions data lookup tool",
+    "about": "About",
+    "privacy": "Privacy Policy"
+  },
+  "pokemon": {
+    "types": {
+      "normal": "Normal",
+      "fire": "Fire",
+      "water": "Water",
+      "electric": "Electric",
+      "grass": "Grass",
+      "ice": "Ice",
+      "fighting": "Fighting",
+      "poison": "Poison",
+      "ground": "Ground",
+      "flying": "Flying",
+      "psychic": "Psychic",
+      "bug": "Bug",
+      "rock": "Rock",
+      "ghost": "Ghost",
+      "dragon": "Dragon",
+      "dark": "Dark",
+      "steel": "Steel",
+      "fairy": "Fairy"
+    },
+    "stats": {
+      "hp": "HP",
+      "attack": "Attack",
+      "defense": "Defense",
+      "specialAttack": "Sp. Atk",
+      "specialDefense": "Sp. Def",
+      "speed": "Speed"
+    },
+    "categories": {
+      "PHYSICAL": "Physical",
+      "SPECIAL": "Special",
+      "STATUS": "Status"
+    },
+    "natures": {
+      "serious": "Serious",
+      "lonely": "Lonely",
+      "adamant": "Adamant",
+      "naughty": "Naughty",
+      "brave": "Brave",
+      "bold": "Bold",
+      "impish": "Impish",
+      "lax": "Lax",
+      "relaxed": "Relaxed",
+      "modest": "Modest",
+      "mild": "Mild",
+      "rash": "Rash",
+      "quiet": "Quiet",
+      "calm": "Calm",
+      "gentle": "Gentle",
+      "careful": "Careful",
+      "sassy": "Sassy",
+      "timid": "Timid",
+      "hasty": "Hasty",
+      "jolly": "Jolly",
+      "naive": "Naive"
+    },
+    "natureNeutral": "{name}: All non-HP stats have ×1.0 multiplier, no boost or reduction",
+    "natureEffect": "{name}: ↑ {up}　↓ {down}"
+  },
+  "home": {
+    "badge": "Pokémon Champions",
+    "desc": "Look up Pokémon data, type matchups, and move info",
+    "descLine2": "Prepare for your road to champion",
+    "cta": "Start Exploring",
+    "featuresTitle": "Features",
+    "feature": {
+      "pokedex": {
+        "title": "Pokédex",
+        "desc": "Browse eligible Pokémon for Champions, view types, learnable moves, and stat simulation"
+      },
+      "moves": {
+        "title": "Move Lookup",
+        "desc": "Search move data, filter by type or category, see which Pokémon can learn them"
+      },
+      "types": {
+        "title": "Type Matchups",
+        "desc": "Check type effectiveness, calculate dual-type defensive matchups"
+      },
+      "teamBuilder": {
+        "title": "Team Builder",
+        "desc": "Pick Pokémon and moves, build your strongest Champions team"
+      }
+    }
+  },
+  "pokemonList": {
+    "title": "Pokédex",
+    "searchPlaceholder": "Search by name or dex number...",
+    "empty": "No Pokémon match your search",
+    "loadError": "Failed to load data. Please check if the backend is running."
+  },
+  "pokemonDetail": {
+    "backToList": "Back to Pokédex",
+    "tabs": {
+      "stats": "Stats",
+      "moves": "Learnable Moves",
+      "matchup": "Type Matchups"
+    },
+    "natureSelect": "Nature",
+    "remainingPoints": "Remaining Points",
+    "natureUp": "Nature: ×1.1 to this stat",
+    "natureDown": "Nature: ×0.9 to this stat",
+    "clearAll": "Clear All",
+    "fillAll": "Max All",
+    "noMoveData": "No learnable move data available",
+    "moveTable": {
+      "name": "Move",
+      "type": "Type",
+      "category": "Category",
+      "power": "Power",
+      "accuracy": "Accuracy"
+    },
+    "noMatchupData": "No matchup data available",
+    "effectDesc": "Effect",
+    "notFound": "Pokémon not found",
+    "loadFailed": "Failed to load",
+    "matchup": {
+      "immune": "0× Immune",
+      "quadResist": "¼× Resist",
+      "resist": "½× Resist",
+      "neutral": "1× Neutral",
+      "weak": "2× Weak",
+      "quadWeak": "4× Weak"
+    }
+  },
+  "movesPage": {
+    "title": "Move Lookup",
+    "searchPlaceholder": "Search move name...",
+    "learners": "Pokémon that can learn this move",
+    "noData": "No data available",
+    "empty": "No moves match your search",
+    "loadError": "Failed to load move data",
+    "moveTable": {
+      "name": "Move",
+      "type": "Type",
+      "category": "Category",
+      "power": "Power",
+      "accuracy": "Accuracy"
+    }
+  },
+  "typesPage": {
+    "title": "Type Matchup Checker",
+    "hint": "Tap a type to check its defensive matchups (select 1–2 types)",
+    "calculate": "Check Matchups",
+    "calculating": "Calculating",
+    "defenseOf": "Defensive Matchups",
+    "loadError": "Failed to load type data"
+  },
+  "teamBuilder": {
+    "title": "Team Builder",
+    "viewOverview": "View Overview",
+    "position": "Slot {n}",
+    "selectPokemon": "Select Pokémon",
+    "searchPokemon": "Search Pokémon name…",
+    "ability": "Ability",
+    "nature": "Nature",
+    "remainingPoints": "Remaining:",
+    "tabs": {
+      "stats": "Stats",
+      "moves": "Moves",
+      "items": "Held Item"
+    },
+    "movePower": "· Power {power}",
+    "moveSlot": "Move {n}",
+    "selectMove": "Select Move (Slot {n})",
+    "searchMove": "Search move name…",
+    "noLearnableMoves": "No learnable move data for this Pokémon",
+    "noItem": "No held item",
+    "changeItem": "Change Item",
+    "selectItem": "Select Item",
+    "selectItemTitle": "Select Held Item",
+    "searchItem": "Search item name…",
+    "defenseAnalysis": "Team Defense Analysis",
+    "addPokemonFirst": "Add Pokémon to your team first",
+    "teamWeakness": "{count} members are weak to",
+    "noCommonWeakness": "No significant common weakness",
+    "weak": "Wk",
+    "resist": "Rs",
+    "immune": "Im",
+    "weakCount": "{count} weak",
+    "resistCount": "{count} resist",
+    "immuneCount": "{count} immune"
+  },
+  "teamOverview": {
+    "title": "Team Overview",
+    "export": "Export",
+    "exporting": "Exporting…",
+    "downloadPng": "Download Image (PNG)",
+    "exportShowdown": "Export showdown.txt",
+    "editTeam": "Edit Team",
+    "emptyTeam": "No team built yet",
+    "goToBuild": "Go Build",
+    "noItem": "No held item",
+    "noNatureEffect": "Neutral",
+    "analysis": "Team Analysis",
+    "defenseWeakness": "Defensive Weakness",
+    "weakCount": "{count} weak",
+    "noMajorWeakness": "No major common weakness",
+    "noResistCoverage": "No resistance coverage",
+    "fullResistCoverage": "Every type is resisted by at least one member",
+    "attackCoverage": "Attack Coverage",
+    "missingAttack": "Missing {types} type attacks",
+    "fullAttackCoverage": "All 18 types covered",
+    "defenseTable": "Defensive Matchup Chart",
+    "weak": "Wk",
+    "resist": "Rs",
+    "immune": "Im"
+  },
+  "about": {
+    "title": "About the Creator",
+    "subtitle": "Meet the developer behind Poké Champions",
+    "role": "Full-Stack Developer",
+    "bio": "Passionate about Pokémon and web development. Built Poké Champions so every trainer can easily look up Champions data and plan the best team.",
+    "milestones": "Development Journey",
+    "milestone": {
+      "idea": { "title": "Inspiration", "desc": "Frustrated by scattered Champions data, decided to build an integrated tool." },
+      "tech": { "title": "Tech Stack", "desc": "Frontend: Vue 3 + Vite. Backend: Spring Boot + PostgreSQL. Deployed on GCP." },
+      "data": { "title": "Data Integration", "desc": "Automated scraping and syncing of official Champions roster, moves, and types." },
+      "launch": { "title": "Launch", "desc": "Continuously optimizing UI and performance for the best trainer experience." }
+    },
+    "thanks": "Special Thanks",
+    "thanksText": "Thanks to all Pokémon trainers for your support and feedback, and to PokeAPI and the official Champions data.",
+    "disclaimer": "This is an unofficial fan project, not affiliated with The Pokémon Company. All Pokémon-related names and images are trademarks and copyrights of their respective owners."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last Updated: {date}",
+    "overview": "Overview",
+    "overviewText": "Poké Champions values your privacy. This policy explains how we collect, use, and protect your information when you use this website.",
+    "dataCollection": "Information We Collect",
+    "dataCollectionText1": "We do not require registration or personal identification. However, our hosting service and analytics tools may automatically collect the following anonymous data when you browse:",
+    "dataCollectionText2": "This data is used only to improve website performance and user experience.",
+    "dataItems": {
+      "browser": "Browser type and version",
+      "device": "Device type (desktop/mobile)",
+      "pages": "Pages visited and time spent",
+      "ip": "IP address (automatically logged by hosting service)"
+    },
+    "cookies": "Cookies & Local Storage",
+    "cookiesText1": "This site uses Google Analytics for anonymous traffic statistics, which sets cookies on your device.",
+    "cookiesText2": "Additionally, this site uses browser localStorage to save team-building preferences. This data stays on your device and is not sent to any server.",
+    "ads": "Third-Party Ads",
+    "adsText1": "This site may display ads via Google AdSense. Google may use cookies to serve ads based on your visits to this and other websites.",
+    "adsText2": "You can manage personalized ad preferences through Google Ad Settings.",
+    "externalLinks": "External Links",
+    "externalLinksText": "This site may contain links to external websites. We are not responsible for the privacy policies or content of those sites.",
+    "children": "Children's Privacy",
+    "childrenText": "This site is not targeted at children under 13, and we do not knowingly collect personal information from children.",
+    "changes": "Policy Changes",
+    "changesText": "We may update this privacy policy from time to time. Updated versions will be posted on this page with a revised \"Last Updated\" date.",
+    "contact": "Contact Us",
+    "contactText": "If you have any questions about this privacy policy, please contact us via the About page."
+  },
+  "natureGrid": {
+    "title": "Select Nature",
+    "headerDec": ["Atk", "Def", "Sp.Atk", "Sp.Def", "Speed"],
+    "headerInc": ["Atk", "Def", "Sp.Atk", "Sp.Def", "Speed"]
+  },
+  "routes": {
+    "home": {
+      "title": "Poké Champions — Pokémon Champions Data & Team Builder",
+      "description": "Look up eligible Pokémon, type matchups, move info, and build your best Champions team online."
+    },
+    "pokemonList": {
+      "title": "Pokédex — Poké Champions",
+      "description": "Browse the list of Pokémon available in Champions rules, view types, base stats, and details."
+    },
+    "pokemonDetail": {
+      "title": "Pokémon Details — Poké Champions",
+      "description": "View detailed base stats, types, learnable moves, and evolution chain."
+    },
+    "moves": {
+      "title": "Move List — Poké Champions",
+      "description": "Search and filter Pokémon moves, view power, accuracy, PP, and effect descriptions."
+    },
+    "types": {
+      "title": "Type Matchups — Poké Champions",
+      "description": "Check the 18-type effectiveness chart and calculate dual-type defensive matchups."
+    },
+    "teamBuilder": {
+      "title": "Team Builder — Poké Champions",
+      "description": "Select Pokémon and moves to build your strongest Champions team and export to share."
+    },
+    "teamOverview": {
+      "title": "Team Overview — Poké Champions",
+      "description": "View your team's type coverage and weakness analysis."
+    },
+    "about": {
+      "title": "About — Poké Champions",
+      "description": "Learn about the developer of Poké Champions and the story behind the site."
+    },
+    "privacy": {
+      "title": "Privacy Policy — Poké Champions",
+      "description": "Poké Champions privacy policy and cookie usage information."
+    }
+  },
+  "langSwitcher": {
+    "zh-TW": "繁體中文",
+    "en": "English",
+    "ja": "日本語"
+  }
+}

@@ -15,24 +15,24 @@ public class TypeDataInitializer implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(TypeDataInitializer.class);
 
     private static final String[][] TYPES = {
-            {"normal",   "一般"},
-            {"fire",     "火"},
-            {"water",    "水"},
-            {"electric", "電"},
-            {"grass",    "草"},
-            {"ice",      "冰"},
-            {"fighting", "格鬥"},
-            {"poison",   "毒"},
-            {"ground",   "地面"},
-            {"flying",   "飛行"},
-            {"psychic",  "超能力"},
-            {"bug",      "蟲"},
-            {"rock",     "岩石"},
-            {"ghost",    "幽靈"},
-            {"dragon",   "龍"},
-            {"dark",     "惡"},
-            {"steel",    "鋼"},
-            {"fairy",    "妖精"},
+            {"normal",   "一般",   "ノーマル"},
+            {"fire",     "火",     "ほのお"},
+            {"water",    "水",     "みず"},
+            {"electric", "電",     "でんき"},
+            {"grass",    "草",     "くさ"},
+            {"ice",      "冰",     "こおり"},
+            {"fighting", "格鬥",   "かくとう"},
+            {"poison",   "毒",     "どく"},
+            {"ground",   "地面",   "じめん"},
+            {"flying",   "飛行",   "ひこう"},
+            {"psychic",  "超能力", "エスパー"},
+            {"bug",      "蟲",     "むし"},
+            {"rock",     "岩石",   "いわ"},
+            {"ghost",    "幽靈",   "ゴースト"},
+            {"dragon",   "龍",     "ドラゴン"},
+            {"dark",     "惡",     "あく"},
+            {"steel",    "鋼",     "はがね"},
+            {"fairy",    "妖精",   "フェアリー"},
     };
 
     private final PokemonTypeRepository typeRepository;
@@ -43,18 +43,19 @@ public class TypeDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (typeRepository.count() >= TYPES.length) {
-            log.info("屬性資料已存在 ({} 筆)，跳過初始化", typeRepository.count());
-            return;
-        }
-
-        log.info("========== 初始化 18 種屬性資料 ==========");
+        log.info("========== 初始化 / 更新 18 種屬性資料 ==========");
         for (String[] type : TYPES) {
-            typeRepository.findByName(type[0]).orElseGet(() -> {
-                PokemonType t = typeRepository.save(new PokemonType(type[0], type[1]));
-                log.info("  ✓ {} / {}", t.getName(), t.getChineseName());
-                return t;
-            });
+            PokemonType existing = typeRepository.findByName(type[0]).orElse(null);
+            if (existing != null) {
+                if (existing.getJapaneseName() == null || existing.getJapaneseName().isBlank()) {
+                    existing.setJapaneseName(type[2]);
+                    typeRepository.save(existing);
+                    log.info("  ↻ {} 補上日文名 {}", type[0], type[2]);
+                }
+            } else {
+                PokemonType t = typeRepository.save(new PokemonType(type[0], type[1], type[2]));
+                log.info("  ✓ {} / {} / {}", t.getName(), t.getChineseName(), t.getJapaneseName());
+            }
         }
         log.info("========== 屬性初始化完成 ==========");
     }

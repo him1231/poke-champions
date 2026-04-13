@@ -1,10 +1,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { pokemonRosterApi } from '../api/pokemonRoster'
 import { typeRosterApi } from '../api/typeRoster'
 import { getPokemonImageUrl } from '../utils/pokemonImage'
 import { comparePokemonByFormId } from '../utils/pokemonSort'
 import { pokemonTypesForDisplay } from '../utils/pokemonTypesDisplay'
+import { localizedName, localizedTypeName } from '../utils/localizedName'
+
+const { t } = useI18n()
 
 const pokemonList = ref([])
 const types = ref([])
@@ -24,7 +28,7 @@ onMounted(async () => {
     pokemonList.value = [...arr].sort(comparePokemonByFormId)
     types.value = Array.isArray(typesRes.data) ? typesRes.data : []
   } catch (e) {
-    error.value = '無法載入資料，請確認後端服務是否啟動'
+    error.value = t('pokemonList.loadError')
   } finally {
     loading.value = false
   }
@@ -64,14 +68,14 @@ function getTypeClass(typeName) {
 <template>
   <div class="container">
     <div class="page-header">
-      <h1 class="page-title">寶可夢圖鑑</h1>
-      <span class="result-badge" v-if="!loading && !error">{{ filtered.length }} 筆</span>
+      <h1 class="page-title">{{ t('pokemonList.title') }}</h1>
+      <span class="result-badge" v-if="!loading && !error">{{ t('common.resultCount', { count: filtered.length }) }}</span>
     </div>
 
     <div class="filters-bar">
       <div class="search-box">
         <span class="material-symbols-rounded search-icon">search</span>
-        <input v-model="search" type="text" placeholder="搜尋名稱、圖鑑編號..." class="search-input" />
+        <input v-model="search" type="text" :placeholder="t('pokemonList.searchPlaceholder')" class="search-input" />
         <button v-if="search" class="search-clear" @click="search = ''">
           <span class="material-symbols-rounded">close</span>
         </button>
@@ -79,8 +83,8 @@ function getTypeClass(typeName) {
 
       <div class="filter-group">
         <select v-model="selectedType" class="filter-select">
-          <option value="">全部屬性</option>
-          <option v-for="t in types" :key="t.name" :value="t.name">{{ t.chineseName }} ({{ t.name }})</option>
+          <option value="">{{ t('common.allTypes') }}</option>
+          <option v-for="tp in types" :key="tp.name" :value="tp.name">{{ localizedTypeName(tp) }} ({{ tp.name }})</option>
         </select>
 
         <button
@@ -94,7 +98,7 @@ function getTypeClass(typeName) {
       </div>
     </div>
 
-    <div v-if="loading" class="loading">載入中</div>
+    <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
     <div v-else-if="error" class="error-msg">{{ error }}</div>
 
     <div v-else class="pokemon-grid">
@@ -114,15 +118,15 @@ function getTypeClass(typeName) {
 
         <div class="card-img-wrap">
           <div class="card-img-bg"></div>
-          <img :src="getPokemonImageUrl(p)" :alt="p.chineseName || p.displayName" loading="lazy" />
+          <img :src="getPokemonImageUrl(p)" :alt="localizedName(p)" loading="lazy" />
         </div>
 
         <div class="card-info">
-          <h3 class="poke-name">{{ p.chineseName || p.displayName }}</h3>
+          <h3 class="poke-name">{{ localizedName(p) }}</h3>
           <p v-if="p.chineseName" class="poke-name-en">{{ p.displayName }}</p>
           <div class="poke-types">
-            <span v-for="t in pokemonTypesForDisplay(p)" :key="t.name" :class="getTypeClass(t.name)">
-              {{ t.chineseName || t.name }}
+            <span v-for="tp in pokemonTypesForDisplay(p)" :key="tp.name" :class="getTypeClass(tp.name)">
+              {{ localizedTypeName(tp) || tp.name }}
             </span>
           </div>
         </div>
@@ -131,7 +135,7 @@ function getTypeClass(typeName) {
 
     <div v-if="!loading && !error && filtered.length === 0" class="empty-state">
       <span class="material-symbols-rounded empty-icon">search_off</span>
-      <p>沒有找到符合條件的寶可夢</p>
+      <p>{{ t('pokemonList.empty') }}</p>
     </div>
   </div>
 </template>

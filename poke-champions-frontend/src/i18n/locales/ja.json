@@ -1,0 +1,329 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "pokedex": "図鑑",
+    "moves": "技",
+    "types": "タイプ",
+    "teamBuilder": "チーム編成"
+  },
+  "common": {
+    "loading": "読み込み中",
+    "noResults": "該当なし",
+    "search": "検索",
+    "back": "戻る",
+    "close": "閉じる",
+    "remove": "削除",
+    "change": "変更",
+    "export": "エクスポート",
+    "clear": "クリア",
+    "resultCount": "{count} 件",
+    "allTypes": "すべてのタイプ",
+    "allCategories": "すべての分類"
+  },
+  "footer": {
+    "subtitle": "ポケモンチャンピオンズ データ検索ツール",
+    "about": "開発者について",
+    "privacy": "プライバシーポリシー"
+  },
+  "pokemon": {
+    "types": {
+      "normal": "ノーマル",
+      "fire": "ほのお",
+      "water": "みず",
+      "electric": "でんき",
+      "grass": "くさ",
+      "ice": "こおり",
+      "fighting": "かくとう",
+      "poison": "どく",
+      "ground": "じめん",
+      "flying": "ひこう",
+      "psychic": "エスパー",
+      "bug": "むし",
+      "rock": "いわ",
+      "ghost": "ゴースト",
+      "dragon": "ドラゴン",
+      "dark": "あく",
+      "steel": "はがね",
+      "fairy": "フェアリー"
+    },
+    "stats": {
+      "hp": "HP",
+      "attack": "こうげき",
+      "defense": "ぼうぎょ",
+      "specialAttack": "とくこう",
+      "specialDefense": "とくぼう",
+      "speed": "すばやさ"
+    },
+    "categories": {
+      "PHYSICAL": "物理",
+      "SPECIAL": "特殊",
+      "STATUS": "変化"
+    },
+    "natures": {
+      "serious": "まじめ",
+      "lonely": "さみしがり",
+      "adamant": "いじっぱり",
+      "naughty": "やんちゃ",
+      "brave": "ゆうかん",
+      "bold": "ずぶとい",
+      "impish": "わんぱく",
+      "lax": "のうてんき",
+      "relaxed": "のんき",
+      "modest": "ひかえめ",
+      "mild": "おっとり",
+      "rash": "うっかりや",
+      "quiet": "れいせい",
+      "calm": "おだやか",
+      "gentle": "おとなしい",
+      "careful": "しんちょう",
+      "sassy": "なまいき",
+      "timid": "おくびょう",
+      "hasty": "せっかち",
+      "jolly": "ようき",
+      "naive": "むじゃき"
+    },
+    "natureNeutral": "{name}：HP以外の全能力の性格補正が×1.0（増減なし）",
+    "natureEffect": "{name}：↑ {up}　↓ {down}"
+  },
+  "home": {
+    "badge": "ポケモンチャンピオンズ",
+    "desc": "ポケモンデータ・タイプ相性・技情報を素早く検索",
+    "descLine2": "チャンピオンへの道を準備しよう",
+    "cta": "探索を始める",
+    "featuresTitle": "機能一覧",
+    "feature": {
+      "pokedex": {
+        "title": "ポケモン図鑑",
+        "desc": "チャンピオンズ対象ポケモンを閲覧、タイプ・習得技・能力値シミュレーション"
+      },
+      "moves": {
+        "title": "技検索",
+        "desc": "技データを検索、タイプ・分類でフィルタ、習得ポケモンを確認"
+      },
+      "types": {
+        "title": "タイプ相性",
+        "desc": "タイプ間の攻防倍率を確認、複合タイプの防御相性を計算"
+      },
+      "teamBuilder": {
+        "title": "チーム編成",
+        "desc": "ポケモンと技を自由に選んで、最強のチャンピオンズチームを作ろう"
+      }
+    }
+  },
+  "pokemonList": {
+    "title": "ポケモン図鑑",
+    "searchPlaceholder": "名前・図鑑番号で検索...",
+    "empty": "条件に一致するポケモンが見つかりません",
+    "loadError": "データの読み込みに失敗しました。バックエンドが起動しているか確認してください。"
+  },
+  "pokemonDetail": {
+    "backToList": "図鑑に戻る",
+    "tabs": {
+      "stats": "能力値",
+      "moves": "習得技",
+      "matchup": "タイプ相性"
+    },
+    "natureSelect": "性格選択",
+    "remainingPoints": "残りポイント",
+    "natureUp": "性格：この能力×1.1",
+    "natureDown": "性格：この能力×0.9",
+    "clearAll": "すべて減らす",
+    "fillAll": "すべて最大",
+    "noMoveData": "習得技データがありません",
+    "moveTable": {
+      "name": "技名",
+      "type": "タイプ",
+      "category": "分類",
+      "power": "威力",
+      "accuracy": "命中"
+    },
+    "noMatchupData": "相性データがありません",
+    "effectDesc": "効果説明",
+    "notFound": "このポケモンは見つかりません",
+    "loadFailed": "読み込み失敗",
+    "matchup": {
+      "immune": "0× 無効",
+      "quadResist": "¼× 耐性",
+      "resist": "½× 耐性",
+      "neutral": "1× 等倍",
+      "weak": "2× 弱点",
+      "quadWeak": "4× 弱点"
+    }
+  },
+  "movesPage": {
+    "title": "技検索",
+    "searchPlaceholder": "技名で検索...",
+    "learners": "習得できるポケモン",
+    "noData": "データなし",
+    "empty": "条件に一致する技が見つかりません",
+    "loadError": "技データの読み込みに失敗しました",
+    "moveTable": {
+      "name": "技名",
+      "type": "タイプ",
+      "category": "分類",
+      "power": "威力",
+      "accuracy": "命中"
+    }
+  },
+  "typesPage": {
+    "title": "タイプ相性チェッカー",
+    "hint": "タイプをタップして防御相性を確認（1〜2タイプ選択可）",
+    "calculate": "相性を確認",
+    "calculating": "計算中",
+    "defenseOf": "の防御相性",
+    "loadError": "タイプデータの読み込みに失敗しました"
+  },
+  "teamBuilder": {
+    "title": "チームビルダー",
+    "viewOverview": "概要を見る",
+    "position": "スロット {n}",
+    "selectPokemon": "ポケモンを選ぶ",
+    "searchPokemon": "ポケモン名で検索…",
+    "ability": "特性",
+    "nature": "性格",
+    "remainingPoints": "残りポイント：",
+    "tabs": {
+      "stats": "能力値",
+      "moves": "技",
+      "items": "持ち物"
+    },
+    "movePower": "· 威力 {power}",
+    "moveSlot": "技 {n}",
+    "selectMove": "技を選ぶ（スロット {n}）",
+    "searchMove": "技名で検索…",
+    "noLearnableMoves": "このポケモンの習得技データがありません",
+    "noItem": "持ち物なし",
+    "changeItem": "アイテムを変更",
+    "selectItem": "アイテムを選ぶ",
+    "selectItemTitle": "持ち物を選ぶ",
+    "searchItem": "アイテム名で検索…",
+    "defenseAnalysis": "チーム防御分析",
+    "addPokemonFirst": "まずチームにポケモンを追加してください",
+    "teamWeakness": "チーム {count} 体が弱点の属性",
+    "noCommonWeakness": "目立つ共通弱点なし",
+    "weak": "弱",
+    "resist": "耐",
+    "immune": "無",
+    "weakCount": "{count} 体弱点",
+    "resistCount": "{count} 体耐性",
+    "immuneCount": "{count} 体無効"
+  },
+  "teamOverview": {
+    "title": "チーム概要",
+    "export": "エクスポート",
+    "exporting": "出力中…",
+    "downloadPng": "画像ダウンロード（PNG）",
+    "exportShowdown": "showdown.txt エクスポート",
+    "editTeam": "チームを編集",
+    "emptyTeam": "チームが未作成です",
+    "goToBuild": "チーム編成へ",
+    "noItem": "持ち物なし",
+    "noNatureEffect": "補正なし",
+    "analysis": "チーム分析",
+    "defenseWeakness": "防御弱点",
+    "weakCount": "{count} 体弱点",
+    "noMajorWeakness": "重大な共通弱点なし",
+    "noResistCoverage": "耐性カバーなし",
+    "fullResistCoverage": "全タイプに耐性メンバーあり",
+    "attackCoverage": "攻撃カバー",
+    "missingAttack": "{types} タイプの攻撃が不足",
+    "fullAttackCoverage": "全18タイプの攻撃をカバー",
+    "defenseTable": "防御相性一覧",
+    "weak": "弱",
+    "resist": "耐",
+    "immune": "無"
+  },
+  "about": {
+    "title": "開発者について",
+    "subtitle": "Poké Championsの開発者を紹介",
+    "role": "フルスタック開発者",
+    "bio": "ポケモンとWeb開発が大好き。すべてのトレーナーがチャンピオンズのデータを簡単に調べ、最強チームを計画できるようにPoké Championsを作りました。",
+    "milestones": "開発の歩み",
+    "milestone": {
+      "idea": { "title": "着想", "desc": "チャンピオンズのデータが散在していることに不便を感じ、自ら統合ツールを開発することに。" },
+      "tech": { "title": "技術選定", "desc": "フロントエンド: Vue 3 + Vite、バックエンド: Spring Boot + PostgreSQL、GCPにデプロイ。" },
+      "data": { "title": "データ統合", "desc": "公式チャンピオンズ名簿・技・タイプデータを自動スクレイピング＆同期。" },
+      "launch": { "title": "リリース", "desc": "UIとパフォーマンスを継続的に最適化し、最高の検索体験を提供。" }
+    },
+    "thanks": "謝辞",
+    "thanksText": "すべてのポケモントレーナーの応援とフィードバック、そしてPokeAPIと公式チャンピオンズデータの公開に感謝します。",
+    "disclaimer": "本サイトは非公式ファンプロジェクトであり、株式会社ポケモンとは一切関係ありません。すべてのポケモン関連の名称・画像は各権利者の商標および著作物です。"
+  },
+  "privacy": {
+    "title": "プライバシーポリシー",
+    "lastUpdated": "最終更新：{date}",
+    "overview": "概要",
+    "overviewText": "Poké Championsはお客様のプライバシーを重視しています。本ポリシーでは、本サイトご利用時の情報の収集・使用・保護方法について説明します。",
+    "dataCollection": "収集する情報",
+    "dataCollectionText1": "ユーザー登録や個人情報の提供は不要です。ただし、ホスティングサービスおよび分析ツールが以下の匿名データを自動収集する場合があります：",
+    "dataCollectionText2": "これらのデータはサイトのパフォーマンスとユーザー体験の改善にのみ使用されます。",
+    "dataItems": {
+      "browser": "ブラウザの種類とバージョン",
+      "device": "デバイスタイプ（PC／スマートフォン）",
+      "pages": "閲覧ページと滞在時間",
+      "ip": "IPアドレス（ホスティングサービスによる自動記録）"
+    },
+    "cookies": "Cookie とローカルストレージ",
+    "cookiesText1": "本サイトはGoogle Analyticsによる匿名トラフィック統計にCookieを使用しています。",
+    "cookiesText2": "また、チーム編成などの設定保存にブラウザのlocalStorageを使用しています。このデータはお客様のデバイスにのみ保存され、サーバーには送信されません。",
+    "ads": "サードパーティ広告",
+    "adsText1": "本サイトではGoogle AdSenseによる広告が表示される場合があります。Googleは本サイトおよび他サイトの閲覧履歴に基づいてCookieを使用し関連広告を配信します。",
+    "adsText2": "Google広告設定からパーソナライズ広告の設定を管理できます。",
+    "externalLinks": "外部リンク",
+    "externalLinksText": "本サイトには外部サイトへのリンクが含まれる場合があります。外部サイトのプライバシーポリシーや内容については責任を負いません。",
+    "children": "お子様のプライバシー",
+    "childrenText": "本サイトは13歳未満のお子様を対象としておらず、お子様の個人情報を意図的に収集することはありません。",
+    "changes": "ポリシーの変更",
+    "changesText": "本プライバシーポリシーは随時更新される場合があります。更新版は本ページに掲載され、「最終更新」日が更新されます。",
+    "contact": "お問い合わせ",
+    "contactText": "本プライバシーポリシーについてご質問がある場合は、「開発者について」ページの連絡先からお問い合わせください。"
+  },
+  "natureGrid": {
+    "title": "性格を選ぶ",
+    "headerDec": ["こうげき", "ぼうぎょ", "とくこう", "とくぼう", "すばやさ"],
+    "headerInc": ["こうげき", "ぼうぎょ", "とくこう", "とくぼう", "すばやさ"]
+  },
+  "routes": {
+    "home": {
+      "title": "Poké Champions — ポケモンチャンピオンズ データ検索＆チーム編成ツール",
+      "description": "チャンピオンズ対象ポケモン・タイプ相性・技情報を検索し、最強チームをオンラインで編成。"
+    },
+    "pokemonList": {
+      "title": "ポケモン図鑑 — Poké Champions",
+      "description": "チャンピオンズルール対象のポケモン一覧を閲覧、タイプ・種族値・詳細情報を確認。"
+    },
+    "pokemonDetail": {
+      "title": "ポケモン詳細 — Poké Champions",
+      "description": "種族値・タイプ・習得技・進化情報の詳細を確認。"
+    },
+    "moves": {
+      "title": "技一覧 — Poké Champions",
+      "description": "ポケモンの技を検索・フィルタ、威力・命中率・PP・効果を確認。"
+    },
+    "types": {
+      "title": "タイプ相性表 — Poké Champions",
+      "description": "18タイプの攻防倍率を確認、複合タイプの防御相性を計算。"
+    },
+    "teamBuilder": {
+      "title": "チーム編成 — Poké Champions",
+      "description": "ポケモンと技を選んで最強のチャンピオンズチームを編成、エクスポートして共有。"
+    },
+    "teamOverview": {
+      "title": "チーム概要 — Poké Champions",
+      "description": "チームのタイプカバー率と弱点分析を確認。"
+    },
+    "about": {
+      "title": "開発者について — Poké Champions",
+      "description": "Poké Championsの開発者とサイト制作の背景について。"
+    },
+    "privacy": {
+      "title": "プライバシーポリシー — Poké Champions",
+      "description": "Poké Championsのプライバシーポリシーとクッキー使用について。"
+    }
+  },
+  "langSwitcher": {
+    "zh-TW": "繁體中文",
+    "en": "English",
+    "ja": "日本語"
+  }
+}
