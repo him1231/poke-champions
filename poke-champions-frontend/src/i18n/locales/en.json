@@ -4,7 +4,8 @@
     "pokedex": "Pokédex",
     "moves": "Moves",
     "types": "Types",
-    "teamBuilder": "Team Builder"
+    "teamBuilder": "Team Builder",
+    "teams": "Teams"
   },
   "common": {
     "loading": "Loading",
@@ -319,6 +320,64 @@
     "privacy": {
       "title": "Privacy Policy — Poké Champions",
       "description": "Poké Champions privacy policy and cookie usage information."
+    },
+    "teamList": {
+      "title": "Explore Teams — Poké Champions",
+      "description": "Browse teams shared by other Pokémon Champions players."
+    },
+    "teamDetail": {
+      "title": "Team Details — Poké Champions",
+      "description": "View shared team members, stats, and move sets."
+    }
+  },
+  "teamShare": {
+    "listPage": {
+      "title": "Explore Teams",
+      "sortLatest": "Latest",
+      "sortPopular": "Popular",
+      "noTeams": "No teams yet. Be the first to share!"
+    },
+    "detailPage": {
+      "notFound": "Team not found",
+      "backToList": "Back to list",
+      "edit": "Edit",
+      "save": "Save",
+      "copyId": "Copy Team ID",
+      "reportBtn": "Report Expired",
+      "alreadyReported": "Reported",
+      "reportTitle": "Report Expired Code",
+      "reportMsg": "Are you sure this rental code is no longer usable in-game? Your report helps other players identify valid teams.",
+      "reportConfirm": "Confirm Report",
+      "expiredWarning": "This team code has been marked as expired and may no longer work in-game.",
+      "pinExpired": "PIN expired, please verify again",
+      "deleteConfirmTitle": "Delete this team?",
+      "deleteConfirmMsg": "This action cannot be undone. The team will be permanently removed.",
+      "deleteBtn": "Delete"
+    },
+    "shareModal": {
+      "title": "Share Team",
+      "rentalCode": "Team ID",
+      "teamTitle": "Team Title",
+      "teamDescription": "Description",
+      "pinLabel": "(4-8 digits)",
+      "pinConfirm": "Confirm PIN",
+      "pinMismatch": "PINs do not match",
+      "pinHint": "PIN is used for editing or deleting this team later",
+      "publicLabel": "List on public team explorer",
+      "submit": "Share",
+      "duplicateError": "This Team ID is already taken",
+      "genericError": "An error occurred, please try again",
+      "successTitle": "Shared successfully!",
+      "viewTeam": "View Team",
+      "noTeamWarning": "No Pokémon in team. Add members in Team Builder first."
+    },
+    "pinModal": {
+      "title": "Enter PIN",
+      "description": "Enter the PIN to edit this team",
+      "placeholder": "PIN",
+      "confirm": "Verify",
+      "invalidPin": "Invalid PIN",
+      "verifyError": "Verification failed, please try again"
     }
   },
   "langSwitcher": {

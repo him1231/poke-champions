@@ -4,7 +4,8 @@
     "pokedex": "圖鑑",
     "moves": "招式",
     "types": "屬性",
-    "teamBuilder": "組隊"
+    "teamBuilder": "組隊",
+    "teams": "隊伍探索"
   },
   "common": {
     "loading": "載入中",
@@ -319,6 +320,64 @@
     "privacy": {
       "title": "隱私權政策 — Poké Champions",
       "description": "Poké Champions 的隱私權政策與 Cookie 使用說明。"
+    },
+    "teamList": {
+      "title": "隊伍探索 — Poké Champions",
+      "description": "瀏覽其他玩家分享的寶可夢冠軍賽隊伍。"
+    },
+    "teamDetail": {
+      "title": "隊伍詳情 — Poké Champions",
+      "description": "查看分享隊伍的詳細成員配置與能力值。"
+    }
+  },
+  "teamShare": {
+    "listPage": {
+      "title": "隊伍探索",
+      "sortLatest": "最新",
+      "sortPopular": "熱門",
+      "noTeams": "目前還沒有隊伍，來分享第一支吧！"
+    },
+    "detailPage": {
+      "notFound": "找不到此隊伍",
+      "backToList": "返回列表",
+      "edit": "編輯",
+      "save": "儲存",
+      "copyId": "複製隊伍 ID",
+      "reportBtn": "回報已失效",
+      "alreadyReported": "已回報",
+      "reportTitle": "回報代碼失效",
+      "reportMsg": "確定要回報這個組隊代碼已經無法在遊戲中使用了嗎？您的回報將幫助其他玩家辨別有效隊伍。",
+      "reportConfirm": "確認回報",
+      "expiredWarning": "此隊伍代碼已被標記為失效，可能無法在遊戲中使用。",
+      "pinExpired": "PIN 碼已失效，請重新驗證",
+      "deleteConfirmTitle": "確定要刪除隊伍？",
+      "deleteConfirmMsg": "此操作無法復原，隊伍將被永久移除。",
+      "deleteBtn": "確定刪除"
+    },
+    "shareModal": {
+      "title": "分享隊伍",
+      "rentalCode": "隊伍 ID",
+      "teamTitle": "隊伍標題",
+      "teamDescription": "隊伍說明",
+      "pinLabel": "（4-8 位）",
+      "pinConfirm": "確認 PIN",
+      "pinMismatch": "兩次輸入的 PIN 碼不一致",
+      "pinHint": "PIN 碼用於日後編輯或刪除隊伍，請牢記",
+      "publicLabel": "公開至隊伍探索列表",
+      "submit": "分享",
+      "duplicateError": "此隊伍 ID 已被使用",
+      "genericError": "發生錯誤，請稍後再試",
+      "successTitle": "分享成功！",
+      "viewTeam": "查看隊伍",
+      "noTeamWarning": "隊伍中沒有寶可夢，請先到組隊頁面加入成員"
+    },
+    "pinModal": {
+      "title": "輸入 PIN 碼",
+      "description": "請輸入此隊伍的 PIN 碼以進行編輯",
+      "placeholder": "PIN 碼",
+      "confirm": "驗證",
+      "invalidPin": "PIN 碼錯誤",
+      "verifyError": "驗證失敗，請稍後再試"
     }
   },
   "langSwitcher": {

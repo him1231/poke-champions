@@ -1,23 +1,38 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter, useRoute } from 'vue-router'
 import { setLocale, SUPPORTED_LOCALES } from './i18n'
+import { useLocalePath } from './composables/useLocalePath'
 
 const { t, locale } = useI18n()
+const router = useRouter()
+const route = useRoute()
+const { localePath } = useLocalePath()
 const mobileMenuOpen = ref(false)
 
+function switchLocale(newLocale) {
+  const currentPath = route.path
+  const stripped = currentPath.replace(/^\/(zh-TW|en|ja)/, '') || '/'
+  setLocale(newLocale)
+  router.push(`/${newLocale}${stripped === '/' ? '' : stripped}`)
+}
+
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+
 const navLinks = computed(() => [
-  { name: t('nav.home'), path: '/', icon: 'home' },
-  { name: t('nav.pokedex'), path: '/pokemon', icon: 'menu_book' },
-  { name: t('nav.moves'), path: '/moves', icon: 'bolt' },
-  { name: t('nav.types'), path: '/types', icon: 'shield' },
-  { name: t('nav.teamBuilder'), path: '/team-builder', icon: 'groups' },
+  { name: t('nav.home'), path: localePath('/'), icon: 'home' },
+  { name: t('nav.pokedex'), path: localePath('/pokemon'), icon: 'menu_book' },
+  { name: t('nav.moves'), path: localePath('/moves'), icon: 'bolt' },
+  { name: t('nav.types'), path: localePath('/types'), icon: 'shield' },
+  { name: t('nav.teamBuilder'), path: localePath('/team-builder'), icon: 'groups' },
+  { name: t('nav.teams'), path: localePath('/teams'), icon: 'explore' },
 ])
 </script>
 
 <template>
   <div class="app">
-    <header class="navbar">
+    <header v-if="!isAdminRoute" class="navbar">
       <div class="container navbar-inner">
         <router-link to="/" class="logo" @click="mobileMenuOpen = false">
           <div class="logo-pokeball">
@@ -40,7 +55,7 @@ const navLinks = computed(() => [
           </router-link>
         </nav>
 
-        <select :value="locale" @change="setLocale($event.target.value)" class="lang-select">
+        <select :value="locale" @change="switchLocale($event.target.value)" class="lang-select">
           <option v-for="loc in SUPPORTED_LOCALES" :key="loc" :value="loc">{{ t(`langSwitcher.${loc}`) }}</option>
         </select>
 
@@ -50,11 +65,11 @@ const navLinks = computed(() => [
       </div>
     </header>
 
-    <main class="main-content">
+    <main :class="isAdminRoute ? '' : 'main-content'">
       <router-view />
     </main>
 
-    <footer class="footer">
+    <footer v-if="!isAdminRoute" class="footer">
       <div class="container footer-inner">
         <div class="footer-brand">
           <span class="footer-logo">Poké Champions</span>
@@ -62,8 +77,8 @@ const navLinks = computed(() => [
         </div>
         <div class="footer-links">
           <router-link v-for="link in navLinks" :key="link.path" :to="link.path">{{ link.name }}</router-link>
-          <router-link to="/about">{{ t('footer.about') }}</router-link>
-          <router-link to="/privacy">{{ t('footer.privacy') }}</router-link>
+          <router-link :to="localePath('/about')">{{ t('footer.about') }}</router-link>
+          <router-link :to="localePath('/privacy')">{{ t('footer.privacy') }}</router-link>
         </div>
       </div>
     </footer>

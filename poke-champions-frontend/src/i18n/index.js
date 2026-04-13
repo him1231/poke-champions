@@ -6,7 +6,7 @@ import ja from './locales/ja.json'
 const STORAGE_KEY = 'poke-lang'
 const SUPPORTED_LOCALES = ['zh-TW', 'en', 'ja']
 
-function detectLocale() {
+export function detectLocale() {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved && SUPPORTED_LOCALES.includes(saved)) return saved
 

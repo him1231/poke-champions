@@ -4,7 +4,8 @@
     "pokedex": "図鑑",
     "moves": "技",
     "types": "タイプ",
-    "teamBuilder": "チーム編成"
+    "teamBuilder": "チーム編成",
+    "teams": "チーム探索"
   },
   "common": {
     "loading": "読み込み中",
@@ -319,6 +320,64 @@
     "privacy": {
       "title": "プライバシーポリシー — Poké Champions",
       "description": "Poké Championsのプライバシーポリシーとクッキー使用について。"
+    },
+    "teamList": {
+      "title": "チーム探索 — Poké Champions",
+      "description": "他のプレイヤーが共有したポケモンチャンピオンズのチームを閲覧。"
+    },
+    "teamDetail": {
+      "title": "チーム詳細 — Poké Champions",
+      "description": "共有チームのメンバー構成とステータスを確認。"
+    }
+  },
+  "teamShare": {
+    "listPage": {
+      "title": "チーム探索",
+      "sortLatest": "新着",
+      "sortPopular": "人気",
+      "noTeams": "まだチームがありません。最初に共有しよう！"
+    },
+    "detailPage": {
+      "notFound": "チームが見つかりません",
+      "backToList": "一覧に戻る",
+      "edit": "編集",
+      "save": "保存",
+      "copyId": "チームIDをコピー",
+      "reportBtn": "無効を報告",
+      "alreadyReported": "報告済み",
+      "reportTitle": "コード無効の報告",
+      "reportMsg": "このレンタルコードがゲーム内で使用できなくなったことを報告しますか？報告は他のプレイヤーが有効なチームを見つけるのに役立ちます。",
+      "reportConfirm": "報告する",
+      "expiredWarning": "このチームコードは無効としてマークされており、ゲーム内で使用できない可能性があります。",
+      "pinExpired": "PINの有効期限が切れました。再度認証してください",
+      "deleteConfirmTitle": "チームを削除しますか？",
+      "deleteConfirmMsg": "この操作は取り消せません。チームは完全に削除されます。",
+      "deleteBtn": "削除"
+    },
+    "shareModal": {
+      "title": "チームを共有",
+      "rentalCode": "チームID",
+      "teamTitle": "チーム名",
+      "teamDescription": "説明",
+      "pinLabel": "（4〜8桁）",
+      "pinConfirm": "PIN確認",
+      "pinMismatch": "PINが一致しません",
+      "pinHint": "PINはチームの編集・削除に使用します",
+      "publicLabel": "チーム探索に公開する",
+      "submit": "共有",
+      "duplicateError": "このチームIDは既に使用されています",
+      "genericError": "エラーが発生しました。もう一度お試しください",
+      "successTitle": "共有完了！",
+      "viewTeam": "チームを見る",
+      "noTeamWarning": "チームにポケモンがいません。先にチーム編成で追加してください。"
+    },
+    "pinModal": {
+      "title": "PINを入力",
+      "description": "チームを編集するにはPINを入力してください",
+      "placeholder": "PIN",
+      "confirm": "認証",
+      "invalidPin": "PINが正しくありません",
+      "verifyError": "認証に失敗しました。もう一度お試しください"
     }
   },
   "langSwitcher": {

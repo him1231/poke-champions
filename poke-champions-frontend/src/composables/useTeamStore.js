@@ -150,10 +150,21 @@ export function useTeamStore() {
     return localizedName(p) || p.apiName
   }
 
+  async function refreshMemberData(allPokemon) {
+    if (!allPokemon?.length) return
+    const byApi = Object.fromEntries(allPokemon.map(p => [p.apiName, p]))
+    for (const member of teamMembers) {
+      if (!member.pokemon) continue
+      const fresh = byApi[member.pokemon.apiName]
+      if (fresh) Object.assign(member.pokemon, fresh)
+    }
+  }
+
   return {
     teamMembers,
     clearSlot,
     pokemonDisplayName,
     emptyMember,
+    refreshMemberData,
   }
 }

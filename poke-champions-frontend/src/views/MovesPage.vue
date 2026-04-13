@@ -5,9 +5,11 @@ import { useRoute } from 'vue-router'
 import { moveRosterApi } from '../api/moveRoster'
 import { typeRosterApi } from '../api/typeRoster'
 import { localizedName, localizedTypeName, localizedDescription } from '../utils/localizedName'
+import { useLocalePath } from '../composables/useLocalePath'
 
 const { t } = useI18n()
 const route = useRoute()
+const { localePath } = useLocalePath()
 const allMoves = ref([])
 const types = ref([])
 const loading = ref(true)
@@ -176,7 +178,7 @@ function categoryBadgeClass(move) {
                         <router-link
                           v-for="p in moveLearners"
                           :key="p.apiName"
-                          :to="`/pokemon/${p.apiName}`"
+                          :to="localePath(`/pokemon/${p.apiName}`)"
                           class="learner-chip"
                         >
                           {{ localizedName(p) }}

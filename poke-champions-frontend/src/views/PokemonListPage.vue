@@ -7,8 +7,10 @@ import { getPokemonImageUrl } from '../utils/pokemonImage'
 import { comparePokemonByFormId } from '../utils/pokemonSort'
 import { pokemonTypesForDisplay } from '../utils/pokemonTypesDisplay'
 import { localizedName, localizedTypeName } from '../utils/localizedName'
+import { useLocalePath } from '../composables/useLocalePath'
 
 const { t } = useI18n()
+const { localePath } = useLocalePath()
 
 const pokemonList = ref([])
 const types = ref([])
@@ -105,7 +107,7 @@ function getTypeClass(typeName) {
       <router-link
         v-for="p in filtered"
         :key="p.id ?? `${p.apiName}-${p.formId}`"
-        :to="`/pokemon/${p.apiName}`"
+        :to="localePath(`/pokemon/${p.apiName}`)"
         class="pokemon-card"
       >
         <div class="card-header">

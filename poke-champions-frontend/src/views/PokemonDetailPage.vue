@@ -9,9 +9,11 @@ import { pokemonTypesForDisplay, typeBadgeClasses } from '../utils/pokemonTypesD
 import { localizedName, localizedTypeName, localizedDescription } from '../utils/localizedName'
 import NatureGridSelector from '../components/NatureGridSelector.vue'
 import { getNatureMultiplier, NATURE_DEFS } from '../constants/pokemonNatures'
+import { useLocalePath } from '../composables/useLocalePath'
 
 const { t } = useI18n()
 const route = useRoute()
+const { localePath } = useLocalePath()
 
 const loading = ref(true)
 const error = ref('')
@@ -333,7 +335,7 @@ const matchupSections = computed(() => {
 
 <template>
   <div class="container page">
-    <RouterLink to="/pokemon" class="back-link">
+    <RouterLink :to="localePath('/pokemon')" class="back-link">
       <span class="material-symbols-rounded">arrow_back</span>
       <span>{{ t('pokemonDetail.backToList') }}</span>
     </RouterLink>

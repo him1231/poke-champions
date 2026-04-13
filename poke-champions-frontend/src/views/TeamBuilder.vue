@@ -14,9 +14,11 @@ import {
   STAT_KEYS, STAT_LABELS, STAT_COLORS, TOTAL_EV, MAX_PER, CATEGORY_LABELS,
   getDefenseMultipliers, calcStat,
 } from '../composables/useTeamStore'
+import { useLocalePath } from '../composables/useLocalePath'
 
 const { t } = useI18n()
-const { teamMembers, clearSlot, pokemonDisplayName } = useTeamStore()
+const { localePath } = useLocalePath()
+const { teamMembers, clearSlot, pokemonDisplayName, refreshMemberData } = useTeamStore()
 
 // ═══════════════════════════════════════════════════
 //  資料載入
@@ -36,6 +38,8 @@ onMounted(async () => {
     allPokemon.value = pokRes.data || []
     allMoves.value = movRes.data || []
     allItems.value = itmRes.data || []
+
+    await refreshMemberData(allPokemon.value)
 
     await Promise.all(
       teamMembers.map(async (member) => {
@@ -333,7 +337,7 @@ const editTab = ref('stats')
         <span class="material-symbols-rounded" style="font-size:1.6rem;vertical-align:middle;margin-right:8px">groups</span>
         {{ t('teamBuilder.title') }}
       </h1>
-      <router-link to="/team-overview" class="btn-overview" v-if="teamMembers.some(m => m.pokemon)">
+      <router-link :to="localePath('/team-overview')" class="btn-overview" v-if="teamMembers.some(m => m.pokemon)">
         <span class="material-symbols-rounded">summarize</span>
         {{ t('teamBuilder.viewOverview') }}
       </router-link>

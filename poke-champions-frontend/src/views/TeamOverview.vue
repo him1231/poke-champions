@@ -11,8 +11,11 @@ import {
   STAT_KEYS, STAT_LABELS, STAT_COLORS, CATEGORY_LABELS,
   getDefenseMultipliers, calcStat,
 } from '../composables/useTeamStore'
+import { useLocalePath } from '../composables/useLocalePath'
+import ShareTeamModal from '../components/ShareTeamModal.vue'
 
 const { t } = useI18n()
+const { localePath } = useLocalePath()
 const { teamMembers, pokemonDisplayName } = useTeamStore()
 
 const filledMembers = computed(() =>
@@ -108,6 +111,7 @@ const uncoveredAttackTypes = computed(() =>
 const overviewRoot = ref(null)
 const downloading = ref(false)
 const exportMenu = ref(null)
+const shareModalVisible = ref(false)
 
 function closeExportMenu() {
   const el = exportMenu.value
@@ -197,7 +201,16 @@ function downloadShowdownTxt() {
             </button>
           </div>
         </details>
-        <router-link to="/team-builder" class="btn-back-edit">
+        <button
+          type="button"
+          class="btn-share"
+          :disabled="teamCount === 0"
+          @click="shareModalVisible = true"
+        >
+          <span class="material-symbols-rounded">share</span>
+          {{ t('teamShare.shareModal.title') }}
+        </button>
+        <router-link :to="localePath('/team-builder')" class="btn-back-edit">
           <span class="material-symbols-rounded">edit</span>
           {{ t('teamOverview.editTeam') }}
         </router-link>
@@ -208,7 +221,7 @@ function downloadShowdownTxt() {
       <div class="empty-state">
         <span class="material-symbols-rounded empty-icon">group_off</span>
         <p>{{ t('teamOverview.emptyTeam') }}</p>
-        <router-link to="/team-builder" class="btn-go-build">{{ t('teamOverview.goToBuild') }}</router-link>
+        <router-link :to="localePath('/team-builder')" class="btn-go-build">{{ t('teamOverview.goToBuild') }}</router-link>
       </div>
     </template>
 
@@ -378,6 +391,8 @@ function downloadShowdownTxt() {
         </div>
       </section>
     </template>
+
+    <ShareTeamModal :visible="shareModalVisible" @close="shareModalVisible = false" />
   </div>
 </template>
 
@@ -498,6 +513,32 @@ function downloadShowdownTxt() {
   font-size: 20px;
   color: var(--accent);
 }
+
+.btn-share {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-glow);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-share:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-share:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-share .material-symbols-rounded { font-size: 18px; }
 
 .btn-back-edit {
   display: flex;
