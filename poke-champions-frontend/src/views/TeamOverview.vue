@@ -13,6 +13,7 @@ import {
 } from '../composables/useTeamStore'
 import { useLocalePath } from '../composables/useLocalePath'
 import ShareTeamModal from '../components/ShareTeamModal.vue'
+import { TEAM_SHARING_ENABLED } from '../api/staticApi'
 
 const { t } = useI18n()
 const { localePath } = useLocalePath()
@@ -202,6 +203,7 @@ function downloadShowdownTxt() {
           </div>
         </details>
         <button
+          v-if="TEAM_SHARING_ENABLED"
           type="button"
           class="btn-share"
           :disabled="teamCount === 0"
@@ -392,7 +394,7 @@ function downloadShowdownTxt() {
       </section>
     </template>
 
-    <ShareTeamModal :visible="shareModalVisible" @close="shareModalVisible = false" />
+    <ShareTeamModal v-if="TEAM_SHARING_ENABLED" :visible="shareModalVisible" @close="shareModalVisible = false" />
   </div>
 </template>
 

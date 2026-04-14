@@ -1,0 +1,110 @@
+[
+  {
+    "chineseName": "一般",
+    "id": 1,
+    "japaneseName": "ノーマル",
+    "name": "normal"
+  },
+  {
+    "chineseName": "火",
+    "id": 2,
+    "japaneseName": "ほのお",
+    "name": "fire"
+  },
+  {
+    "chineseName": "水",
+    "id": 3,
+    "japaneseName": "みず",
+    "name": "water"
+  },
+  {
+    "chineseName": "電",
+    "id": 4,
+    "japaneseName": "でんき",
+    "name": "electric"
+  },
+  {
+    "chineseName": "草",
+    "id": 5,
+    "japaneseName": "くさ",
+    "name": "grass"
+  },
+  {
+    "chineseName": "冰",
+    "id": 6,
+    "japaneseName": "こおり",
+    "name": "ice"
+  },
+  {
+    "chineseName": "格鬥",
+    "id": 7,
+    "japaneseName": "かくとう",
+    "name": "fighting"
+  },
+  {
+    "chineseName": "毒",
+    "id": 8,
+    "japaneseName": "どく",
+    "name": "poison"
+  },
+  {
+    "chineseName": "地面",
+    "id": 9,
+    "japaneseName": "じめん",
+    "name": "ground"
+  },
+  {
+    "chineseName": "飛行",
+    "id": 10,
+    "japaneseName": "ひこう",
+    "name": "flying"
+  },
+  {
+    "chineseName": "超能力",
+    "id": 11,
+    "japaneseName": "エスパー",
+    "name": "psychic"
+  },
+  {
+    "chineseName": "蟲",
+    "id": 12,
+    "japaneseName": "むし",
+    "name": "bug"
+  },
+  {
+    "chineseName": "岩石",
+    "id": 13,
+    "japaneseName": "いわ",
+    "name": "rock"
+  },
+  {
+    "chineseName": "幽靈",
+    "id": 14,
+    "japaneseName": "ゴースト",
+    "name": "ghost"
+  },
+  {
+    "chineseName": "龍",
+    "id": 15,
+    "japaneseName": "ドラゴン",
+    "name": "dragon"
+  },
+  {
+    "chineseName": "惡",
+    "id": 16,
+    "japaneseName": "あく",
+    "name": "dark"
+  },
+  {
+    "chineseName": "鋼",
+    "id": 17,
+    "japaneseName": "はがね",
+    "name": "steel"
+  },
+  {
+    "chineseName": "妖精",
+    "id": 18,
+    "japaneseName": "フェアリー",
+    "name": "fairy"
+  }
+]

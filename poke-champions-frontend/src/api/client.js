@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 function rosterBaseURL() {
-  const root = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+  const root = (import.meta.env.VITE_API_BASE_URL || import.meta.env.BASE_URL || '').replace(/\/$/, '')
   return root ? `${root}/api/roster` : '/api/roster'
 }
 

@@ -5,6 +5,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { setLocale, SUPPORTED_LOCALES } from './i18n'
 import { useLocalePath } from './composables/useLocalePath'
 import ChangelogBell from './components/ChangelogBell.vue'
+import { TEAM_SHARING_ENABLED } from './api/staticApi'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -51,10 +52,15 @@ const simpleNav = computed(() => [
   { name: t('nav.moves'), path: localePath('/moves'), icon: 'bolt', exact: false },
 ])
 
-const teamNavChildren = computed(() => [
-  { name: t('nav.teamBuilder'), path: localePath('/team-builder'), icon: 'groups' },
-  { name: t('nav.teams'), path: localePath('/teams'), icon: 'explore' },
-])
+const teamNavChildren = computed(() => {
+  const items = [
+    { name: t('nav.teamBuilder'), path: localePath('/team-builder'), icon: 'groups' },
+  ]
+  if (TEAM_SHARING_ENABLED) {
+    items.push({ name: t('nav.teams'), path: localePath('/teams'), icon: 'explore' })
+  }
+  return items
+})
 
 const toolsNavChildren = computed(() => [
   { name: t('nav.types'), path: localePath('/types'), icon: 'shield' },

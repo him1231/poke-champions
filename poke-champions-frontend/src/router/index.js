@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import i18n from '../i18n'
 import { SUPPORTED_LOCALES, detectLocale, setLocale } from '../i18n'
 import HomePage from '../views/HomePage.vue'
@@ -17,12 +17,17 @@ import AboutPage from '../views/AboutPage.vue'
 import PrivacyPage from '../views/PrivacyPage.vue'
 
 const SITE = 'Poké Champions'
-const ORIGIN = 'https://victorpoke-champions.com'
+const ORIGIN = import.meta.env.VITE_SITE_ORIGIN || (typeof window !== 'undefined'
+  ? `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}`
+  : 'https://victorpoke-champions.com')
 const GA_MEASUREMENT_ID = 'G-MN3EEBL4Y1'
 const LOCALE_RE = SUPPORTED_LOCALES.map(l => l.replace('-', '\\-')).join('|')
+const USE_HASH_HISTORY = import.meta.env.VITE_STATIC_DATA === 'true'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: USE_HASH_HISTORY
+    ? createWebHashHistory(import.meta.env.BASE_URL)
+    : createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior: () => ({ top: 0 }),
   routes: [
     {

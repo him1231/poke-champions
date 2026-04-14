@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { IS_STATIC_DATA, staticTeamListResponse, staticUnavailable } from './staticApi'
 
 function teamBaseURL() {
-  const root = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+  const root = (import.meta.env.VITE_API_BASE_URL || import.meta.env.BASE_URL || '').replace(/\/$/, '')
   return root ? `${root}/api/teams` : '/api/teams'
 }
 
@@ -14,21 +15,38 @@ const teamClient = axios.create({
 })
 
 export const teamShareApi = {
-  create: (payload) => teamClient.post('', payload),
+  create: (payload) =>
+    IS_STATIC_DATA
+      ? staticUnavailable()
+      : teamClient.post('', payload),
 
   list: (sort = 'latest', page = 0, size = 20) =>
-    teamClient.get('', { params: { sort, page, size } }),
+    IS_STATIC_DATA
+      ? staticTeamListResponse(sort, page, size)
+      : teamClient.get('', { params: { sort, page, size } }),
 
-  getByRentalCode: (rentalCode) => teamClient.get(`/${rentalCode}`),
+  getByRentalCode: (rentalCode) =>
+    IS_STATIC_DATA
+      ? staticUnavailable()
+      : teamClient.get(`/${rentalCode}`),
 
-  update: (rentalCode, payload) => teamClient.put(`/${rentalCode}`, payload),
+  update: (rentalCode, payload) =>
+    IS_STATIC_DATA
+      ? staticUnavailable()
+      : teamClient.put(`/${rentalCode}`, payload),
 
   delete: (rentalCode, pin) =>
-    teamClient.delete(`/${rentalCode}`, { data: { pin } }),
+    IS_STATIC_DATA
+      ? staticUnavailable()
+      : teamClient.delete(`/${rentalCode}`, { data: { pin } }),
 
   verifyPin: (rentalCode, pin) =>
-    teamClient.post(`/${rentalCode}/verify-pin`, { pin }),
+    IS_STATIC_DATA
+      ? staticUnavailable()
+      : teamClient.post(`/${rentalCode}/verify-pin`, { pin }),
 
   report: (rentalCode) =>
-    teamClient.post(`/${rentalCode}/report`),
+    IS_STATIC_DATA
+      ? staticUnavailable()
+      : teamClient.post(`/${rentalCode}/report`),
 }
