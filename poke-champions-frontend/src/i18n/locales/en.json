@@ -38,6 +38,14 @@
     "badgeNew": "New",
     "versions": [
       {
+        "version": "v1.2.1",
+        "headline": "Rotom forms move fix",
+        "date": "2026-04-14",
+        "items": [
+          "Fixed Rotom appliance forms (Heat/Wash/Frost/Fan/Mow) not displaying learnable moves"
+        ]
+      },
+      {
         "version": "v1.2.0",
         "headline": "Battle utilities",
         "date": "2026-04-14",

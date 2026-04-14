@@ -61,6 +61,12 @@ public final class PokeApiSlugResolver {
             }
         }
 
+        // Game8 等來源的無括號 Rotom 形態："Heat Rotom" → "rotom-heat"
+        if (trimmed.endsWith(" Rotom") && !trimmed.equalsIgnoreCase("Rotom")) {
+            String form = trimmed.substring(0, trimmed.length() - " Rotom".length()).trim().toLowerCase();
+            return "rotom-" + form;
+        }
+
         int parenStart = trimmed.indexOf('(');
         if (parenStart == -1) {
             return slugify(trimmed);

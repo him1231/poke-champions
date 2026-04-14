@@ -1,0 +1,17 @@
+{
+  "name": "Poké Champions",
+  "short_name": "PokéChamps",
+  "description": "寶可夢冠軍賽資料查詢與組隊工具",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a24",
+  "theme_color": "#e6534f",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
