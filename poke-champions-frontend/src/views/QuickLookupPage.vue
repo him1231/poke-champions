@@ -5,7 +5,7 @@ import { pokemonRosterApi } from '../api/pokemonRoster'
 import { typeRosterApi } from '../api/typeRoster'
 import { getPokemonImageUrl } from '../utils/pokemonImage'
 import { comparePokemonByFormId } from '../utils/pokemonSort'
-import { pokemonTypesForDisplay, typeBadgeClasses } from '../utils/pokemonTypesDisplay'
+import { typeBadgeClasses } from '../utils/pokemonTypesDisplay'
 import { localizedName } from '../utils/localizedName'
 import { useLocalePath } from '../composables/useLocalePath'
 import { ALL_TYPES, getDefenseMultipliers } from '../composables/useTeamStore'
@@ -13,22 +13,63 @@ import { ALL_TYPES, getDefenseMultipliers } from '../composables/useTeamStore'
 const { t } = useI18n()
 const { localePath } = useLocalePath()
 
+const PIN_STORAGE_KEY = 'quick-lookup-pinned-pokemon'
+
 const pokemonList = ref([])
 const types = ref([])
 const loading = ref(true)
 const error = ref(null)
 const search = ref('')
 const selectedTypes = ref([])
+const pinnedPokemon = ref(loadPinnedPokemon())
+const abilitiesByPokemon = ref({})
+
+function loadPinnedPokemon() {
+  try {
+    const raw = localStorage.getItem(PIN_STORAGE_KEY)
+    const parsed = JSON.parse(raw || '[]')
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+function savePinnedPokemon() {
+  localStorage.setItem(PIN_STORAGE_KEY, JSON.stringify(pinnedPokemon.value))
+}
+
+function isPinned(apiName) {
+  return pinnedPokemon.value.includes(apiName)
+}
+
+function togglePin(apiName) {
+  if (!apiName) return
+  if (isPinned(apiName)) {
+    pinnedPokemon.value = pinnedPokemon.value.filter((entry) => entry !== apiName)
+  } else {
+    pinnedPokemon.value = [...pinnedPokemon.value, apiName]
+  }
+  savePinnedPokemon()
+}
+
+async function loadAbilitiesMap() {
+  const url = `${import.meta.env.BASE_URL}static-data/pokemon-abilities.json`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Failed to load abilities map: ${res.status}`)
+  return res.json()
+}
 
 onMounted(async () => {
   try {
-    const [pokemonRes, typesRes] = await Promise.all([
+    const [pokemonRes, typesRes, abilitiesMap] = await Promise.all([
       pokemonRosterApi.getPokemonList(),
       typeRosterApi.getTypes(),
+      loadAbilitiesMap(),
     ])
     const arr = Array.isArray(pokemonRes.data) ? pokemonRes.data : []
     pokemonList.value = [...arr].sort(comparePokemonByFormId)
     types.value = Array.isArray(typesRes.data) ? typesRes.data : []
+    abilitiesByPokemon.value = abilitiesMap && typeof abilitiesMap === 'object' ? abilitiesMap : {}
   } catch (e) {
     error.value = t('quickLookup.loadError')
   } finally {
@@ -51,58 +92,183 @@ function clearFilters() {
   selectedTypes.value = []
 }
 
+function matchesSearch(pokemon) {
+  if (!search.value) return true
+  const raw = search.value.trim()
+  const q = raw.toLowerCase()
+  return (
+    (pokemon.displayName && pokemon.displayName.toLowerCase().includes(q)) ||
+    (pokemon.chineseName && pokemon.chineseName.toLowerCase().includes(q)) ||
+    (pokemon.japaneseName && pokemon.japaneseName.toLowerCase().includes(q)) ||
+    (pokemon.apiName && pokemon.apiName.toLowerCase().includes(q)) ||
+    String(pokemon.nationalDexNumber).includes(raw)
+  )
+}
+
 function matchesSelectedTypes(pokemon) {
   if (!selectedTypes.value.length) return true
   const ownTypes = pokemon.types || []
   return selectedTypes.value.every((typeName) => ownTypes.includes(typeName))
 }
 
-const filteredPokemon = computed(() => {
-  let list = pokemonList.value
+const visiblePokemon = computed(() => {
+  const filtered = pokemonList.value.filter((pokemon) => {
+    if (isPinned(pokemon.apiName)) return true
+    return matchesSearch(pokemon) && matchesSelectedTypes(pokemon)
+  })
 
-  if (search.value) {
-    const raw = search.value.trim()
-    const q = raw.toLowerCase()
-    list = list.filter(
-      (pokemon) =>
-        (pokemon.displayName && pokemon.displayName.toLowerCase().includes(q)) ||
-        (pokemon.chineseName && pokemon.chineseName.toLowerCase().includes(q)) ||
-        (pokemon.japaneseName && pokemon.japaneseName.toLowerCase().includes(q)) ||
-        (pokemon.apiName && pokemon.apiName.toLowerCase().includes(q)) ||
-        String(pokemon.nationalDexNumber).includes(raw),
-    )
-  }
-
-  return list.filter(matchesSelectedTypes)
+  return [...filtered].sort((a, b) => {
+    const pinDiff = Number(isPinned(b.apiName)) - Number(isPinned(a.apiName))
+    if (pinDiff !== 0) return pinDiff
+    return comparePokemonByFormId(a, b)
+  })
 })
 
-const rows = computed(() =>
-  filteredPokemon.value.map((pokemon) => {
-    const multipliers = getDefenseMultipliers(pokemon.types || [])
-    const weaknessEntries = Object.entries(multipliers)
-      .filter(([, multiplier]) => multiplier > 1)
-      .sort((a, b) => {
-        if (b[1] !== a[1]) return b[1] - a[1]
-        return ALL_TYPES.indexOf(a[0]) - ALL_TYPES.indexOf(b[0])
-      })
+const TYPE_IMMUNITY_ABILITIES = {
+  levitate: ['ground'],
+  'earth-eater': ['ground'],
+  'flash-fire': ['fire'],
+  'well-baked-body': ['fire'],
+  'water-absorb': ['water'],
+  'storm-drain': ['water'],
+  'dry-skin': ['water'],
+  'volt-absorb': ['electric'],
+  'lightning-rod': ['electric'],
+  'motor-drive': ['electric'],
+  'sap-sipper': ['grass'],
+}
 
-    return {
-      pokemon,
-      quadWeaknesses: weaknessEntries
-        .filter(([, multiplier]) => multiplier >= 4)
-        .map(([type]) => type),
-      weaknesses: weaknessEntries
-        .filter(([, multiplier]) => multiplier > 1 && multiplier < 4)
-        .map(([type]) => type),
+function roundMultiplier(value) {
+  return Math.round(value * 100) / 100
+}
+
+function applyAbilityToMatchup(baseMap, abilityName) {
+  const result = { ...baseMap }
+  const ability = String(abilityName || '').toLowerCase()
+
+  for (const immuneType of TYPE_IMMUNITY_ABILITIES[ability] || []) {
+    result[immuneType] = 0
+  }
+
+  if (ability === 'thick-fat') {
+    result.fire = roundMultiplier(result.fire * 0.5)
+    result.ice = roundMultiplier(result.ice * 0.5)
+  }
+
+  if (ability === 'heatproof') {
+    result.fire = roundMultiplier(result.fire * 0.5)
+  }
+
+  if (ability === 'water-bubble') {
+    result.fire = roundMultiplier(result.fire * 0.5)
+  }
+
+  if (ability === 'dry-skin') {
+    result.fire = roundMultiplier(result.fire * 1.25)
+  }
+
+  if (ability === 'fluffy') {
+    result.fire = roundMultiplier(result.fire * 2)
+  }
+
+  if (ability === 'purifying-salt') {
+    result.ghost = roundMultiplier(result.ghost * 0.5)
+  }
+
+  if (ability === 'filter' || ability === 'solid-rock' || ability === 'prism-armor') {
+    for (const typeName of ALL_TYPES) {
+      if (result[typeName] > 1) {
+        result[typeName] = roundMultiplier(result[typeName] * 0.75)
+      }
     }
-  }),
+  }
+
+  if (ability === 'wonder-guard') {
+    for (const typeName of ALL_TYPES) {
+      if (result[typeName] <= 1) {
+        result[typeName] = 0
+      }
+    }
+  }
+
+  return result
+}
+
+function matchupSignature(matchupMap) {
+  return ALL_TYPES.map((typeName) => `${typeName}:${matchupMap[typeName]}`).join('|')
+}
+
+function multiplierLabel(multiplier) {
+  const rounded = roundMultiplier(multiplier)
+  const text = Number.isInteger(rounded)
+    ? String(rounded)
+    : String(rounded).replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1')
+  return `${text}×`
+}
+
+function groupedMatchups(matchupMap) {
+  const groups = {}
+  for (const typeName of ALL_TYPES) {
+    const multiplier = roundMultiplier(matchupMap[typeName])
+    if (multiplier === 1) continue
+    const key = String(multiplier)
+    if (!groups[key]) groups[key] = []
+    groups[key].push(typeName)
+  }
+  return groups
+}
+
+function abilityDisplayName(ability) {
+  return ability?.chineseName || ability?.displayName || ability?.japaneseName || ability?.name || t('quickLookup.noAbilityInfo')
+}
+
+function buildAbilityVariants(pokemon) {
+  const baseMatchup = getDefenseMultipliers(pokemon.types || [])
+  const abilities = Array.isArray(abilitiesByPokemon.value[pokemon.apiName]) ? abilitiesByPokemon.value[pokemon.apiName] : []
+  const sourceAbilities = abilities.length ? abilities : [{ name: 'no-ability-info' }]
+  const groups = new Map()
+
+  for (const ability of sourceAbilities) {
+    const adjusted = applyAbilityToMatchup(baseMatchup, ability.name)
+    const signature = matchupSignature(adjusted)
+    if (!groups.has(signature)) {
+      groups.set(signature, {
+        abilityNames: [],
+        matchupMap: adjusted,
+        grouped: groupedMatchups(adjusted),
+      })
+    }
+    groups.get(signature).abilityNames.push(abilityDisplayName(ability))
+  }
+
+  return [...groups.values()].map((entry) => ({
+    abilityLabel: entry.abilityNames.join(' / '),
+    matchupMap: entry.matchupMap,
+    grouped: entry.grouped,
+  }))
+}
+
+const rows = computed(() =>
+  visiblePokemon.value.flatMap((pokemon) =>
+    buildAbilityVariants(pokemon).map((variant, index) => ({
+      pokemon,
+      isPinned: isPinned(pokemon.apiName),
+      rowKey: `${pokemon.apiName}-${index}-${variant.abilityLabel}`,
+      abilityLabel: variant.abilityLabel,
+      grouped: variant.grouped,
+    })),
+  ),
 )
 
-function pokemonSecondaryName(pokemon) {
-  const primary = localizedName(pokemon)
-  const candidates = [pokemon.displayName, pokemon.chineseName, pokemon.japaneseName]
-  return candidates.find((name) => name && name !== primary) || ''
-}
+const multiplierColumns = computed(() => {
+  const seen = new Set()
+  for (const row of rows.value) {
+    Object.keys(row.grouped).forEach((key) => seen.add(Number(key)))
+  }
+  return [...seen]
+    .sort((a, b) => a - b)
+    .map((value) => ({ key: String(value), value, label: multiplierLabel(value) }))
+})
 </script>
 
 <template>
@@ -125,7 +291,10 @@ function pokemonSecondaryName(pokemon) {
 
       <div class="type-filter-panel">
         <div class="type-filter-head">
-          <p class="type-filter-hint">{{ t('quickLookup.hint') }}</p>
+          <div>
+            <p class="type-filter-hint">{{ t('quickLookup.hint') }}</p>
+            <p class="type-filter-note">{{ t('quickLookup.pinHint') }}</p>
+          </div>
           <div class="type-filter-actions">
             <span class="selected-count">{{ t('quickLookup.selectedCount', { count: selectedTypes.length }) }}</span>
             <button
@@ -166,61 +335,45 @@ function pokemonSecondaryName(pokemon) {
           <thead>
             <tr>
               <th>{{ t('quickLookup.colPokemon') }}</th>
-              <th>{{ t('quickLookup.colQuadWeak') }}</th>
-              <th>{{ t('quickLookup.colWeak') }}</th>
+              <th>{{ t('quickLookup.colAbility') }}</th>
+              <th v-for="column in multiplierColumns" :key="column.key">{{ column.label }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in rows" :key="row.pokemon.id ?? `${row.pokemon.apiName}-${row.pokemon.formId}`">
+            <tr v-for="row in rows" :key="row.rowKey" :class="{ pinned: row.isPinned }">
               <td class="pokemon-cell">
-                <router-link :to="localePath(`/pokemon/${row.pokemon.apiName}`)" class="pokemon-link">
-                  <img
-                    :src="getPokemonImageUrl(row.pokemon)"
-                    :alt="localizedName(row.pokemon)"
-                    loading="lazy"
-                    class="pokemon-thumb"
-                  />
-                  <div class="pokemon-main">
-                    <div class="pokemon-name-row">
-                      <span class="pokemon-name">{{ localizedName(row.pokemon) }}</span>
-                      <span class="pokemon-dex">#{{ String(row.pokemon.nationalDexNumber).padStart(4, '0') }}</span>
-                    </div>
-                    <p v-if="pokemonSecondaryName(row.pokemon)" class="pokemon-subname">{{ pokemonSecondaryName(row.pokemon) }}</p>
-                    <div class="pokemon-types">
-                      <span
-                        v-for="type in pokemonTypesForDisplay(row.pokemon)"
-                        :key="type.name"
-                        :class="typeBadgeClasses(type.name)"
-                      >
-                        {{ t('pokemon.types.' + type.name) }}
-                      </span>
-                    </div>
-                  </div>
-                </router-link>
-              </td>
-              <td>
-                <div v-if="row.quadWeaknesses.length" class="weakness-list">
-                  <span
-                    v-for="type in row.quadWeaknesses"
-                    :key="type"
-                    :class="typeBadgeClasses(type)"
+                <div class="pokemon-thumb-wrap">
+                  <router-link :to="localePath(`/pokemon/${row.pokemon.apiName}`)" class="pokemon-thumb-link" :title="localizedName(row.pokemon)">
+                    <img
+                      :src="getPokemonImageUrl(row.pokemon)"
+                      :alt="localizedName(row.pokemon)"
+                      loading="lazy"
+                      class="pokemon-thumb"
+                    />
+                  </router-link>
+                  <button
+                    type="button"
+                    class="pin-btn"
+                    :class="{ active: row.isPinned }"
+                    :title="row.isPinned ? t('quickLookup.unpin') : t('quickLookup.pin')"
+                    @click="togglePin(row.pokemon.apiName)"
                   >
-                    {{ t('pokemon.types.' + type) }}
+                    <span class="material-symbols-rounded">keep</span>
+                  </button>
+                </div>
+              </td>
+              <td class="ability-cell">{{ row.abilityLabel }}</td>
+              <td v-for="column in multiplierColumns" :key="column.key">
+                <div v-if="row.grouped[column.key]?.length" class="matchup-list">
+                  <span
+                    v-for="typeName in row.grouped[column.key]"
+                    :key="typeName"
+                    :class="['type-chip', ...typeBadgeClasses(typeName)]"
+                  >
+                    {{ t('pokemon.types.' + typeName) }}
                   </span>
                 </div>
-                <span v-else class="empty-weakness">{{ t('quickLookup.noQuadWeak') }}</span>
-              </td>
-              <td>
-                <div v-if="row.weaknesses.length" class="weakness-list">
-                  <span
-                    v-for="type in row.weaknesses"
-                    :key="type"
-                    :class="typeBadgeClasses(type)"
-                  >
-                    {{ t('pokemon.types.' + type) }}
-                  </span>
-                </div>
-                <span v-else class="empty-weakness">{{ row.quadWeaknesses.length ? t('quickLookup.none') : t('quickLookup.noWeak') }}</span>
+                <span v-else class="empty-matchup">—</span>
               </td>
             </tr>
           </tbody>
@@ -351,6 +504,12 @@ function pokemonSecondaryName(pokemon) {
   font-size: 0.9rem;
 }
 
+.type-filter-note {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
 .type-filter-actions {
   display: flex;
   align-items: center;
@@ -442,15 +601,15 @@ function pokemonSecondaryName(pokemon) {
 
 .quick-table {
   width: 100%;
-  min-width: 760px;
+  min-width: 980px;
   border-collapse: collapse;
 }
 
 .quick-table th,
 .quick-table td {
-  padding: 14px 16px;
+  padding: 14px 12px;
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
   border-bottom: 1px solid var(--border);
 }
 
@@ -470,66 +629,84 @@ function pokemonSecondaryName(pokemon) {
   background: rgba(255, 255, 255, 0.03);
 }
 
-.pokemon-cell {
-  min-width: 300px;
+.quick-table tbody tr.pinned {
+  background: rgba(255, 196, 0, 0.05);
 }
 
-.pokemon-link {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: inherit;
-  text-decoration: none;
+.pokemon-cell {
+  width: 88px;
+  min-width: 88px;
+}
+
+.pokemon-thumb-wrap {
+  position: relative;
+  width: 64px;
+  margin: 0 auto;
+}
+
+.pokemon-thumb-link {
+  display: block;
 }
 
 .pokemon-thumb {
   width: 64px;
   height: 64px;
   object-fit: contain;
-  flex-shrink: 0;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
 }
 
-.pokemon-main {
-  min-width: 0;
-}
-
-.pokemon-name-row {
+.pin-btn {
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 4px;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(18, 20, 40, 0.88);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
 }
 
-.pokemon-name {
-  font-size: 0.95rem;
-  font-weight: 700;
+.pin-btn .material-symbols-rounded {
+  font-size: 16px;
+  transform: rotate(45deg);
+}
+
+.pin-btn:hover {
   color: var(--text-primary);
+  border-color: var(--border-light);
 }
 
-.pokemon-dex {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--text-muted);
+.pin-btn.active {
+  color: #ffc107;
+  border-color: rgba(255, 193, 7, 0.45);
+  background: rgba(72, 54, 0, 0.95);
 }
 
-.pokemon-subname {
-  margin-bottom: 8px;
-  color: var(--text-muted);
-  font-size: 0.78rem;
+.ability-cell {
+  min-width: 180px;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
-.pokemon-types,
-.weakness-list {
+.matchup-list {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  min-width: 92px;
 }
 
-.empty-weakness {
+.type-chip {
+  white-space: nowrap;
+}
+
+.empty-matchup {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.84rem;
 }
 
 .empty-state {
@@ -565,13 +742,8 @@ function pokemonSecondaryName(pokemon) {
     font-size: 0.8rem;
   }
 
-  .pokemon-link {
-    gap: 10px;
-  }
-
-  .pokemon-thumb {
-    width: 54px;
-    height: 54px;
+  .quick-table {
+    min-width: 900px;
   }
 }
 </style>

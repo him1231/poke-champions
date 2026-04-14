@@ -641,7 +641,7 @@
   },
   "quickLookup": {
     "title": "Quick Lookup",
-    "subtitle": "Use the type buttons above to filter quickly (up to 2). The table below shows each Pokémon’s 4× and 2× weaknesses at a glance.",
+    "subtitle": "Use the type buttons above to filter quickly (up to 2). Pinned Pokémon always stay visible. Rows split by ability when the matchup changes, and every non-1× matchup is shown.",
     "searchPlaceholder": "Search Pokémon name or dex number...",
     "hint": "Pick up to 2 types. Choosing 2 filters for the matching dual-type combination.",
     "selectedCount": "Selected {count}/2",
@@ -653,6 +653,11 @@
     "noWeak": "No weakness",
     "none": "None",
     "empty": "No Pokémon match your filters",
-    "loadError": "Failed to load quick lookup data"
+    "loadError": "Failed to load quick lookup data",
+    "pinHint": "Pinned Pokémon ignore search and type filters.",
+    "colAbility": "Ability",
+    "noAbilityInfo": "Ability data unavailable",
+    "pin": "Pin",
+    "unpin": "Unpin"
   }
 }

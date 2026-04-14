@@ -641,7 +641,7 @@
   },
   "quickLookup": {
     "title": "快速檢索",
-    "subtitle": "上方可按屬性快速篩選（最多 2 個），下方表格直接列出每隻寶可夢的 4×／2× 弱點。",
+    "subtitle": "上方可按屬性快速篩選（最多 2 個）；已 pin 的寶可夢會固定顯示。下方會按特性拆行，列出所有非 1× 的屬性相剋。",
     "searchPlaceholder": "搜尋寶可夢名稱、圖鑑編號...",
     "hint": "最多選 2 個屬性；選 2 個時會篩選對應雙屬性寶可夢。",
     "selectedCount": "已選 {count}/2",
@@ -653,6 +653,11 @@
     "noWeak": "無弱點",
     "none": "無",
     "empty": "沒有找到符合條件的寶可夢",
-    "loadError": "無法載入快速檢索資料，請稍後再試"
+    "loadError": "無法載入快速檢索資料，請稍後再試",
+    "pinHint": "Pin 咗嘅寶可夢唔會受 search / 屬性 filter 影響。",
+    "colAbility": "特性",
+    "noAbilityInfo": "特性資料未同步",
+    "pin": "Pin",
+    "unpin": "Unpin"
   }
 }
