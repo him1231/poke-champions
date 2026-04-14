@@ -10,7 +10,8 @@
     "toolsMenu": "Types & tools",
     "speedTiers": "Speed tiers",
     "speedCompare": "Speed compare",
-    "damageCalc": "Damage calc"
+    "damageCalc": "Damage calc",
+    "quickLookup": "Quick lookup"
   },
   "common": {
     "loading": "Loading",
@@ -273,6 +274,10 @@
       "teamBuilder": {
         "title": "Team Builder",
         "desc": "Pick Pokémon and moves, build your strongest Champions team"
+      },
+      "quickLookup": {
+        "title": "Quick lookup",
+        "desc": "Filter Pokémon by type and instantly see what each one is weak to"
       }
     }
   },
@@ -406,10 +411,22 @@
     "bio": "Passionate about Pokémon and web development. Built Poké Champions so every trainer can easily look up Champions data and plan the best team.",
     "milestones": "Development Journey",
     "milestone": {
-      "idea": { "title": "Inspiration", "desc": "Frustrated by scattered Champions data, decided to build an integrated tool." },
-      "tech": { "title": "Tech Stack", "desc": "Frontend: Vue 3 + Vite. Backend: Spring Boot + PostgreSQL. Deployed on GCP." },
-      "data": { "title": "Data Integration", "desc": "Automated scraping and syncing of official Champions roster, moves, and types." },
-      "launch": { "title": "Launch", "desc": "Continuously optimizing UI and performance for the best trainer experience." }
+      "idea": {
+        "title": "Inspiration",
+        "desc": "Frustrated by scattered Champions data, decided to build an integrated tool."
+      },
+      "tech": {
+        "title": "Tech Stack",
+        "desc": "Frontend: Vue 3 + Vite. Backend: Spring Boot + PostgreSQL. Deployed on GCP."
+      },
+      "data": {
+        "title": "Data Integration",
+        "desc": "Automated scraping and syncing of official Champions roster, moves, and types."
+      },
+      "launch": {
+        "title": "Launch",
+        "desc": "Continuously optimizing UI and performance for the best trainer experience."
+      }
     },
     "thanks": "Special Thanks",
     "thanksText": "Thanks to all Pokémon trainers for your support and feedback, and to PokeAPI and the official Champions data.",
@@ -446,8 +463,20 @@
   },
   "natureGrid": {
     "title": "Select Nature",
-    "headerDec": ["Atk", "Def", "Sp.Atk", "Sp.Def", "Speed"],
-    "headerInc": ["Atk", "Def", "Sp.Atk", "Sp.Def", "Speed"]
+    "headerDec": [
+      "Atk",
+      "Def",
+      "Sp.Atk",
+      "Sp.Def",
+      "Speed"
+    ],
+    "headerInc": [
+      "Atk",
+      "Def",
+      "Sp.Atk",
+      "Sp.Def",
+      "Speed"
+    ]
   },
   "routes": {
     "home": {
@@ -505,6 +534,10 @@
     "teamDetail": {
       "title": "Team Details — Poké Champions",
       "description": "View shared team members, stats, and move sets."
+    },
+    "quickLookup": {
+      "title": "Quick Lookup — Poké Champions",
+      "description": "Filter Pokémon by type and instantly check their 4× and 2× weaknesses."
     }
   },
   "speedTiers": {
@@ -605,5 +638,21 @@
     "zh-TW": "繁體中文",
     "en": "English",
     "ja": "日本語"
+  },
+  "quickLookup": {
+    "title": "Quick Lookup",
+    "subtitle": "Use the type buttons above to filter quickly (up to 2). The table below shows each Pokémon’s 4× and 2× weaknesses at a glance.",
+    "searchPlaceholder": "Search Pokémon name or dex number...",
+    "hint": "Pick up to 2 types. Choosing 2 filters for the matching dual-type combination.",
+    "selectedCount": "Selected {count}/2",
+    "clearFilters": "Clear filters",
+    "colPokemon": "Pokémon",
+    "colQuadWeak": "4× Weak",
+    "colWeak": "2× Weak",
+    "noQuadWeak": "—",
+    "noWeak": "No weakness",
+    "none": "None",
+    "empty": "No Pokémon match your filters",
+    "loadError": "Failed to load quick lookup data"
   }
 }

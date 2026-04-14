@@ -73,6 +73,14 @@ const features = computed(() => [
     iconColor: '#4a90d9',
   },
   {
+    icon: 'search',
+    title: t('home.feature.quickLookup.title'),
+    desc: t('home.feature.quickLookup.desc'),
+    link: localePath('/quick-lookup'),
+    gradient: 'linear-gradient(135deg, rgba(255, 193, 7, 0.14), rgba(74, 144, 217, 0.1))',
+    iconColor: '#f0b429',
+  },
+  {
     icon: 'calculate',
     title: t('home.feature.damageCalc.title'),
     desc: t('home.feature.damageCalc.desc'),

@@ -9,6 +9,7 @@ import TypesPage from '../views/TypesPage.vue'
 import SpeedTiersPage from '../views/SpeedTiersPage.vue'
 import SpeedComparePage from '../views/SpeedComparePage.vue'
 import DamageCalcPage from '../views/DamageCalcPage.vue'
+import QuickLookupPage from '../views/QuickLookupPage.vue'
 import TeamBuilder from '../views/TeamBuilder.vue'
 import TeamOverview from '../views/TeamOverview.vue'
 import TeamListPage from '../views/TeamListPage.vue'
@@ -84,6 +85,12 @@ const router = createRouter({
           name: 'damage-calc',
           component: DamageCalcPage,
           meta: { titleKey: 'routes.damageCalc.title', descKey: 'routes.damageCalc.description' },
+        },
+        {
+          path: 'quick-lookup',
+          name: 'quick-lookup',
+          component: QuickLookupPage,
+          meta: { titleKey: 'routes.quickLookup.title', descKey: 'routes.quickLookup.description' },
         },
         {
           path: 'team-builder',

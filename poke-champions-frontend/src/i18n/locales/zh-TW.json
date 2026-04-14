@@ -10,7 +10,8 @@
     "toolsMenu": "屬性與工具",
     "speedTiers": "速度線",
     "speedCompare": "速度比較",
-    "damageCalc": "傷害計算"
+    "damageCalc": "傷害計算",
+    "quickLookup": "快速檢索"
   },
   "common": {
     "loading": "載入中",
@@ -273,6 +274,10 @@
       "teamBuilder": {
         "title": "隊伍組建",
         "desc": "自由選擇寶可夢與招式，打造你的冠軍賽最強隊伍"
+      },
+      "quickLookup": {
+        "title": "快速檢索",
+        "desc": "用屬性快速篩選寶可夢，直接查看每隻怕咩屬性"
       }
     }
   },
@@ -406,10 +411,22 @@
     "bio": "熱愛寶可夢與網頁開發，打造 Poké Champions 的初衷是讓每位訓練家都能輕鬆查閱冠軍賽資料、規劃最強隊伍。",
     "milestones": "開發歷程",
     "milestone": {
-      "idea": { "title": "靈感來源", "desc": "對寶可夢冠軍賽數據散落各處感到不便，決定自己動手整合。" },
-      "tech": { "title": "技術選型", "desc": "前端採 Vue 3 + Vite，後端 Spring Boot + PostgreSQL，部署於 GCP。" },
-      "data": { "title": "資料整合", "desc": "自動爬取並同步官方冠軍賽名單、招式、屬性等資料。" },
-      "launch": { "title": "正式上線", "desc": "持續優化 UI 與效能，為訓練家提供最佳查詢體驗。" }
+      "idea": {
+        "title": "靈感來源",
+        "desc": "對寶可夢冠軍賽數據散落各處感到不便，決定自己動手整合。"
+      },
+      "tech": {
+        "title": "技術選型",
+        "desc": "前端採 Vue 3 + Vite，後端 Spring Boot + PostgreSQL，部署於 GCP。"
+      },
+      "data": {
+        "title": "資料整合",
+        "desc": "自動爬取並同步官方冠軍賽名單、招式、屬性等資料。"
+      },
+      "launch": {
+        "title": "正式上線",
+        "desc": "持續優化 UI 與效能，為訓練家提供最佳查詢體驗。"
+      }
     },
     "thanks": "特別感謝",
     "thanksText": "感謝所有寶可夢訓練家的支持與回饋，以及 PokeAPI、官方冠軍賽資料的公開。",
@@ -446,8 +463,20 @@
   },
   "natureGrid": {
     "title": "選擇性格",
-    "headerDec": ["攻擊", "防禦", "特攻", "特防", "速度"],
-    "headerInc": ["攻擊", "防禦", "特攻", "特防", "速度"]
+    "headerDec": [
+      "攻擊",
+      "防禦",
+      "特攻",
+      "特防",
+      "速度"
+    ],
+    "headerInc": [
+      "攻擊",
+      "防禦",
+      "特攻",
+      "特防",
+      "速度"
+    ]
   },
   "routes": {
     "home": {
@@ -505,6 +534,10 @@
     "teamDetail": {
       "title": "隊伍詳情 — Poké Champions",
       "description": "查看分享隊伍的詳細成員配置與能力值。"
+    },
+    "quickLookup": {
+      "title": "快速檢索 — Poké Champions",
+      "description": "用屬性快速篩選寶可夢，直接查看 4× 與 2× 弱點，快速確認怕咩屬性。"
     }
   },
   "speedTiers": {
@@ -605,5 +638,21 @@
     "zh-TW": "繁體中文",
     "en": "English",
     "ja": "日本語"
+  },
+  "quickLookup": {
+    "title": "快速檢索",
+    "subtitle": "上方可按屬性快速篩選（最多 2 個），下方表格直接列出每隻寶可夢的 4×／2× 弱點。",
+    "searchPlaceholder": "搜尋寶可夢名稱、圖鑑編號...",
+    "hint": "最多選 2 個屬性；選 2 個時會篩選對應雙屬性寶可夢。",
+    "selectedCount": "已選 {count}/2",
+    "clearFilters": "清除篩選",
+    "colPokemon": "寶可夢",
+    "colQuadWeak": "4× 弱點",
+    "colWeak": "2× 弱點",
+    "noQuadWeak": "—",
+    "noWeak": "無弱點",
+    "none": "無",
+    "empty": "沒有找到符合條件的寶可夢",
+    "loadError": "無法載入快速檢索資料，請稍後再試"
   }
 }

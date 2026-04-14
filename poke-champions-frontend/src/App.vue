@@ -42,7 +42,8 @@ const isToolsNavActive = computed(() => {
     p.startsWith('/types') ||
     p.startsWith('/speed-tiers') ||
     p.startsWith('/speed-compare') ||
-    p.startsWith('/damage-calc')
+    p.startsWith('/damage-calc') ||
+    p.startsWith('/quick-lookup')
   )
 })
 
@@ -64,6 +65,7 @@ const teamNavChildren = computed(() => {
 
 const toolsNavChildren = computed(() => [
   { name: t('nav.types'), path: localePath('/types'), icon: 'shield' },
+  { name: t('nav.quickLookup'), path: localePath('/quick-lookup'), icon: 'search' },
   { name: t('nav.speedTiers'), path: localePath('/speed-tiers'), icon: 'speed' },
   { name: t('nav.speedCompare'), path: localePath('/speed-compare'), icon: 'compare_arrows' },
   { name: t('nav.damageCalc'), path: localePath('/damage-calc'), icon: 'calculate' },
