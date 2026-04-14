@@ -8,7 +8,9 @@
     "teams": "隊伍探索",
     "teamMenu": "隊伍",
     "toolsMenu": "屬性與工具",
-    "speedTiers": "速度線"
+    "speedTiers": "速度線",
+    "speedCompare": "速度比較",
+    "damageCalc": "傷害計算"
   },
   "common": {
     "loading": "載入中",
@@ -28,6 +30,146 @@
     "subtitle": "寶可夢冠軍賽資料查詢工具",
     "about": "關於製作者",
     "privacy": "隱私權政策"
+  },
+  "changelog": {
+    "title": "更新紀錄",
+    "bellAria": "開啟更新紀錄",
+    "panelHint": "最新版本列於最上方。點開此面板後，小紅點會視為已讀。",
+    "badgeNew": "最新",
+    "versions": [
+      {
+        "version": "v1.2.0",
+        "headline": "對戰小工具",
+        "date": "2026-04-14",
+        "items": [
+          "新增速度比較器：我方與敵方各 6 格，並排比較無努力／滿速／急速",
+          "新增傷害計算器：冠軍賽 Lv.50、性格與 66 努力、屬性倍率與 STAB（MVP）"
+        ]
+      },
+      {
+        "version": "v1.1.0",
+        "headline": "隊伍分享與速度線",
+        "date": "2026-04-14",
+        "items": [
+          "新增隊伍分享功能",
+          "新增速度線資料"
+        ]
+      },
+      {
+        "version": "v1.0.2",
+        "headline": "組隊匯出",
+        "date": "2026-04-13",
+        "items": [
+          "組隊頁面支援匯出 PS（Pokémon Showdown）格式文檔"
+        ]
+      },
+      {
+        "version": "v1.0.1",
+        "headline": "網站上線",
+        "date": "2026-04-12",
+        "items": [
+          "詳細的寶可夢資料庫查詢",
+          "直覺好用的線上組隊工具"
+        ]
+      }
+    ]
+  },
+  "speedCompare": {
+    "title": "速度比較",
+    "subtitle": "左側為我方、右側為對手，各選最多 6 隻（含 Mega 形態）；下方表格依速度線頁相同方式計算並排序。",
+    "formulaNote": "與「速度線」頁一致：無努力 = 種族值+20、滿速 = 種族值+52、急速 = floor(滿速×1.1)；僅使用已同步種族速度的名冊資料。",
+    "allyTitle": "我方（6）",
+    "foeTitle": "對手（6）",
+    "slotEmpty": "位置 {n}",
+    "resultTitle": "速度比較結果",
+    "sortBy": "排序依據",
+    "sortExtreme": "急速",
+    "sortMax": "滿速",
+    "sortNoEv": "無努力",
+    "sortBase": "種族速度",
+    "colSide": "陣營",
+    "colPokemon": "寶可夢",
+    "colBase": "種族速度",
+    "colNoEv": "無努力",
+    "colMax": "滿速",
+    "colExtreme": "急速",
+    "colBar": "相對極速",
+    "sideAlly": "我方",
+    "sideFoe": "對手",
+    "emptyHint": "請至少在我方或對手擇一填入寶可夢（需已同步種族速度）。",
+    "pickerTitle": "選擇寶可夢"
+  },
+  "damageCalc": {
+    "title": "傷害計算",
+    "subtitle": "冠軍賽對戰環境 Lv.50：含特性、天候、場地、壁、道具、能力等級、擊中要害、狀態異常、隱形岩。",
+    "attacker": "攻擊側",
+    "defender": "防御側",
+    "selectPokemon": "選擇寶可夢",
+    "selectMove": "選擇招式",
+    "megaForm": "形態（含 Mega）",
+    "swap": "交換攻守",
+    "evPoints": "能力點數 {used}/{total}",
+    "rank": "能力等級",
+    "atkAbilityTitle": "特性",
+    "atkAbilityHugePower": "大力士 / 瑜伽之力 ×2物攻",
+    "atkAbilityAdaptability": "適應力 STAB→×2",
+    "atkAbilityToughClaws": "硬爪 ×1.3",
+    "atkAbilitySheerForce": "強行 ×1.3",
+    "atkAbilityAte": "~ate 系（精靈皮膚等）×1.2",
+    "defAbilityTitle": "特性",
+    "defAbilityMultiscale": "多重鱗片 ×0.5",
+    "defAbilityFurCoat": "毛皮大衣 ×0.5物",
+    "defAbilityIceScales": "冰鱗粉 ×0.5特",
+    "defAbilitySolidRock": "堅硬岩石 / 過濾 ×0.75抗",
+    "defAbilityThickFat": "厚脂肪 ×0.5火冰",
+    "weatherTitle": "天候",
+    "weatherSun": "晴",
+    "weatherRain": "雨",
+    "weatherSand": "砂",
+    "weatherSnow": "雪",
+    "terrainTitle": "場地",
+    "terrainElectric": "電氣",
+    "terrainGrassy": "青草",
+    "terrainPsychic": "精神",
+    "terrainMisty": "薄霧",
+    "critTitle": "擊中要害",
+    "crit": "擊中要害 ×1.5",
+    "statusTitle": "狀態異常",
+    "statusNone": "無",
+    "statusBurn": "燒傷",
+    "statusPoison": "中毒",
+    "statusParalyze": "麻痺",
+    "statusSleep": "睡眠",
+    "statusFreeze": "冰凍",
+    "screenTitle": "壁",
+    "screenReflect": "反射壁",
+    "screenLightScreen": "光牆",
+    "screenAuroraVeil": "極光幕",
+    "spread": "全體技 (×0.75)",
+    "doubleScreen": "雙打壁 (×2/3)",
+    "itemTitle": "道具",
+    "itemLifeOrb": "生命寶珠 ×1.3",
+    "itemChoiceBand": "講究頭帶 ×1.5物",
+    "itemChoiceSpecs": "講究眼鏡 ×1.5特",
+    "itemExpertBelt": "達人帶 ×1.2抗",
+    "defItemAssaultVest": "突擊背心 特防×1.5",
+    "defItemEviolite": "進化奇石 防禦×1.5",
+    "hazardTitle": "隱形岩",
+    "stealthRock": "隱形岩",
+    "srResult": "隱形岩傷害：{dmg}（{pct}% HP）",
+    "resultTitle": "估算結果",
+    "damageRange": "傷害區間（最小—最大）",
+    "hpPercent": "約佔對手 HP：{min}% — {max}%",
+    "metaStab": "STAB",
+    "metaType": "屬性效果",
+    "metaOther": "變因倍率",
+    "metaAtk": "使用能力（攻／特攻）",
+    "metaDef": "對應防禦（物防／特防）",
+    "metaHp": "對手 HP",
+    "noDamage": "此招式無法計算威力傷害（變化技或威力資料缺失）。",
+    "needAll": "請選擇攻擊方、防禦方寶可夢與一招可計算威力的招式。",
+    "noLearnableMoves": "尚無可學招式資料，請稍後再試或更換寶可夢。",
+    "defEvHint": "依攻擊方招式類型，自動對應{stat}"
   },
   "pokemon": {
     "types": {
@@ -111,6 +253,14 @@
       "speedTiers": {
         "title": "速度線",
         "desc": "Lv.50 無努力／滿速／急速數值，以及天氣下速度翻倍寶可夢參考表"
+      },
+      "speedCompare": {
+        "title": "速度比較",
+        "desc": "同時配置我方與對手各 6 隻，對照速度線相同假設下的極速與排序"
+      },
+      "damageCalc": {
+        "title": "傷害計算",
+        "desc": "攻擊方與防禦方 Lv.50 能力、選招後估算傷害區間與 HP 占比（MVP）"
       },
       "teamBuilder": {
         "title": "隊伍組建",
@@ -315,6 +465,14 @@
     "speedTiers": {
       "title": "速度線 — Poké Champions",
       "description": "冠軍賽 Lv.50 速度線：無努力、滿速、急速（性格修正）與常見天氣／場地加速寶可夢參考。"
+    },
+    "speedCompare": {
+      "title": "速度比較 — Poké Champions",
+      "description": "我方與敵方各 6 隻寶可夢的速度並排比較，採與速度線頁相同的簡化假設。"
+    },
+    "damageCalc": {
+      "title": "傷害計算 — Poké Champions",
+      "description": "冠軍賽 Lv.50 雙向傷害估算：性格、努力值、屬性克制與 STAB（不含道具特性等進階係數）。"
     },
     "teamBuilder": {
       "title": "隊伍組建 — Poké Champions",

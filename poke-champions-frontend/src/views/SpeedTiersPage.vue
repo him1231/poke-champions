@@ -5,45 +5,12 @@ import { pokemonRosterApi } from '../api/pokemonRoster'
 import { getPokemonImageUrl } from '../utils/pokemonImage'
 import { localizedName } from '../utils/localizedName'
 import { typeBadgeClasses } from '../utils/pokemonTypesDisplay'
+import { calcSpeeds, calcDoubled, tierIndexByBase } from '../utils/speedTiersCalc'
 
 const { t } = useI18n()
 
 const loading = ref(true)
 const pokemonList = ref([])
-
-function calcSpeeds(baseSpd) {
-  const b = Number(baseSpd) || 0
-  const noEv = b + 20
-  const maxSpd = b + 52
-  const extreme = Math.floor(maxSpd * 1.1)
-  return { base: b, noEv, maxSpd, extreme }
-}
-
-function calcDoubled(baseSpd) {
-  const { maxSpd } = calcSpeeds(baseSpd)
-  return {
-    maxDoubled: maxSpd * 2,
-    /** 與常見表：先滿速×2 再算 +速度性格（floor(滿速×2×1.1)） */
-    extremeDoubled: Math.floor(maxSpd * 2 * 1.1),
-  }
-}
-
-/**
- * 與常見「速度線速查表」一致：分組依「種族速度」區間，而非計算後的急速值。
- * 例：種族速度 61 的班基拉斯歸在 60–69，而非依急速 124 歸在 110–119。
- */
-function tierIndexByBase(baseSpd) {
-  const b = Number(baseSpd) || 0
-  if (b >= 120) return 0
-  if (b >= 110) return 1
-  if (b >= 100) return 2
-  if (b >= 90) return 3
-  if (b >= 80) return 4
-  if (b >= 70) return 5
-  if (b >= 60) return 6
-  if (b >= 42) return 7
-  return 8
-}
 
 const TIER_KEYS = [
   't120',

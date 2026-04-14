@@ -147,6 +147,64 @@
     <priority>0.75</priority>
   </url>
 
+  <!-- Speed compare -->
+  <url>
+    <loc>https://victorpoke-champions.com/zh-TW/speed-compare</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/speed-compare"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/speed-compare"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/speed-compare"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/speed-compare"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/en/speed-compare</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/speed-compare"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/speed-compare"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/speed-compare"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/speed-compare"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/ja/speed-compare</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/speed-compare"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/speed-compare"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/speed-compare"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/speed-compare"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+
+  <!-- Damage calculator -->
+  <url>
+    <loc>https://victorpoke-champions.com/zh-TW/damage-calc</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/damage-calc"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/damage-calc"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/damage-calc"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/damage-calc"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/en/damage-calc</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/damage-calc"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/damage-calc"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/damage-calc"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/damage-calc"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/ja/damage-calc</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/damage-calc"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/damage-calc"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/damage-calc"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/damage-calc"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+
   <!-- Team Builder -->
   <url>
     <loc>https://victorpoke-champions.com/zh-TW/team-builder</loc>
@@ -174,6 +232,64 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/team-builder"/>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+
+  <!-- Team Overview -->
+  <url>
+    <loc>https://victorpoke-champions.com/zh-TW/team-overview</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/team-overview"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/team-overview"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/team-overview"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/team-overview"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/en/team-overview</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/team-overview"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/team-overview"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/team-overview"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/team-overview"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/ja/team-overview</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/team-overview"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/team-overview"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/team-overview"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/team-overview"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+
+  <!-- Public team list -->
+  <url>
+    <loc>https://victorpoke-champions.com/zh-TW/teams</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/teams"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/teams"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/teams"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/teams"/>
+    <changefreq>daily</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/en/teams</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/teams"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/teams"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/teams"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/teams"/>
+    <changefreq>daily</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://victorpoke-champions.com/ja/teams</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://victorpoke-champions.com/zh-TW/teams"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://victorpoke-champions.com/en/teams"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://victorpoke-champions.com/ja/teams"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://victorpoke-champions.com/en/teams"/>
+    <changefreq>daily</changefreq>
+    <priority>0.72</priority>
   </url>
 
   <!-- About -->

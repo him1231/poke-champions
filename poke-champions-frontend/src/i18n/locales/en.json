@@ -8,7 +8,9 @@
     "teams": "Team browser",
     "teamMenu": "Teams",
     "toolsMenu": "Types & tools",
-    "speedTiers": "Speed tiers"
+    "speedTiers": "Speed tiers",
+    "speedCompare": "Speed compare",
+    "damageCalc": "Damage calc"
   },
   "common": {
     "loading": "Loading",
@@ -28,6 +30,146 @@
     "subtitle": "Pokémon Champions data lookup tool",
     "about": "About",
     "privacy": "Privacy Policy"
+  },
+  "changelog": {
+    "title": "Release notes",
+    "bellAria": "Open release notes",
+    "panelHint": "Newest release at the top. Opening this panel marks updates as read.",
+    "badgeNew": "New",
+    "versions": [
+      {
+        "version": "v1.2.0",
+        "headline": "Battle utilities",
+        "date": "2026-04-14",
+        "items": [
+          "Speed compare: your team vs opponent (6+6) with no-EV / max Speed / +Spe nature columns",
+          "Damage calculator: Lv.50, nature & 66 EVs, type chart & STAB (MVP, no items/abilities yet)"
+        ]
+      },
+      {
+        "version": "v1.1.0",
+        "headline": "Team sharing & speed tiers",
+        "date": "2026-04-14",
+        "items": [
+          "Team sharing",
+          "Speed tier reference data"
+        ]
+      },
+      {
+        "version": "v1.0.2",
+        "headline": "Team export",
+        "date": "2026-04-13",
+        "items": [
+          "Team Builder: export teams as Pokémon Showdown (PS) paste format"
+        ]
+      },
+      {
+        "version": "v1.0.1",
+        "headline": "Site launch",
+        "date": "2026-04-12",
+        "items": [
+          "In-depth Pokémon database lookup",
+          "Intuitive online team builder"
+        ]
+      }
+    ]
+  },
+  "speedCompare": {
+    "title": "Speed compare",
+    "subtitle": "Your side vs opponent, up to six each (including Mega forms); the table uses the same speed-tier assumptions and sorts results.",
+    "formulaNote": "Same as Speed tiers: no EV = base+20, max Speed = base+52, +Speed nature = floor(max×1.1). Only Pokémon with synced base Speed are listed.",
+    "allyTitle": "Your team (6)",
+    "foeTitle": "Opponent (6)",
+    "slotEmpty": "Slot {n}",
+    "resultTitle": "Comparison",
+    "sortBy": "Sort by",
+    "sortExtreme": "+Speed nature",
+    "sortMax": "Max Speed",
+    "sortNoEv": "No EVs",
+    "sortBase": "Base Speed",
+    "colSide": "Side",
+    "colPokemon": "Pokémon",
+    "colBase": "Base Speed",
+    "colNoEv": "No EV",
+    "colMax": "Max Spd",
+    "colExtreme": "+Spe",
+    "colBar": "Relative",
+    "sideAlly": "Yours",
+    "sideFoe": "Foe",
+    "emptyHint": "Pick at least one Pokémon on either side (requires synced base Speed in the roster).",
+    "pickerTitle": "Choose Pokémon"
+  },
+  "damageCalc": {
+    "title": "Damage Calculator",
+    "subtitle": "Champions Lv.50 battle: abilities, weather, terrain, screens, items, rank, crit, status, Stealth Rock.",
+    "attacker": "Attacker",
+    "defender": "Defender",
+    "selectPokemon": "Select Pokémon",
+    "selectMove": "Select move",
+    "megaForm": "Form (incl. Mega)",
+    "swap": "Swap sides",
+    "evPoints": "Effort points {used}/{total}",
+    "rank": "Rank",
+    "atkAbilityTitle": "Ability",
+    "atkAbilityHugePower": "Huge / Pure Power ×2 Phys",
+    "atkAbilityAdaptability": "Adaptability STAB→×2",
+    "atkAbilityToughClaws": "Tough Claws ×1.3",
+    "atkAbilitySheerForce": "Sheer Force ×1.3",
+    "atkAbilityAte": "-ate (Pixilate etc.) ×1.2",
+    "defAbilityTitle": "Ability",
+    "defAbilityMultiscale": "Multiscale ×0.5",
+    "defAbilityFurCoat": "Fur Coat ×0.5 Phys",
+    "defAbilityIceScales": "Ice Scales ×0.5 Spec",
+    "defAbilitySolidRock": "Solid Rock / Filter ×0.75 SE",
+    "defAbilityThickFat": "Thick Fat ×0.5 Fire/Ice",
+    "weatherTitle": "Weather",
+    "weatherSun": "Sun",
+    "weatherRain": "Rain",
+    "weatherSand": "Sand",
+    "weatherSnow": "Snow",
+    "terrainTitle": "Terrain",
+    "terrainElectric": "Electric",
+    "terrainGrassy": "Grassy",
+    "terrainPsychic": "Psychic",
+    "terrainMisty": "Misty",
+    "critTitle": "Critical hit",
+    "crit": "Crit ×1.5",
+    "statusTitle": "Status condition",
+    "statusNone": "None",
+    "statusBurn": "Burn",
+    "statusPoison": "Poison",
+    "statusParalyze": "Paralyze",
+    "statusSleep": "Sleep",
+    "statusFreeze": "Freeze",
+    "screenTitle": "Screens",
+    "screenReflect": "Reflect",
+    "screenLightScreen": "Light Screen",
+    "screenAuroraVeil": "Aurora Veil",
+    "spread": "Spread (×0.75)",
+    "doubleScreen": "Doubles screen (×2/3)",
+    "itemTitle": "Item",
+    "itemLifeOrb": "Life Orb ×1.3",
+    "itemChoiceBand": "Choice Band ×1.5 Phys",
+    "itemChoiceSpecs": "Choice Specs ×1.5 Spec",
+    "itemExpertBelt": "Expert Belt ×1.2 SE",
+    "defItemAssaultVest": "Assault Vest SpD ×1.5",
+    "defItemEviolite": "Eviolite Def ×1.5",
+    "hazardTitle": "Stealth Rock",
+    "stealthRock": "Stealth Rock",
+    "srResult": "Stealth Rock: {dmg} ({pct}% HP)",
+    "resultTitle": "Estimate",
+    "damageRange": "Damage range (min — max)",
+    "hpPercent": "Roughly {min}% — {max}% of defender HP",
+    "metaStab": "STAB",
+    "metaType": "Type mult.",
+    "metaOther": "Modifier mult.",
+    "metaAtk": "Atk / Sp. Atk used",
+    "metaDef": "Def / Sp. Def used",
+    "metaHp": "Defender HP",
+    "noDamage": "This move cannot be scored (status or missing power).",
+    "needAll": "Choose attacker, defender, and a damaging move.",
+    "noLearnableMoves": "No learnset data yet—try another Pokémon or try again later.",
+    "defEvHint": "Auto-matched to {stat} based on move category"
   },
   "pokemon": {
     "types": {
@@ -111,6 +253,14 @@
       "speedTiers": {
         "title": "Speed Tiers",
         "desc": "Lv.50 benchmarks: no EVs, max Speed, +Spe nature, plus weather speed-doubling reference"
+      },
+      "speedCompare": {
+        "title": "Speed compare",
+        "desc": "Line up to six Pokémon on each side and compare speeds using the same assumptions as Speed tiers"
+      },
+      "damageCalc": {
+        "title": "Damage calculator",
+        "desc": "Two-sided Lv.50 damage ranges with nature, EVs, type chart, and STAB (MVP)"
       },
       "teamBuilder": {
         "title": "Team Builder",
@@ -315,6 +465,14 @@
     "speedTiers": {
       "title": "Speed Tiers — Poké Champions",
       "description": "Lv.50 speed benchmarks (no EVs, max Speed, +Speed nature) and common doubled-speed Pokémon in weather."
+    },
+    "speedCompare": {
+      "title": "Speed compare — Poké Champions",
+      "description": "Compare speeds for up to six Pokémon on your side and six on the opponent’s, using the same assumptions as Speed tiers."
+    },
+    "damageCalc": {
+      "title": "Damage calculator — Poké Champions",
+      "description": "Champions Lv.50 two-sided damage estimates: nature, EVs, type matchups, and STAB (MVP; no items or abilities yet)."
     },
     "teamBuilder": {
       "title": "Team Builder — Poké Champions",

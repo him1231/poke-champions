@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 import { setLocale, SUPPORTED_LOCALES } from './i18n'
 import { useLocalePath } from './composables/useLocalePath'
+import ChangelogBell from './components/ChangelogBell.vue'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -36,7 +37,12 @@ const isTeamNavActive = computed(() => {
 
 const isToolsNavActive = computed(() => {
   const p = pathTail.value
-  return p.startsWith('/types') || p.startsWith('/speed-tiers')
+  return (
+    p.startsWith('/types') ||
+    p.startsWith('/speed-tiers') ||
+    p.startsWith('/speed-compare') ||
+    p.startsWith('/damage-calc')
+  )
 })
 
 const simpleNav = computed(() => [
@@ -53,6 +59,8 @@ const teamNavChildren = computed(() => [
 const toolsNavChildren = computed(() => [
   { name: t('nav.types'), path: localePath('/types'), icon: 'shield' },
   { name: t('nav.speedTiers'), path: localePath('/speed-tiers'), icon: 'speed' },
+  { name: t('nav.speedCompare'), path: localePath('/speed-compare'), icon: 'compare_arrows' },
+  { name: t('nav.damageCalc'), path: localePath('/damage-calc'), icon: 'calculate' },
 ])
 
 const footerLinks = computed(() => [
@@ -177,9 +185,12 @@ onUnmounted(() => document.removeEventListener('mousedown', onGlobalPointerDown)
           </div>
         </nav>
 
-        <select :value="locale" @change="switchLocale($event.target.value)" class="lang-select">
+        <div class="nav-actions">
+          <ChangelogBell @panel-open="closeMenus" />
+          <select :value="locale" @change="switchLocale($event.target.value)" class="lang-select">
           <option v-for="loc in SUPPORTED_LOCALES" :key="loc" :value="loc">{{ t(`langSwitcher.${loc}`) }}</option>
         </select>
+        </div>
 
         <button type="button" class="menu-toggle" :aria-label="t('common.close')" @click="mobileMenuOpen = !mobileMenuOpen">
           <span class="hamburger" :class="{ open: mobileMenuOpen }"></span>
@@ -388,6 +399,13 @@ onUnmounted(() => document.removeEventListener('mousedown', onGlobalPointerDown)
 .nav-dropdown-link.router-link-active {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .lang-select {

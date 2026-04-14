@@ -65,6 +65,22 @@ const features = computed(() => [
     iconColor: '#62bc5a',
   },
   {
+    icon: 'compare_arrows',
+    title: t('home.feature.speedCompare.title'),
+    desc: t('home.feature.speedCompare.desc'),
+    link: localePath('/speed-compare'),
+    gradient: 'linear-gradient(135deg, rgba(74, 144, 217, 0.15), rgba(98, 188, 90, 0.1))',
+    iconColor: '#4a90d9',
+  },
+  {
+    icon: 'calculate',
+    title: t('home.feature.damageCalc.title'),
+    desc: t('home.feature.damageCalc.desc'),
+    link: localePath('/damage-calc'),
+    gradient: 'linear-gradient(135deg, rgba(230, 83, 79, 0.12), rgba(171, 106, 200, 0.12))',
+    iconColor: '#e55353',
+  },
+  {
     icon: 'groups',
     title: t('home.feature.teamBuilder.title'),
     desc: t('home.feature.teamBuilder.desc'),

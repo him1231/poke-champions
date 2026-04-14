@@ -8,7 +8,9 @@
     "teams": "チーム探索",
     "teamMenu": "チーム",
     "toolsMenu": "タイプ・ツール",
-    "speedTiers": "素早さの指標"
+    "speedTiers": "素早さの指標",
+    "speedCompare": "素早さ比較",
+    "damageCalc": "ダメージ計算"
   },
   "common": {
     "loading": "読み込み中",
@@ -28,6 +30,146 @@
     "subtitle": "ポケモンチャンピオンズ データ検索ツール",
     "about": "開発者について",
     "privacy": "プライバシーポリシー"
+  },
+  "changelog": {
+    "title": "更新履歴",
+    "bellAria": "更新履歴を開く",
+    "panelHint": "新しいバージョンが上に表示されます。パネルを開くと未読バッジが消えます。",
+    "badgeNew": "最新",
+    "versions": [
+      {
+        "version": "v1.2.0",
+        "headline": "対戦ツール",
+        "date": "2026-04-14",
+        "items": [
+          "素早さ比較：手持ち6体と相手6体を並べ、無努力／フル素早さ／プラス性格を比較",
+          "ダメージ計算：Lv.50・性格と努力66・タイプ相性とSTAB（MVP、道具・特性などは未対応）"
+        ]
+      },
+      {
+        "version": "v1.1.0",
+        "headline": "チーム共有と素早さ",
+        "date": "2026-04-14",
+        "items": [
+          "チーム共有機能を追加",
+          "素早さの指標データを追加"
+        ]
+      },
+      {
+        "version": "v1.0.2",
+        "headline": "チーム書き出し",
+        "date": "2026-04-13",
+        "items": [
+          "チーム編成ページで Pokémon Showdown（PS）形式のテキストを書き出し可能に"
+        ]
+      },
+      {
+        "version": "v1.0.1",
+        "headline": "サイト公開",
+        "date": "2026-04-12",
+        "items": [
+          "詳細なポケモンデータベース検索",
+          "直感的なオンラインチーム編成ツール"
+        ]
+      }
+    ]
+  },
+  "speedCompare": {
+    "title": "素早さ比較",
+    "subtitle": "左が自分、右が相手。最大6体ずつ（メガを含む）選び、素早さの指標ページと同じ前提で並べ替え表示します。",
+    "formulaNote": "「素早さの指標」と同じ式です。種族値が同期済みのポケモンのみ集計されます。",
+    "allyTitle": "自分側（6）",
+    "foeTitle": "相手側（6）",
+    "slotEmpty": "スロット {n}",
+    "resultTitle": "比較結果",
+    "sortBy": "並べ替え",
+    "sortExtreme": "プラス性格",
+    "sortMax": "フル素早さ",
+    "sortNoEv": "無努力",
+    "sortBase": "種族値",
+    "colSide": "側",
+    "colPokemon": "ポケモン",
+    "colBase": "種族値",
+    "colNoEv": "無努力",
+    "colMax": "フル",
+    "colExtreme": "プラス",
+    "colBar": "相対",
+    "sideAlly": "自分",
+    "sideFoe": "相手",
+    "emptyHint": "どちらかにポケモンを選ぶと表示されます（種族値の素早さが同期済みのもの）。",
+    "pickerTitle": "ポケモンを選ぶ"
+  },
+  "damageCalc": {
+    "title": "ダメージ計算",
+    "subtitle": "チャンピオンズ Lv.50 対戦：特性・天候・フィールド・壁・道具・ランク・急所・状態異常・ステルスロック対応。",
+    "attacker": "攻撃側",
+    "defender": "防御側",
+    "selectPokemon": "ポケモンを選ぶ",
+    "selectMove": "技を選ぶ",
+    "megaForm": "フォルム（メガ含む）",
+    "swap": "入れ替え",
+    "evPoints": "能力ポイント {used}/{total}",
+    "rank": "ランク",
+    "atkAbilityTitle": "とくせい",
+    "atkAbilityHugePower": "ちからもち / ヨガパワー ×2物理",
+    "atkAbilityAdaptability": "てきおうりょく STAB→×2",
+    "atkAbilityToughClaws": "かたいツメ ×1.3",
+    "atkAbilitySheerForce": "ちからずく ×1.3",
+    "atkAbilityAte": "~スキン系（フェアリースキン等）×1.2",
+    "defAbilityTitle": "とくせい",
+    "defAbilityMultiscale": "マルチスケイル ×0.5",
+    "defAbilityFurCoat": "ファーコート ×0.5物理",
+    "defAbilityIceScales": "こおりのりんぷん ×0.5特殊",
+    "defAbilitySolidRock": "ハードロック / フィルター ×0.75効果抜群",
+    "defAbilityThickFat": "あついしぼう ×0.5ほのお・こおり",
+    "weatherTitle": "天候",
+    "weatherSun": "晴",
+    "weatherRain": "雨",
+    "weatherSand": "砂",
+    "weatherSnow": "雪",
+    "terrainTitle": "フィールド",
+    "terrainElectric": "エレキ",
+    "terrainGrassy": "グラス",
+    "terrainPsychic": "サイコ",
+    "terrainMisty": "ミスト",
+    "critTitle": "急所",
+    "crit": "急所 ×1.5",
+    "statusTitle": "状態異常",
+    "statusNone": "なし",
+    "statusBurn": "やけど",
+    "statusPoison": "どく",
+    "statusParalyze": "まひ",
+    "statusSleep": "ねむり",
+    "statusFreeze": "こおり",
+    "screenTitle": "壁",
+    "screenReflect": "リフレクター",
+    "screenLightScreen": "ひかりのかべ",
+    "screenAuroraVeil": "オーロラベール",
+    "spread": "全体技 (×0.75)",
+    "doubleScreen": "ダブル戦壁 (×2/3)",
+    "itemTitle": "持ち物",
+    "itemLifeOrb": "いのちのたま ×1.3",
+    "itemChoiceBand": "こだわりハチマキ ×1.5物理",
+    "itemChoiceSpecs": "こだわりメガネ ×1.5特殊",
+    "itemExpertBelt": "たつじんのおび ×1.2効果抜群",
+    "defItemAssaultVest": "とつげきチョッキ とくぼう×1.5",
+    "defItemEviolite": "しんかのきせき 防御×1.5",
+    "hazardTitle": "ステルスロック",
+    "stealthRock": "ステルスロック",
+    "srResult": "ステルスロック：{dmg}（{pct}% HP）",
+    "resultTitle": "推定ダメージ",
+    "damageRange": "ダメージ幅（最小—最大）",
+    "hpPercent": "相手のHPに対する目安：{min}% — {max}%",
+    "metaStab": "STAB",
+    "metaType": "タイプ倍率",
+    "metaOther": "変動倍率",
+    "metaAtk": "使用した攻／特攻",
+    "metaDef": "参照した防／特防",
+    "metaHp": "相手のHP",
+    "noDamage": "この技は威力計算の対象外です（変化技など）。",
+    "needAll": "攻撃側・防御側と、威力のある技を選んでください。",
+    "noLearnableMoves": "習得技データがありません。別のポケモンを選ぶか、しばらくしてからお試しください。",
+    "defEvHint": "技の分類に応じて{stat}を自動適用"
   },
   "pokemon": {
     "types": {
@@ -111,6 +253,14 @@
       "speedTiers": {
         "title": "速度線",
         "desc": "Lv.50 の無努力・満速・急速と、天気で速度が2倍になるポケモンの参考表"
+      },
+      "speedCompare": {
+        "title": "素早さ比較",
+        "desc": "自分と相手それぞれ最大6体を並べ、素早さの指標と同じ前提で比較"
+      },
+      "damageCalc": {
+        "title": "ダメージ計算",
+        "desc": "Lv.50 攻防のダメージ幅を、性格・努力値・タイプ相性・STAB で試算（MVP）"
       },
       "teamBuilder": {
         "title": "チーム編成",
@@ -315,6 +465,14 @@
     "speedTiers": {
       "title": "速度線 — Poké Champions",
       "description": "チャンピオンズ Lv.50 の無努力・満速・急速（性格補正）と天気加速ポケモンの目安。"
+    },
+    "speedCompare": {
+      "title": "素早さ比較 — Poké Champions",
+      "description": "手持ち6体と相手6体の素早さを、速度線ページと同じ簡易前提で並べて比較。"
+    },
+    "damageCalc": {
+      "title": "ダメージ計算 — Poké Champions",
+      "description": "チャンピオンズ Lv.50 の攻防ダメージを、性格・努力値・タイプ相性・STAB で推定（MVP）。"
     },
     "teamBuilder": {
       "title": "チーム編成 — Poké Champions",
