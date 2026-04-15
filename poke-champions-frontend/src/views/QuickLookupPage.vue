@@ -23,6 +23,7 @@ const search = ref('')
 const selectedTypes = ref([])
 const pinnedPokemon = ref(loadPinnedPokemon())
 const abilitiesByPokemon = ref({})
+const activeAbilityTooltip = ref(null)
 
 function loadPinnedPokemon() {
   try {
@@ -274,6 +275,43 @@ const multiplierColumns = computed(() => {
     .sort((a, b) => a - b)
     .map((value) => ({ key: String(value), value, label: multiplierLabel(value) }))
 })
+
+function showAbilityTooltip(ability, event) {
+  const description = localizedDescription(ability)
+  if (!description) return
+
+  const title = localizedName(ability) || ability?.displayName || ability?.name || ''
+  const horizontalPadding = 180
+  const x = Math.min(window.innerWidth - horizontalPadding, Math.max(horizontalPadding, event.clientX))
+  const placeBelow = event.clientY < 160
+
+  activeAbilityTooltip.value = {
+    title,
+    description,
+    x,
+    y: event.clientY,
+    placeBelow,
+  }
+}
+
+function moveAbilityTooltip(event) {
+  if (!activeAbilityTooltip.value) return
+
+  const horizontalPadding = 180
+  const x = Math.min(window.innerWidth - horizontalPadding, Math.max(horizontalPadding, event.clientX))
+  const placeBelow = event.clientY < 160
+
+  activeAbilityTooltip.value = {
+    ...activeAbilityTooltip.value,
+    x,
+    y: event.clientY,
+    placeBelow,
+  }
+}
+
+function hideAbilityTooltip() {
+  activeAbilityTooltip.value = null
+}
 </script>
 
 <template>
@@ -374,9 +412,11 @@ const multiplierColumns = computed(() => {
                     v-for="(ab, idx) in row.abilityObjs"
                     :key="(ab && (ab.name || ab.displayName || ab.chineseName)) ? (ab.name || ab.displayName || ab.chineseName) + '-' + idx : idx"
                     class="ability-chip"
+                    @mouseenter="showAbilityTooltip(ab, $event)"
+                    @mousemove="moveAbilityTooltip($event)"
+                    @mouseleave="hideAbilityTooltip"
                   >
                     <span class="ability-name">{{ localizedName(ab) || ab.displayName || ab.name }}</span>
-                    <span v-if="localizedDescription(ab)" class="ability-tooltip">{{ localizedDescription(ab) }}</span>
                   </div>
                   <template v-if="!row.abilityObjs.length">
                     <span class="ability-placeholder">{{ t('quickLookup.noAbilityInfo') }}</span>
@@ -406,6 +446,21 @@ const multiplierColumns = computed(() => {
         <p>{{ t('quickLookup.empty') }}</p>
       </div>
     </template>
+
+    <Teleport to="body">
+      <div
+        v-if="activeAbilityTooltip"
+        class="ability-hover-tooltip"
+        :class="{ 'is-below': activeAbilityTooltip.placeBelow }"
+        :style="{
+          left: `${activeAbilityTooltip.x}px`,
+          top: `${activeAbilityTooltip.y}px`,
+        }"
+      >
+        <div class="ability-hover-tooltip-title">{{ activeAbilityTooltip.title }}</div>
+        <div class="ability-hover-tooltip-desc">{{ activeAbilityTooltip.description }}</div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -614,7 +669,9 @@ const multiplierColumns = computed(() => {
 .type-tab.fairy { background: linear-gradient(135deg, var(--type-fairy), #d070d0); }
 
 .table-wrap {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 90dvh;
+  scrollbar-width: none;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-card);
@@ -641,7 +698,7 @@ const multiplierColumns = computed(() => {
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-primary);
   white-space: nowrap;
 }
 
@@ -657,11 +714,11 @@ const multiplierColumns = computed(() => {
 
 .quick-table td:first-child {
   z-index: 10;
-  background: var(--bg-card);
+  background: var(--bg-primary);
 }
 
 .quick-table tbody tr.pinned td:first-child {
-  background: rgba(255, 196, 0, 0.05);
+  background: var(--bg-primary);
 }
 
 .quick-table tbody tr:last-child td {
@@ -766,31 +823,37 @@ const multiplierColumns = computed(() => {
   background: rgba(255, 255, 255, 0.06);
 }
 
-.ability-tooltip {
-  display: none;
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  max-width: 320px;
+.ability-hover-tooltip {
+  position: fixed;
+  z-index: 2200;
+  width: min(320px, calc(100vw - 24px));
   padding: 10px 12px;
   border-radius: 10px;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-lg);
+  color: var(--text-secondary);
+  line-height: 1.45;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 14px));
+}
+
+.ability-hover-tooltip.is-below {
+  transform: translate(-50%, 14px);
+}
+
+.ability-hover-tooltip-title {
+  margin-bottom: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ability-hover-tooltip-desc {
   font-size: 0.82rem;
   font-weight: 400;
   color: var(--text-secondary);
-  line-height: 1.45;
   white-space: normal;
-  z-index: 50;
-  pointer-events: none;
-}
-
-.ability-chip:hover .ability-tooltip {
-  display: block;
-  animation: fadeIn 0.12s ease;
 }
 
 .ability-placeholder {
