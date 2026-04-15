@@ -635,11 +635,33 @@ const multiplierColumns = computed(() => {
 }
 
 .quick-table th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--text-muted);
   background: rgba(255, 255, 255, 0.03);
   white-space: nowrap;
+}
+
+.quick-table th:first-child,
+.quick-table td:first-child {
+  position: sticky;
+  left: 0;
+}
+
+.quick-table th:first-child {
+  z-index: 30;
+}
+
+.quick-table td:first-child {
+  z-index: 10;
+  background: var(--bg-card);
+}
+
+.quick-table tbody tr.pinned td:first-child {
+  background: rgba(255, 196, 0, 0.05);
 }
 
 .quick-table tbody tr:last-child td {
@@ -710,7 +732,6 @@ const multiplierColumns = computed(() => {
 
 /* Ability chips - similar to Pokemon detail page, but constrained to max 3 lines to save space */
 .ability-cell {
-  min-width: 180px;
   color: var(--text-primary);
   font-weight: 600;
   position: relative;
@@ -734,6 +755,7 @@ const multiplierColumns = computed(() => {
   border-radius: 10px;
   font-size: 0.78rem;
   font-weight: 600;
+  white-space: nowrap;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   color: var(--text-primary);
