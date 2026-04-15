@@ -6,7 +6,7 @@ import { typeRosterApi } from '../api/typeRoster'
 import { getPokemonImageUrl } from '../utils/pokemonImage'
 import { comparePokemonByFormId } from '../utils/pokemonSort'
 import { typeBadgeClasses } from '../utils/pokemonTypesDisplay'
-import { localizedName } from '../utils/localizedName'
+import { localizedName, localizedDescription } from '../utils/localizedName'
 import { useLocalePath } from '../composables/useLocalePath'
 import { ALL_TYPES, getDefenseMultipliers } from '../composables/useTeamStore'
 
@@ -233,16 +233,20 @@ function buildAbilityVariants(pokemon) {
     const signature = matchupSignature(adjusted)
     if (!groups.has(signature)) {
       groups.set(signature, {
+        abilityObjs: [],
         abilityNames: [],
         matchupMap: adjusted,
         grouped: groupedMatchups(adjusted),
       })
     }
-    groups.get(signature).abilityNames.push(abilityDisplayName(ability))
+    const group = groups.get(signature)
+    group.abilityObjs.push(ability)
+    group.abilityNames.push(abilityDisplayName(ability))
   }
 
   return [...groups.values()].map((entry) => ({
     abilityLabel: entry.abilityNames.join(' / '),
+    abilityObjs: entry.abilityObjs,
     matchupMap: entry.matchupMap,
     grouped: entry.grouped,
   }))
@@ -255,6 +259,7 @@ const rows = computed(() =>
       isPinned: isPinned(pokemon.apiName),
       rowKey: `${pokemon.apiName}-${index}-${variant.abilityLabel}`,
       abilityLabel: variant.abilityLabel,
+      abilityObjs: variant.abilityObjs || [],
       grouped: variant.grouped,
     })),
   ),
@@ -362,7 +367,23 @@ const multiplierColumns = computed(() => {
                   </button>
                 </div>
               </td>
-              <td class="ability-cell">{{ row.abilityLabel }}</td>
+
+              <td class="ability-cell">
+                <div class="ability-chips">
+                  <div
+                    v-for="(ab, idx) in row.abilityObjs"
+                    :key="(ab && (ab.name || ab.displayName || ab.chineseName)) ? (ab.name || ab.displayName || ab.chineseName) + '-' + idx : idx"
+                    class="ability-chip"
+                  >
+                    <span class="ability-name">{{ localizedName(ab) || ab.displayName || ab.name }}</span>
+                    <span v-if="localizedDescription(ab)" class="ability-tooltip">{{ localizedDescription(ab) }}</span>
+                  </div>
+                  <template v-if="!row.abilityObjs.length">
+                    <span class="ability-placeholder">{{ t('quickLookup.noAbilityInfo') }}</span>
+                  </template>
+                </div>
+              </td>
+
               <td v-for="column in multiplierColumns" :key="column.key">
                 <div v-if="row.grouped[column.key]?.length" class="matchup-list">
                   <span
@@ -687,9 +708,71 @@ const multiplierColumns = computed(() => {
   background: rgba(72, 54, 0, 0.95);
 }
 
+/* Ability chips - similar to Pokemon detail page, but constrained to max 3 lines to save space */
 .ability-cell {
   min-width: 180px;
   color: var(--text-primary);
+  font-weight: 600;
+  position: relative;
+  max-height: 120px; /* ~3 rows of chips */
+  overflow: hidden;
+}
+
+.ability-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.ability-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  cursor: default;
+}
+
+.ability-chip:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ability-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 320px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  white-space: normal;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.ability-chip:hover .ability-tooltip {
+  display: block;
+  animation: fadeIn 0.12s ease;
+}
+
+.ability-placeholder {
+  color: var(--text-muted);
   font-weight: 600;
 }
 
